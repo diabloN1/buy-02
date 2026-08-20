@@ -14,26 +14,42 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Backend Build') {
             steps {
                 script {
+                    def builds = [:]
+
                     services.each { service ->
-                        dir("backend/${service}") {
-                            sh './mvnw package -DskipTests'
+                        def currentService = service
+
+                        builds[currentService] = {
+                            dir("backend/${currentService}") {
+                                sh './mvnw package -DskipTests'
+                            }
                         }
                     }
+
+                    parallel builds
                 }
             }
         }
 
-        stage('Unit Tests') {
+        stage('Backend Unit Tests') {
             steps {
                 script {
+                    def tests = [:]
+
                     services.each { service ->
-                        dir("backend/${service}") {
-                            sh './mvnw test'
+                        def currentService = service
+
+                        tests[currentService] = {
+                            dir("backend/${currentService}") {
+                                sh './mvnw test'
+                            }
                         }
                     }
+
+                    parallel tests
                 }
             }
         }

@@ -1,3 +1,9 @@
+def services = [
+    'media-service',
+    'user-service',
+    'product-service'
+]
+
 pipeline {
     agent any
 
@@ -8,25 +14,23 @@ pipeline {
             }
         }
 
+        stage('Build') {
+            steps {
+                script {
+                    services.each { service ->
+                        dir("backend/${service}") {
+                            sh './mvnw package -DskipTests'
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Unit Tests') {
-            parallel {
-                stage('media-service') {
-                    steps {
-                        dir('backend/media-service') {
-                            sh './mvnw test'
-                        }
-                    }
-                }
-                stage('user-service') {
-                    steps {
-                        dir('backend/user-service') {
-                            sh './mvnw test'
-                        }
-                    }
-                }
-                stage('product-service') {
-                    steps {
-                        dir('backend/product-service') {
+            steps {
+                script {
+                    services.each { service ->
+                        dir("backend/${service}") {
                             sh './mvnw test'
                         }
                     }

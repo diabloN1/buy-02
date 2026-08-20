@@ -172,7 +172,7 @@ public class MediaServiceImplTest {
         @DisplayName("Should reject non-image file made to .png")
         void upload_nonImageFile_ShouldThrowBadRequestException() throws IOException {
             // given
-            MultipartFile file = loadTestFile("script-to-png.png", "text/plain");
+            MultipartFile file = loadTestFile("valid.png", "text/plain");
 
             // when / then
             assertThatThrownBy(() -> mediaService.upload(file, productId))

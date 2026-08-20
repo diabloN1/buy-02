@@ -282,8 +282,8 @@ public class MediaServiceImplTest {
                 .setAuthentication(authentication);
     }
 
-    @Test
-    void failTest() {
-        assertEquals(1, 2);
-    }
+//     @Test
+//     void failTest_forJenkinsTesting() {
+//         assertEquals(1, 2);
+//     }
 }

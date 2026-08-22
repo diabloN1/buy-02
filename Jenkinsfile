@@ -7,6 +7,18 @@ def services = [
 pipeline {
     agent any
 
+    environment {
+        JWT_SECRET= credentials('JWT_SECRET')
+        GATEWAY_KEYSTORE_PASSWORD= credentials('GATEWAY_KEYSTORE_PASSWORD')
+        MINIO_ROOT_USER= credentials('MINIO_ROOT_USER')
+        MINIO_ROOT_PASSWORD= credentials('MINIO_ROOT_PASSWORD')
+        MONGO_ROOT_USERNAME= credentials('MONGO_ROOT_USERNAME')
+        MONGO_ROOT_PASSWORD= credentials('MONGO_ROOT_PASSWORD')
+        ADMIN_NAME= credentials('ADMIN_NAME')
+        ADMIN_EMAIL= credentials('ADMIN_EMAIL')
+        ADMIN_PASSWORD= credentials('ADMIN_PASSWORD')
+    }
+
     stages {
         stage('Checkout') {
             steps {

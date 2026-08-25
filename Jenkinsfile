@@ -68,7 +68,18 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker compose up -d --build'
+                withCredentials([
+                    file(
+                        credentialsId: 'GATEWAY_KEYSTORE',
+                        variable: 'KEYSTORE_FILE'
+                    )
+                ]) {
+                    sh '''
+                        cp "$KEYSTORE_FILE" backend/api-gateway/src/main/resources/gateway-keystore.p12
+
+                        docker compose up -d --build
+                    '''
+                }
             }
         }
     }

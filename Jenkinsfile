@@ -1,7 +1,9 @@
 def services = [
     'media-service',
     'user-service',
-    'product-service'
+    'product-service',
+    'api-gateway',
+    'eureka'
 ]
 
 pipeline {
@@ -46,7 +48,7 @@ pipeline {
             }
         }
 
-        stage('Backend Unit Tests') {
+        stage('Backend Tests') {
             steps {
                 script {
                     def tests = [:]

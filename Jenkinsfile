@@ -85,5 +85,15 @@ pipeline {
                 }
             }
         }
+
+        stage('Deployment Verification') {
+            steps {
+                sh '''
+                    sleep 20
+                    curl --insecure --fail https://localhost:8080/actuator/health
+                '''
+            }
+        }
+
     }
 }

@@ -88,10 +88,21 @@ pipeline {
 
         stage('Deployment Verification') {
             steps {
-                sh '''
-                    sleep 20
-                    curl --insecure --fail https://localhost:8080/actuator/health
-                '''
+                script {
+                    retry(6) {
+                        def status = sh(
+                            script: "docker inspect --format='{{.State.Health.Status}}' mr-jenk-pipeline-api-gateway-1",
+                            returnStdout: true
+                        ).trim()
+
+                        echo "API Gateway health: ${status}"
+
+                        if (status != 'healthy') {
+                            sleep 5
+                            error("Retrying now")
+                        }
+                    }
+                }
             }
         }
 

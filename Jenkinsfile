@@ -65,18 +65,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Check Permissions') {
-            steps {
-                sh '''
-                    whoami
-                    ls -ld backend/api-gateway
-                    ls -ld backend/api-gateway/src
-                    ls -ld backend/api-gateway/src/main
-                    ls -ld backend/api-gateway/src/main/resources
-                '''
-            }
-        }
         
         stage('Deploy') {
             steps {
@@ -87,6 +75,7 @@ pipeline {
                     )
                 ]) {
                     sh '''
+                        rm -f backend/api-gateway/src/main/resources/gateway-keystore.p12
                         cp "$KEYSTORE_FILE" backend/api-gateway/src/main/resources/gateway-keystore.p12
 
                         docker compose up -d --build

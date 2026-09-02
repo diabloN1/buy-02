@@ -249,11 +249,6 @@ class ProductServiceImplTest {
             // given
             when(productRepo.save(any(Product.class)))
                     .thenReturn(product);
-            
-            when(productMediaService.uploadImages(
-                    any(),
-                    eq(PRODUCT_ID)))
-                    .thenReturn(List.of());
 
             // when
             ProductResponse result =

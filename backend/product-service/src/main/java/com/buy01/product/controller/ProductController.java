@@ -46,7 +46,7 @@ public class ProductController {
         return productService.getProductsByUser(userId, pageable);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
+    @PreAuthorize("hasRole('SELLER')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ProductResponse create(
             @RequestPart("product") @Valid CreateRequest request,
@@ -54,7 +54,7 @@ public class ProductController {
         return productService.createProduct(request, images);
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
+    @PreAuthorize("hasRole('SELLER')")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ProductResponse updateProduct(
             @PathVariable String id,

@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Auditable(action = AuditAction.CREATED, entityId = "#id")
+    @Auditable(action = AuditAction.CREATED, entityId = "#result.id")
     public UserResponse createUser(CreateUserRequest userReq) {
         log.info("Attempting to create user with email: {}", userReq.getEmail());
         if (userRepo.existsByEmail(userReq.getEmail())) {

@@ -111,7 +111,11 @@ public class MediaServiceImpl implements MediaService {
 
                 verifyOwnership(media);
 
-                deleteObject(media);
+                s3Client.deleteObject(
+                                DeleteObjectRequest.builder()
+                                                .bucket(bucket)
+                                                .key(media.getPath())
+                                                .build());
 
                 mediaRepository.delete(media);
 
@@ -212,14 +216,6 @@ public class MediaServiceImpl implements MediaService {
         private Media getMediaOrThrow(String id) {
                 return mediaRepository.findById(id)
                                 .orElseThrow(() -> new NotFoundException("Image not found"));
-        }
-
-        private void deleteObject(Media media) {
-                s3Client.deleteObject(
-                                DeleteObjectRequest.builder()
-                                                .bucket(bucket)
-                                                .key(media.getPath())
-                                                .build());
         }
 
         private void notifyRelatedService(Media media) {

@@ -27,7 +27,7 @@ public class MediaController {
         private final MediaService mediaService;
 
         @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-        @PreAuthorize("isAuthenticated() and (#productId == null or hasAnyRole('SELLER', 'ADMIN'))")
+        @PreAuthorize("isAuthenticated() and (#productId == null or hasAnyRole('SELLER'))")
         public ResponseEntity<Media> upload(
                         @RequestPart("image") MultipartFile image,
                         @RequestParam(required = false) String productId) throws IOException {
@@ -64,7 +64,7 @@ public class MediaController {
         }
 
         @GetMapping("/count")
-        @PreAuthorize("hasRole('SELLER') or hasRole('ADMIN')")
+        @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<Long> countMedia() {
                 return ResponseEntity.ok(mediaService.countMedia());
         }

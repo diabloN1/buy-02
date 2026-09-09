@@ -28,7 +28,7 @@ public class JwtService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    private static final long ACCESS_TOKEN_EXPIRATION = Duration.ofMinutes(1).toMillis();
+    private static final long ACCESS_TOKEN_EXPIRATION = Duration.ofMinutes(15).toMillis();
 
     private static final long REFRESH_TOKEN_EXPIRATION_DAYS = 30;
 

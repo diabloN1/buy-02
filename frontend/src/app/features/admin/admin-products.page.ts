@@ -84,14 +84,6 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
                   <mat-icon>visibility</mat-icon>
                 </a>
 
-                <a
-                  mat-icon-button
-                  [routerLink]="['/seller/products', p.id, 'edit']"
-                  aria-label="Edit"
-                >
-                  <mat-icon>edit</mat-icon>
-                </a>
-
                 <button
                   mat-icon-button
                   color="warn"

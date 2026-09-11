@@ -61,7 +61,7 @@ describe("ProfilePage", () => {
 
     component.save();
 
-    expect(profileSvcSpy.update).toHaveBeenCalledWith({ name: "New Name" });
+    expect(profileSvcSpy.update).toHaveBeenCalledWith({ name: "New Name", email: "user@example.com" });
     expect(notifySpy.success).toHaveBeenCalledWith("Profile saved");
     expect(component.saving()).toBeFalse();
   });

@@ -33,7 +33,7 @@ describe("AppComponent", () => {
       user: signal({ id: "1", role: "USER", name: "User", email: "user@test.com" })
     });
 
-    await TestBed.configureTestingModule({
+    TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
         provideHttpClient(),
@@ -43,7 +43,7 @@ describe("AppComponent", () => {
         { provide: AuthService, useValue: authServiceSpy },
         { provide: CurrentUserService, useValue: currentUserServiceSpy }
       ]
-    }).compileComponents();
+    });
 
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;

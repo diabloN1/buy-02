@@ -68,6 +68,22 @@ pipeline {
             }
         }
         
+        stage('Frontend Build') {
+            steps {
+                dir('frontend') {
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Frontend Tests') {
+            steps {
+                dir('frontend') {
+                    sh 'npm run test'
+                }
+            }
+        }
+
         stage('Deploy') {
             steps {
                 withCredentials([

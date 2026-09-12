@@ -67,19 +67,26 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Frontend CI') {
             agent {
                 docker {
-                    image 'node:20-alpine'
+                    image 'frontend-agent:1.0'
                 }
             }
 
             stages {
-                stage('Build') {
+                stage('Install') {
                     steps {
                         dir('frontend') {
                             sh 'npm ci'
+                        }
+                    }
+                }
+
+                stage('Build') {
+                    steps {
+                        dir('frontend') {
                             sh 'npm run build'
                         }
                     }
@@ -88,12 +95,13 @@ pipeline {
                 stage('Test') {
                     steps {
                         dir('frontend') {
-                            sh 'npm test'
+                            sh 'npm test -- --watch=false'
                         }
                     }
                 }
             }
         }
+
         stage('Deploy') {
             steps {
                 withCredentials([

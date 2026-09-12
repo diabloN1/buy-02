@@ -147,18 +147,40 @@ pipeline {
 
     post {
         success {
-            mail(
-                to: 'amine.yacoubi.med@gmail.com',
-                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Build succeeded. View: ${env.BUILD_URL}"
-            )
+            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                mail(
+                    to: env.NOTIFICATION_EMAIL,
+                    subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — SUCCESS",
+                    body: """
+                            Build completed successfully.
+
+                            Job: ${env.JOB_NAME}
+                            Build: #${env.BUILD_NUMBER}
+                            Status: SUCCESS
+
+                            The application was built, tested, and deployed successfully.
+                        """.stripIndent()
+                )
+            }
         }
+
         failure {
-            mail(
-                to: 'amine.yacoubi.med@gmail.com',
-                subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Build failed. Console: ${env.BUILD_URL}console"
-            )
+            catchError(buildResult: 'FAILURE', stageResult: 'UNSTABLE') {
+                mail(
+                    to: env.NOTIFICATION_EMAIL,
+                    subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — FAILURE",
+                    body: """
+                            Build failed.
+
+                            Job: ${env.JOB_NAME}
+                            Build: #${env.BUILD_NUMBER}
+                            Status: FAILURE
+
+                            Review the Jenkins console output for details:
+                            ${env.BUILD_URL}console
+                        """.stripIndent()
+                )
+            }
         }
     }
 }

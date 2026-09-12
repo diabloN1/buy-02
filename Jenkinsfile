@@ -10,6 +10,8 @@ pipeline {
     agent any
 
     environment {
+        NOTIFICATION_EMAIL = "amine.yacoubi.med@gmail.com"
+
         JWT_SECRET= credentials('JWT_SECRET')
         GATEWAY_KEYSTORE_PASSWORD= credentials('GATEWAY_KEYSTORE_PASSWORD')
         MINIO_ROOT_USER= credentials('MINIO_ROOT_USER')
@@ -175,9 +177,6 @@ pipeline {
                             Job: ${env.JOB_NAME}
                             Build: #${env.BUILD_NUMBER}
                             Status: FAILURE
-
-                            Review the Jenkins console output for details:
-                            ${env.BUILD_URL}console
                         """.stripIndent()
                 )
             }

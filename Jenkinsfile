@@ -28,42 +28,52 @@ pipeline {
             }
         }
 
-        stage('Backend Build') {
-            steps {
-                script {
-                    def builds = [:]
-
-                    services.each { service ->
-                        def currentService = service
-
-                        builds[currentService] = {
-                            dir("backend/${currentService}") {
-                                sh './mvnw package -DskipTests'
-                            }
-                        }
-                    }
-
-                    parallel builds
+        stage('Backend CI') {
+            agent {
+                docker {
+                    image 'backend-agent:1.0'
                 }
             }
-        }
 
-        stage('Backend Tests') {
-            steps {
-                script {
-                    def tests = [:]
+            stages {
+                stage('Build') {
+                    steps {
+                        script {
+                            def builds = [:]
 
-                    services.each { service ->
-                        def currentService = service
+                            services.each { service ->
+                                def currentService = service
 
-                        tests[currentService] = {
-                            dir("backend/${currentService}") {
-                                sh './mvnw test'
+                                builds[currentService] = {
+                                    dir("backend/${currentService}") {
+                                        sh './mvnw package -DskipTests'
+                                    }
+                                }
                             }
+
+                            parallel builds
                         }
                     }
+                }
 
-                    parallel tests
+                stage('Tests') {
+                    steps {
+                        script {
+                            def tests = [:]
+
+                            services.each { service ->
+                                def currentService = service
+
+                                tests[currentService] = {
+                                    dir("backend/${currentService}") {
+                                        sh './mvnw test'
+                                    }
+                                }
+                            }
+
+                            parallel tests
+                        }
+                    }
                 }
             }
         }

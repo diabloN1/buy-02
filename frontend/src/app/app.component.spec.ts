@@ -36,8 +36,6 @@ describe("AppComponent", () => {
     TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
         provideRouter([]),
         { provide: ThemeService, useValue: themeServiceSpy },
         { provide: AuthService, useValue: authServiceSpy },

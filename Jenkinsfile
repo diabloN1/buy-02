@@ -78,18 +78,21 @@ pipeline {
             stages {
                 stage('Build') {
                     steps {
-                        sh 'npm run build'
+                        dir('frontend') {
+                            sh 'npm run build'
+                        }
                     }
                 }
 
                 stage('Test') {
                     steps {
-                        sh 'npm test'
+                        dir('frontend') {
+                            sh 'npm test'
+                        }
                     }
                 }
             }
         }
-        
         stage('Deploy') {
             steps {
                 withCredentials([

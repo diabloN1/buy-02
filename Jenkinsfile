@@ -56,7 +56,7 @@ pipeline {
                     }
                 }
 
-                stage('Tests') {
+                stage('Test') {
                     steps {
                         script {
                             def tests = [:]
@@ -87,17 +87,10 @@ pipeline {
             }
 
             stages {
-                stage('Install') {
-                    steps {
-                        dir('frontend') {
-                            sh 'npm ci'
-                        }
-                    }
-                }
-
                 stage('Build') {
                     steps {
                         dir('frontend') {
+                            sh 'npm ci'
                             sh 'npm run build'
                         }
                     }

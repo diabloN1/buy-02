@@ -72,6 +72,7 @@ pipeline {
             agent {
                 docker {
                     image 'frontend-agent:1.0'
+                    privileged true
                 }
             }
 

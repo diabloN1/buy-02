@@ -3,13 +3,15 @@ def services = [
     'user-service',
     'product-service',
     'api-gateway',
-    'eureka'
+    'eureka',
+    // 'audit-service'
 ]
 
 pipeline {
     agent any
 
     environment {
+        IMAGE_TAG = "1.0.${BUILD_NUMBER}"
         NOTIFICATION_EMAIL = "amine.yacoubi.med@gmail.com"
 
         JWT_SECRET= credentials('JWT_SECRET')
@@ -24,6 +26,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -38,6 +41,7 @@ pipeline {
             }
 
             stages {
+
                 stage('Build') {
                     steps {
                         script {
@@ -89,6 +93,7 @@ pipeline {
             }
 
             stages {
+
                 stage('Build') {
                     steps {
                         dir('frontend') {
@@ -118,9 +123,11 @@ pipeline {
                 ]) {
                     sh '''
                         rm -f backend/api-gateway/src/main/resources/gateway-keystore.p12
-                        cp "$KEYSTORE_FILE" backend/api-gateway/src/main/resources/gateway-keystore.p12
 
-                        docker compose up -d --build
+                        cp "$KEYSTORE_FILE" \
+                        backend/api-gateway/src/main/resources/gateway-keystore.p12
+
+                        docker compose up -f docker-compose.jenkins.yml -d --build
                     '''
                 }
             }
@@ -129,18 +136,53 @@ pipeline {
         stage('Deployment Verification') {
             steps {
                 script {
-                    retry(6) {
-                        def status = sh(
-                            script: "docker inspect --format='{{.State.Health.Status}}' mr-jenk-pipeline-api-gateway-1",
-                            returnStdout: true
-                        ).trim()
+                    try {
 
-                        echo "API Gateway health: ${status}"
+                        retry(6) {
 
-                        if (status != 'healthy') {
-                            sleep 5
-                            error("Retrying now")
+                            def status = sh(
+                                script: "docker inspect --format='{{.State.Health.Status}}' mr-jenk-pipeline-api-gateway-1",
+                                returnStdout: true
+                            ).trim()
+
+                            if (status != 'healthy') {
+                                sleep 5
+                                error("API Gateway is not healthy")
+                            }
                         }
+
+                        echo "Deployment ${env.IMAGE_TAG} is healthy."
+
+                    } catch (Exception e) {
+
+                        echo "Deployment verification failed."
+                        echo "Starting rollback..."
+
+                        def previousBuild = currentBuild.previousSuccessfulBuild
+
+                        if (previousBuild == null) {
+                            error(
+                                "No previous successful deployment exists. " +
+                                "Rollback cannot be performed."
+                            )
+                        }
+
+                        def previousVersion = "1.0.${previousBuild.number}"
+
+                        sh """
+                            export IMAGE_TAG=${previousVersion}
+
+                            echo "Rolling back to version: \$IMAGE_TAG"
+
+                            docker compose up -d --no-build
+                        """
+
+                        echo "Rollback to ${previousVersion} completed."
+
+                        error(
+                            "Deployment ${env.IMAGE_TAG} failed. " +
+                            "Application rolled back to ${previousVersion}."
+                        )
                     }
                 }
             }
@@ -148,6 +190,7 @@ pipeline {
     }
 
     post {
+
         success {
             catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                 mail(
@@ -158,6 +201,7 @@ pipeline {
 
                             Job: ${env.JOB_NAME}
                             Build: #${env.BUILD_NUMBER}
+                            Version: ${env.IMAGE_TAG}
                             Status: SUCCESS
 
                             The application was built, tested, and deployed successfully.
@@ -176,10 +220,12 @@ pipeline {
 
                             Job: ${env.JOB_NAME}
                             Build: #${env.BUILD_NUMBER}
+                            Version: ${env.IMAGE_TAG}
                             Status: FAILURE
                         """.stripIndent()
                 )
             }
         }
     }
+
 }

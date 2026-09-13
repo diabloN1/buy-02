@@ -127,7 +127,7 @@ pipeline {
                         cp "$KEYSTORE_FILE" \
                         backend/api-gateway/src/main/resources/gateway-keystore.p12
 
-                        docker compose up -f docker-compose.jenkins.yml -d --build
+                        docker compose -f docker-compose.jenkins.yml up -d --build
                     '''
                 }
             }

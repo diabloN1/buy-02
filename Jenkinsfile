@@ -137,6 +137,7 @@ pipeline {
             steps {
                 script {
                     try {
+                        error("TEST: forcing rollback")
 
                         retry(6) {
 

@@ -174,7 +174,7 @@ pipeline {
 
                             echo "Rolling back to version: \$IMAGE_TAG"
 
-                            docker compose up -d --no-build
+                            docker compose -f docker-compose.jenkins.yml up -d --no-build
                         """
 
                         echo "Rollback to ${previousVersion} completed."

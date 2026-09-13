@@ -137,8 +137,6 @@ pipeline {
             steps {
                 script {
                     try {
-                        error("TEST: forcing rollback")
-
                         retry(6) {
 
                             def status = sh(

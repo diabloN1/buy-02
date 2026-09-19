@@ -3,11 +3,15 @@ package com.buy01.audit.service;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import com.buy01.audit.entity.CartAudit;
 import com.buy01.audit.entity.MediaAudit;
+import com.buy01.audit.entity.OrderAudit;
 import com.buy01.audit.entity.ProductAudit;
 import com.buy01.audit.entity.UserAudit;
 import com.buy01.audit.event.AuditEvent;
+import com.buy01.audit.repository.CartAuditRepo;
 import com.buy01.audit.repository.MediaAuditRepo;
+import com.buy01.audit.repository.OrderAuditRepo;
 import com.buy01.audit.repository.ProductAuditRepo;
 import com.buy01.audit.repository.UserAuditRepo;
 
@@ -20,6 +24,8 @@ public class AuditService {
     private final MediaAuditRepo mediaRepo;
     private final ProductAuditRepo productRepo;
     private final UserAuditRepo userRepo;
+    private final CartAuditRepo cartRepo;
+    private final OrderAuditRepo orderRepo;
 
     @KafkaListener(topics = "audit-events", groupId = "audit-service")
     public void consume(AuditEvent event) {
@@ -62,6 +68,32 @@ public class AuditService {
                         .build();
 
                 mediaRepo.save(mediaAudit);
+                break;
+                
+            case CART:
+                CartAudit cartAudit = CartAudit
+                        .builder()
+                        .cartId(event.entityId())
+                        .executorId(event.executorId())
+                        .action(event.action())
+                        .isAdmin(event.isAdmin())
+                        .timestamp(event.timestamp())
+                        .build();
+
+                cartRepo.save(cartAudit);
+                break;
+                
+            case ORDER:
+                OrderAudit orderAudit = OrderAudit
+                        .builder()
+                        .orderId(event.entityId())
+                        .executorId(event.executorId())
+                        .action(event.action())
+                        .isAdmin(event.isAdmin())
+                        .timestamp(event.timestamp())
+                        .build();
+
+                orderRepo.save(orderAudit);
                 break;
         }
     }

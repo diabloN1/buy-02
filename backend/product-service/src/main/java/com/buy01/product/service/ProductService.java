@@ -17,6 +17,8 @@ public interface ProductService {
 
     ProductResponse getProductById(String id);
 
+    List<ProductResponse> getProductsByIds(List<String> productIds);
+
     Page<ProductResponse> getProductsByUser(String userId, Pageable pageable);
 
     ProductResponse updateProduct(

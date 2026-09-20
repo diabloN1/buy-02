@@ -31,17 +31,6 @@ services:
 
     volumes:
       - kafka-data:/var/lib/kafka/data
-      
-  # kafka-ui:
-  #   image: provectuslabs/kafka-ui:latest
-  #   ports:
-  #     - "8085:8080"
-  #   environment:
-  #     KAFKA_CLUSTERS_0_NAME: local
-  #     KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
-  #   depends_on:
-  #     kafka:
-  #       condition: service_healthy
 
   eureka:
     build: ./backend/eureka
@@ -182,6 +171,36 @@ services:
       timeout: 3s
       retries: 20
 
+  cart:
+    build: ./backend/cart-service
+
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "-",
+          "http://localhost:8085/actuator/health",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
   api-gateway:
 
     build: ./backend/api-gateway
@@ -226,22 +245,6 @@ services:
     volumes:
       - mongo-data:/data/db
 
-  # mongo-express:
-  #   image: mongo-express:latest
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - mongodb
-  #   ports:
-  #     - "8081:8081"
-  #   environment:
-  #     ME_CONFIG_MONGODB_SERVER: mongodb
-  #     ME_CONFIG_MONGODB_PORT: 27017
-  #     ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME}
-  #     ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD}
-
-  #     ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_ROOT_USERNAME}
-  #     ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_ROOT_PASSWORD}
-
   minio:
     image: minio/minio
 
@@ -262,6 +265,33 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+
+  # kafka-ui:
+  #   image: provectuslabs/kafka-ui:latest
+  #   ports:
+  #     - "8085:8080"
+  #   environment:
+  #     KAFKA_CLUSTERS_0_NAME: local
+  #     KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+  #   depends_on:
+  #     kafka:
+  #       condition: service_healthy
+
+  # mongo-express:
+  #   image: mongo-express:latest
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - mongodb
+  #   ports:
+  #     - "8081:8081"
+  #   environment:
+  #     ME_CONFIG_MONGODB_SERVER: mongodb
+  #     ME_CONFIG_MONGODB_PORT: 27017
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USERNAME}
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD}
+
+  #     ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_ROOT_USERNAME}
+  #     ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_ROOT_PASSWORD}
 
 volumes:
   mongo-data:

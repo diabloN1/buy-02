@@ -49,6 +49,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductResponse> getProductsByIds(List<String> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            return List.of();
+        }
+
+        return productRepository.findAllById(productIds)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
     public Page<ProductResponse> getProductsByUser(String userId, Pageable pageable) {
         return productRepository.findByUserId(userId, pageable).map(this::mapToResponse);
     }

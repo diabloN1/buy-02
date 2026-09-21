@@ -19,6 +19,8 @@ import { UserService } from "@core/services/user.service";
 import { UserWidget } from "@core/models/user.model";
 import { CurrentUserService } from "@core/services/current-user.service";
 import { ImagePreviewComponent } from "@shared/components/image-preview.component";
+import { NotificationService } from "@core/services/notification.service";
+import { CartService } from "@core/services/cart.service";
 
 @Component({
   selector: "app-product-details",
@@ -91,21 +93,66 @@ import { ImagePreviewComponent } from "@shared/components/image-preview.componen
             }
             <p class="description">{{ p.description }}</p>
             <div class="stock-tag">
-              <mat-icon
-                style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px;"
-                >inventory_2</mat-icon
-              >
-              In stock: {{ p.quantity }}
+              @if (p.quantity != 0) {
+                <mat-icon
+                  style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px;"
+                  >inventory_2</mat-icon
+                >
+                In stock: {{ p.quantity }}
+              } @else {
+                <span class="out-of-stock">
+                  <mat-icon>outlined_flag</mat-icon>
+                  Out of stock
+                </span>
+              }
             </div>
-            @if (ownedByMe()) {
-              <div class="actions">
+
+              @if (ableToBuy()) {
+                <div class="quantity-selector">
+                  <label>Quantity:</label>
+                  <div class="quantity-stepper">
+                    <button
+                      mat-icon-button
+                      (click)="quantity.set(quantity() - 1)"
+                      [disabled]="quantity() <= 1"
+                      aria-label="Decrease quantity"
+                    >
+                      <mat-icon>remove</mat-icon>
+                    </button>
+                    <span class="quantity-value">{{ quantity() }}</span>
+                    <button
+                      mat-icon-button
+                      (click)="quantity.set(quantity() + 1)"
+                      [disabled]="quantity() >= (p.quantity || 1)"
+                      aria-label="Increase quantity"
+                    >
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              } 
+            <div class="actions">
+              @if (ownedByMe()) {
                 <a
                   mat-stroked-button
                   [routerLink]="['/seller/products', p.id, 'edit']"
                   ><mat-icon>edit</mat-icon> Edit product</a
                 >
-              </div>
-            }
+              }
+
+              @if (!this.currentUser.user()) {
+                <span>Want to buy ?</span>
+                <a mat-stroked-button routerLink="/login" class="connect-btn">
+                  <mat-icon>login</mat-icon> Create account!
+                </a>
+              }
+              
+              @if (ableToBuy()) {
+                <a mat-flat-button color="primary" (click)="addToCart()">
+                  <mat-icon>add_shopping_cart</mat-icon> Add to cart
+                </a>
+              }
+            </div>
           </div>
         </div>
         <app-image-preview
@@ -219,6 +266,93 @@ import { ImagePreviewComponent } from "@shared/components/image-preview.componen
       }
       .actions {
         margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .actions a {
+        margin: 0;
+      }
+
+      .quantity-stepper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--app-fg);
+      }
+
+      .quantity-stepper mat-icon {
+        width: 20px;
+        height: 20px;
+        color: var(--app-muted);
+      }
+
+      .quantity-value {
+        min-width: 24px;
+        text-align: center;
+        font-size: 16px;
+      }
+
+      .quantity-selector {
+        margin: 16px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--app-fg);
+      }
+
+      .quantity-selector label {
+        min-width: 60px;
+      }
+
+      .quantity-input {
+        width: 60px;
+        padding: 8px 12px;
+        border: 2px solid var(--app-border);
+        border-radius: var(--app-radius-sm);
+        background: var(--app-surface);
+        color: var(--app-fg);
+        font-size: 16px;
+        text-align: center;
+        transition: border-color 0.25s ease;
+      }
+
+      .quantity-input:focus {
+        outline: none;
+        border-color: var(--app-primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+      }
+
+      .quantity-input::-webkit-outer-spin-button,
+      .quantity-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      .quantity-input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      .add-to-cart-btn:hover {
+        filter: brightness(1.08);
+      }
+      .connect-btn {
+        border-color: var(--app-primary);
+        color: var(--app-primary);
+      }
+      .connect-btn:hover {
+        background-color: var(--app-primary);
+        color: var(--app-primary-contrast, #fff);
+      }
+      .out-of-stock {
+        color: var(--app-muted);
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
       }
       .seller {
         display: flex;
@@ -262,7 +396,10 @@ export class ProductDetailsPage {
   private readonly route = inject(ActivatedRoute);
   private readonly svc = inject(ProductService);
   private readonly userService = inject(UserService);
+  private readonly cartService = inject(CartService);
+  private readonly toast = inject(NotificationService);
   readonly currentUser = inject(CurrentUserService);
+
   readonly previewOpen = signal(false);
 
   private readonly product$ = this.route.paramMap.pipe(
@@ -282,6 +419,7 @@ export class ProductDetailsPage {
   );
 
   readonly active = signal(0);
+  readonly quantity = signal(1);
 
   readonly activeImage = computed(
     () => this.product()?.images?.[this.active()]?.url ?? null,
@@ -293,4 +431,27 @@ export class ProductDetailsPage {
 
     return !!p && !!u && p.userId === u.id;
   });
+
+  readonly ableToBuy = computed(() => {
+    return !this.ownedByMe() && this.currentUser.user()?.id && this.product()?.quantity;
+  });
+
+  addToCart() {
+    const p = this.product();
+    if (!p || !p.quantity) return;
+    this.cartService
+      .addToCart({
+        productId: p.id,
+        quantity: this.quantity(),
+      })
+      .subscribe({
+        next: () => {
+          this.toast.success("Product added! go to cart for checkout");
+        },
+        error: (err) => {
+          console.error(err);
+          this.toast.success("An error has aquired! please try again later!");
+        },
+      });
+  }
 }

@@ -36,6 +36,15 @@ public class CartController {
     }
 
     @PreAuthorize("isAuthenticated()")
+    @GetMapping("/items/{productId}")
+    public Integer getItemQuantity(
+            @PathVariable String productId, 
+            @AuthenticationPrincipal Jwt jwt) {
+        String userId = jwt.getSubject();
+        return cartService.getItemQuantity(userId, productId);
+    }
+
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<CartResponse> addToCart(
             @RequestBody @Valid AddToCartRequest request,

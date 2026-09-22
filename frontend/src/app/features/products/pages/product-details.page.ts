@@ -93,7 +93,7 @@ import { CartService } from "@core/services/cart.service";
             }
             <p class="description">{{ p.description }}</p>
             <div class="stock-tag">
-              @if (p.quantity != 0) {
+              @if (p.quantity > 0) {
                 <mat-icon
                   style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px;"
                   >inventory_2</mat-icon
@@ -107,30 +107,32 @@ import { CartService } from "@core/services/cart.service";
               }
             </div>
 
-              @if (ableToBuy()) {
-                <div class="quantity-selector">
-                  <label>Quantity:</label>
-                  <div class="quantity-stepper">
-                    <button
-                      mat-icon-button
-                      (click)="quantity.set(quantity() - 1)"
-                      [disabled]="quantity() <= 1"
-                      aria-label="Decrease quantity"
-                    >
-                      <mat-icon>remove</mat-icon>
-                    </button>
-                    <span class="quantity-value">{{ quantity() }}</span>
-                    <button
-                      mat-icon-button
-                      (click)="quantity.set(quantity() + 1)"
-                      [disabled]="quantity() >= (p.quantity || 1)"
-                      aria-label="Increase quantity"
-                    >
-                      <mat-icon>add</mat-icon>
-                    </button>
-                  </div>
+            @if (ableToBuy()) {
+              <div class="quantity-selector">
+                <label>Quantity:</label>
+                <div class="quantity-stepper">
+                  <button
+                    matMiniFab
+                    class="minifab"
+                    (click)="quantity.set(quantity() - 1)"
+                    [disabled]="quantity() <= 1"
+                    aria-label="Decrease quantity"
+                  >
+                    <mat-icon>remove</mat-icon>
+                  </button>
+                  <span class="quantity-value">{{ quantity() }}</span>
+                  <button
+                    matMiniFab
+                    class="minifab"
+                    (click)="quantity.set(quantity() + 1)"
+                    [disabled]="quantity() >= (p.quantity || 1)"
+                    aria-label="Increase quantity"
+                  >
+                    <mat-icon>add</mat-icon>
+                  </button>
                 </div>
-              } 
+              </div>
+            }
             <div class="actions">
               @if (ownedByMe()) {
                 <a
@@ -140,13 +142,13 @@ import { CartService } from "@core/services/cart.service";
                 >
               }
 
-              @if (!this.currentUser.user()) {
+              @if (!currentUser.user()) {
                 <span>Want to buy ?</span>
-                <a mat-stroked-button routerLink="/login" class="connect-btn">
+                <a mat-stroked-button routerLink="/auth/register" class="connect-btn">
                   <mat-icon>login</mat-icon> Create account!
                 </a>
               }
-              
+
               @if (ableToBuy()) {
                 <a mat-flat-button color="primary" (click)="addToCart()">
                   <mat-icon>add_shopping_cart</mat-icon> Add to cart
@@ -308,37 +310,6 @@ import { CartService } from "@core/services/cart.service";
         min-width: 60px;
       }
 
-      .quantity-input {
-        width: 60px;
-        padding: 8px 12px;
-        border: 2px solid var(--app-border);
-        border-radius: var(--app-radius-sm);
-        background: var(--app-surface);
-        color: var(--app-fg);
-        font-size: 16px;
-        text-align: center;
-        transition: border-color 0.25s ease;
-      }
-
-      .quantity-input:focus {
-        outline: none;
-        border-color: var(--app-primary);
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-      }
-
-      .quantity-input::-webkit-outer-spin-button,
-      .quantity-input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-
-      .quantity-input[type="number"] {
-        -moz-appearance: textfield;
-      }
-
-      .add-to-cart-btn:hover {
-        filter: brightness(1.08);
-      }
       .connect-btn {
         border-color: var(--app-primary);
         color: var(--app-primary);
@@ -389,6 +360,16 @@ import { CartService } from "@core/services/cart.service";
         font-size: 12px;
         color: var(--app-muted);
       }
+      
+      .minifab {
+        box-shadow: none;
+        color: var(--app-fg);
+        background-color: transparent;
+      }
+
+      .minifab:disabled {
+        visibility: hidden;
+      }
     `,
   ],
 })
@@ -433,7 +414,15 @@ export class ProductDetailsPage {
   });
 
   readonly ableToBuy = computed(() => {
-    return !this.ownedByMe() && this.currentUser.user()?.id && this.product()?.quantity;
+    const p = this.product();
+    const u = this.currentUser.user();
+    return (
+      !this.ownedByMe() &&
+      !!u &&
+      !!p &&
+      u.id &&
+      p.quantity > 0
+    );
   });
 
   addToCart() {
@@ -450,7 +439,7 @@ export class ProductDetailsPage {
         },
         error: (err) => {
           console.error(err);
-          this.toast.success("An error has aquired! please try again later!");
+          this.toast.error("An error has occurred! please try again later!");
         },
       });
   }

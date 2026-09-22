@@ -36,7 +36,7 @@ public class CartController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/items/{productId}")
+    @GetMapping("/items/{productId}/quantity")
     public Integer getItemQuantity(
             @PathVariable String productId, 
             @AuthenticationPrincipal Jwt jwt) {

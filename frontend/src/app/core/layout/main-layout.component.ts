@@ -87,6 +87,15 @@ import { CurrentUserService } from "@core/services/current-user.service";
         </mat-icon>
       </button>
 
+      <button
+        matMiniFab
+        class="theme desktop-theme"
+        routerLink="/cart"
+        [attr.aria-label]="'Toggle theme'"
+      >
+        <mat-icon>shopping_cart</mat-icon>
+      </button>
+
       @if (auth.isAuthenticated()) {
         <button
           mat-button
@@ -332,7 +341,6 @@ import { CurrentUserService } from "@core/services/current-user.service";
       }
 
       @media (max-width: 820px) {
-
         .nav {
           display: none;
         }

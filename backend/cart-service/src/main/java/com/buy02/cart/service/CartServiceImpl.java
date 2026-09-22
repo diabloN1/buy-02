@@ -45,16 +45,18 @@ public class CartServiceImpl implements CartService {
 
         Cart cart = resolveCartByUserId(userId);
 
-        // verify product exists
-        productClient.getProductById(request.productId());
+        ProductResponse product = productClient.getProductById(request.productId());
 
-        // verify if item already in cart
+        if (product.getQuantity() < request.quantity()) {
+            throw new BadRequestException("Product stock is bellow quantity wanted.");
+        }
+
         Optional<Item> existingItem = cart.getItems().stream()
                 .filter(item -> item.getProductId().equals(request.productId()))
                 .findFirst();
 
         if (existingItem.isPresent()) {
-            throw new BadRequestException("Product already in cart. Use update to change quantity.");
+            throw new BadRequestException("Product already in cart. Use update quantity.");
         }
 
         Item newItem = Item.builder()
@@ -78,11 +80,16 @@ public class CartServiceImpl implements CartService {
     public CartResponse updateItemQuantity(String productId, UpdateCartItemRequest request, String userId) {
 
         Cart cart = resolveCartByUserId(userId);
+        ProductResponse product = productClient.getProductById(productId);
 
         Item item = cart.getItems().stream()
                 .filter(i -> i.getProductId().equals(productId))
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Product " + productId + " not found in cart"));
+
+        if (product.getQuantity() < item.getQuantity() + request.quantity()) {
+            throw new BadRequestException("The wanted quantity is not available in stock");
+        }
 
         item.setQuantity(request.quantity());
 
@@ -114,6 +121,27 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
         log.info("Cart cleared for user {}", userId);
     }
+
+    @Override
+    public Integer getItemQuantity(String userId, String productId) {
+        Cart cart = resolveCartByUserId(userId);
+
+        if (cart.getItems() == null) {
+            return 0;
+        }
+
+        Item item = cart.getItems().stream()
+                .filter(i -> i.getProductId().equals(productId))
+                .findFirst()
+                .orElse(null);
+
+        if (item == null) {
+            return 0;
+        }
+
+        return item.getQuantity();
+    }
+
 
     private Cart resolveCartByUserId(String userId) {
         return cartRepository.findByUserId(userId)

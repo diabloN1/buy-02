@@ -8,6 +8,8 @@ public interface CartService {
 
     CartResponse getCart(String userId);
 
+    Integer getItemQuantity(String userId, String productId);
+
     CartResponse addToCart(AddToCartRequest request, String userId);
 
     CartResponse updateItemQuantity(String productId, UpdateCartItemRequest request, String userId);

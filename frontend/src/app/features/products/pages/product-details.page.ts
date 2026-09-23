@@ -194,6 +194,7 @@ import { CartService } from "@core/services/cart.service";
                       mat-stroked-button
                       color="primary"
                       (click)="updateCart()"
+                      [disabled]="quantity() == cartQuantity()"
                     >
                       <mat-icon>cached</mat-icon> Update quantity
                     </button>

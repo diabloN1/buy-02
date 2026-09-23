@@ -87,7 +87,7 @@ public class CartServiceImpl implements CartService {
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException("Product " + productId + " not found in cart"));
 
-        if (product.getQuantity() < item.getQuantity() + request.quantity()) {
+        if (product.getQuantity() < request.quantity()) {
             throw new BadRequestException("The wanted quantity is not available in stock");
         }
 

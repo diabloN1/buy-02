@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from "@angular/core";
@@ -107,30 +108,35 @@ import { CartService } from "@core/services/cart.service";
               }
             </div>
 
-            @if (ableToBuy()) {
-              <div class="quantity-selector">
-                <label>Quantity:</label>
-                <div class="quantity-stepper">
-                  <button
-                    matMiniFab
-                    class="minifab"
-                    (click)="quantity.set(quantity() - 1)"
-                    [disabled]="quantity() <= 1"
-                    aria-label="Decrease quantity"
-                  >
-                    <mat-icon>remove</mat-icon>
-                  </button>
-                  <span class="quantity-value">{{ quantity() }}</span>
-                  <button
-                    matMiniFab
-                    class="minifab"
-                    (click)="quantity.set(quantity() + 1)"
-                    [disabled]="quantity() >= (p.quantity || 1)"
-                    aria-label="Increase quantity"
-                  >
-                    <mat-icon>add</mat-icon>
-                  </button>
+            @if (ableToBuy() && cartQuantity() == 0) {
+              <div class="in-cart-card">
+                <div class="quantity-selector">
+                  <label>Quantity:</label>
+                  <div class="quantity-stepper">
+                    <button
+                      matMiniFab
+                      class="minifab"
+                      (click)="quantity.set(quantity() - 1)"
+                      [disabled]="quantity() <= 1"
+                      aria-label="Decrease quantity"
+                    >
+                      <mat-icon>remove</mat-icon>
+                    </button>
+                    <span class="quantity-value">{{ quantity() }}</span>
+                    <button
+                      matMiniFab
+                      class="minifab"
+                      (click)="quantity.set(quantity() + 1)"
+                      [disabled]="quantity() >= (p.quantity || 1)"
+                      aria-label="Increase quantity"
+                    >
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
                 </div>
+                <a mat-flat-button color="primary" (click)="addToCart()">
+                  <mat-icon>add_shopping_cart</mat-icon> Add to cart
+                </a>
               </div>
             }
             <div class="actions">
@@ -144,15 +150,58 @@ import { CartService } from "@core/services/cart.service";
 
               @if (!currentUser.user()) {
                 <span>Want to buy ?</span>
-                <a mat-stroked-button routerLink="/auth/register" class="connect-btn">
+                <a
+                  mat-stroked-button
+                  routerLink="/auth/register"
+                  class="connect-btn"
+                >
                   <mat-icon>login</mat-icon> Create account!
                 </a>
               }
 
-              @if (ableToBuy()) {
-                <a mat-flat-button color="primary" (click)="addToCart()">
-                  <mat-icon>add_shopping_cart</mat-icon> Add to cart
-                </a>
+              @if (cartQuantity() > 0) {
+                <div class="in-cart-card">
+                  <div class="quantity-display">
+                    <span>Update quantity:</span>
+                    <div class="quantity-stepper">
+                      <button
+                        mat-mini-fab
+                        class="minifab"
+                        (click)="quantity.set(quantity() - 1)"
+                        [disabled]="quantity() <= 1"
+                        aria-label="Decrease quantity"
+                      >
+                        <mat-icon>remove</mat-icon>
+                      </button>
+                      <span class="quantity-value">{{ quantity() }}</span>
+                      <button
+                        mat-mini-fab
+                        class="minifab"
+                        (click)="quantity.set(quantity() + 1)"
+                        [disabled]="quantity() >= (p.quantity || 1)"
+                        aria-label="Increase quantity"
+                      >
+                        <mat-icon>add</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="in-cart-message">
+                    <mat-icon class="check-icon">check_circle</mat-icon>
+                    <span>{{ cartQuantity() }} already in cart</span>
+                  </div>
+                  <div class="in-cart-actions">
+                    <button
+                      mat-stroked-button
+                      color="primary"
+                      (click)="updateCart()"
+                    >
+                      <mat-icon>cached</mat-icon> Update quantity
+                    </button>
+                    <a mat-flat-button color="primary" routerLink="/cart">
+                      <mat-icon>shopping_cart</mat-icon> View Cart
+                    </a>
+                  </div>
+                </div>
               }
             </div>
           </div>
@@ -306,10 +355,6 @@ import { CartService } from "@core/services/cart.service";
         color: var(--app-fg);
       }
 
-      .quantity-selector label {
-        min-width: 60px;
-      }
-
       .connect-btn {
         border-color: var(--app-primary);
         color: var(--app-primary);
@@ -370,6 +415,48 @@ import { CartService } from "@core/services/cart.service";
       .minifab:disabled {
         visibility: hidden;
       }
+
+      .in-cart-card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        background: var(--app-surface);
+        border: 2px solid var(--app-primary);
+        border-radius: var(--app-radius);
+        margin-top: 16px;
+      }
+
+      .quantity-display {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+        color: var(--app-fg);
+      }
+
+      .in-cart-message {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--app-primary);
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .check-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: var(--app-primary);
+      }
+
+      .in-cart-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
     `,
   ],
 })
@@ -380,8 +467,6 @@ export class ProductDetailsPage {
   private readonly cartService = inject(CartService);
   private readonly toast = inject(NotificationService);
   readonly currentUser = inject(CurrentUserService);
-
-  readonly previewOpen = signal(false);
 
   private readonly product$ = this.route.paramMap.pipe(
     switchMap((params) => this.svc.get(params.get("id")!)),
@@ -399,8 +484,11 @@ export class ProductDetailsPage {
     { initialValue: undefined },
   );
 
+  readonly previewOpen = signal(false);
+
   readonly active = signal(0);
   readonly quantity = signal(1);
+  readonly cartQuantity = signal(0);
 
   readonly activeImage = computed(
     () => this.product()?.images?.[this.active()]?.url ?? null,
@@ -416,14 +504,31 @@ export class ProductDetailsPage {
   readonly ableToBuy = computed(() => {
     const p = this.product();
     const u = this.currentUser.user();
-    return (
-      !this.ownedByMe() &&
-      !!u &&
-      !!p &&
-      u.id &&
-      p.quantity > 0
-    );
+
+    return !!u && !!p && !this.ownedByMe() && p.quantity > 0;
   });
+
+  constructor() {
+    effect(() => {
+      const product = this.product();
+      const user = this.currentUser.user();
+
+      if (!product || !user) {
+        this.quantity.set(1);
+        return;
+      }
+
+      this.cartService.getItemQuantity(product.id).subscribe({
+        next: (qty) => {
+          if (qty) {
+            this.quantity.set(qty);
+            this.cartQuantity.set(qty);
+          }
+        },
+        error: () => this.quantity.set(1),
+      });
+    });
+  }
 
   addToCart() {
     const p = this.product();
@@ -436,11 +541,25 @@ export class ProductDetailsPage {
       .subscribe({
         next: () => {
           this.toast.success("Product added! go to cart for checkout");
+          this.cartQuantity.set(this.quantity());
         },
         error: (err) => {
           console.error(err);
-          this.toast.error("An error has occurred! please try again later!");
         },
       });
+  }
+
+  updateCart(): void {
+    const p = this.product();
+    if (!p) return;
+    this.cartService.updateItemQuantity(p.id, this.quantity()).subscribe({
+      next: () => {
+        this.cartQuantity.set(this.quantity());
+        this.toast.success("Cart updated!");
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
   }
 }

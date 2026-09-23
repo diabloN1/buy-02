@@ -39,5 +39,6 @@ export const API = {
   carts: {
     root: "/carts",
     item: (productId: string) => `/carts/items/${productId}`,
+    itemQuantity: (productId: string) => `/carts/items/${productId}/quantity`,
   },
 } as const;

@@ -114,6 +114,12 @@ export const APP_ROUTES: Routes = [
   },
 
   {
+    path: "cart",
+    loadComponent: () =>
+      import("./features/cart/cart.page").then((m) => m.CartPage),
+  },
+
+  {
     path: "**",
     loadComponent: () =>
       import("./features/not-found/not-found.page").then((m) => m.NotFoundPage),

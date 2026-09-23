@@ -115,6 +115,7 @@ export const APP_ROUTES: Routes = [
 
   {
     path: "cart",
+    canActivate: [authGuard],
     loadComponent: () =>
       import("./features/cart/cart.page").then((m) => m.CartPage),
   },

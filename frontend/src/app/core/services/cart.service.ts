@@ -34,6 +34,10 @@ export class CartService {
     return this.http.delete<Cart>(API.base + API.carts.item(productId));
   }
 
+  getItemQuantity(productId: string): Observable<number> {
+    return this.http.get<number>(API.base + API.carts.itemQuantity(productId));
+  }
+
   clearCart(): Observable<void> {
     return this.http.delete<void>(API.base + API.carts.root);
   }

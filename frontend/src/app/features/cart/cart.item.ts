@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter } from "@angular/core";
+import { Component, Input, Output, EventEmitter, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
+import { CartService } from "@core/services/cart.service";
 
 @Component({
   selector: "app-cart-item",
@@ -20,26 +21,33 @@ import { MatIconModule } from "@angular/material/icon";
 
       <div class="item-quantity">
         <button
-          mat-icon-button
-          (click)="decrease.emit()"
+          mat-mini-fab
+          class="minifab"
+          (click)="updateItemQuantity(quantity - 1)"
           [disabled]="quantity <= 1"
           aria-label="Decrease quantity"
         >
           <mat-icon>remove</mat-icon>
         </button>
-        <span>{{ quantity }}</span>
+        <span class="quantity-value">{{ quantity }}</span>
         <button
-          mat-icon-button
-          (click)="increase.emit()"
+          mat-mini-fab
+          class="minifab"
+          (click)="updateItemQuantity(quantity + 1)"
+          [disabled]="quantity >= availableStock"
           aria-label="Increase quantity"
         >
           <mat-icon>add</mat-icon>
         </button>
       </div>
-
       <span class="item-price">{{ price | currency }}</span>
 
-      <button mat-icon-button (click)="remove.emit()" aria-label="Remove item">
+      <button
+        mat-mini-fab
+        class="minifab"
+        (click)="deleteItem()"
+        aria-label="Remove item"
+      >
         <mat-icon>close</mat-icon>
       </button>
     </div>
@@ -94,20 +102,60 @@ import { MatIconModule } from "@angular/material/icon";
         text-align: right;
       }
 
-      button.mat-icon-button {
-        padding: 4px;
+      .minifab {
+        box-shadow: none;
+        color: var(--app-fg);
+        background-color: transparent;
+      }
+
+      .minifab:disabled {
+        visibility: hidden;
+      }
+
+      img {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: var(--app-radius-sm);
+        border: 1px solid var(--app-border);
+        display: block;
       }
     `,
   ],
 })
 export class CartItemComponent {
+  private readonly cartSvc = inject(CartService);
+
   @Input() productId!: string;
   @Input() quantity: number = 1;
   @Input() price: number = 0;
   @Input() productName: string = "";
   @Input() imageUrl: string | null = "";
+  @Input() availableStock: number = 1;
 
-  @Output() decrease = new EventEmitter<void>();
-  @Output() increase = new EventEmitter<void>();
+  @Output() quantityChange = new EventEmitter<number>();
   @Output() remove = new EventEmitter<void>();
+
+  updateItemQuantity(quantity: number): void {
+    if (quantity < 1 || quantity > this.availableStock) return;
+    this.cartSvc.updateItemQuantity(this.productId, quantity).subscribe({
+      next: () => {
+        this.quantityChange.emit(quantity);
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
+
+  deleteItem() {
+    this.cartSvc.removeCartItem(this.productId).subscribe({
+      next: (res) => {
+        this.remove.emit();
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
 }

@@ -1,9 +1,4 @@
-import {
-  Component,
-  computed,
-  inject,
-  signal,
-} from "@angular/core";
+import { Component, computed, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 
 import { MatButtonModule } from "@angular/material/button";
@@ -28,7 +23,7 @@ import { RouterModule } from "@angular/router";
     MatDividerModule,
     LoadingSpinnerComponent,
     CartItemComponent,
-    RouterModule
+    RouterModule,
   ],
   template: `
     <section class="container">
@@ -53,6 +48,9 @@ import { RouterModule } from "@angular/router";
                   [price]="item.price"
                   [productName]="item.productName"
                   [imageUrl]="item.imageUrl"
+                  [availableStock]="item.availableStock"
+                  (quantityChange)="updateItemQuantity(item.productId, $event)"
+                  (remove)="removeItem(item.productId)"
                 />
               }
             </div>
@@ -171,12 +169,36 @@ export class CartPage {
 
   readonly cartTotal = computed(() => {
     const c = this.cart();
-    return c?.items?.reduce((sum, item) => sum + item.price * item.quantity, 0) ?? 0;
+    return (
+      c?.items?.reduce((sum, item) => sum + item.price * item.quantity, 0) ?? 0
+    );
   });
 
   constructor() {
     this.cartSvc.getCart().subscribe({
       next: (cart) => this.cart.set(cart),
+    });
+  }
+
+  updateItemQuantity(productId: string, quantity: number): void {
+    this.cart.update((currentCart) => {
+      if (!currentCart) return null;
+      return {
+        ...currentCart,
+        items: currentCart.items.map((item) =>
+          item.productId === productId ? { ...item, quantity } : item,
+        ),
+      };
+    });
+  }
+
+  removeItem(productId: string) {
+    this.cart.update((currentCart) => {
+      if (!currentCart) return null;
+      return {
+        ...currentCart,
+        items: currentCart.items.filter((item) => item.productId != productId),
+      };
     });
   }
 

@@ -21,6 +21,7 @@ public class CartItemResponse {
     private BigDecimal price;
     private Integer quantity;
     private String imageUrl;
+    private Integer availableStock;
 
     public static CartItemResponse from(
             Item item,
@@ -36,6 +37,7 @@ public class CartItemResponse {
                 .price(product.getPrice())
                 .quantity(item.getQuantity())
                 .imageUrl(imageUrl)
+                .availableStock(product.getQuantity())
                 .build();
     }
 }

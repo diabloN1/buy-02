@@ -1,5 +1,4 @@
 import {
-  ChangeDetectionStrategy,
   Component,
   inject,
   signal,
@@ -121,7 +120,7 @@ const MAX_SIZE = 2 * 1024 * 1024;
           <div class="thumbs">
             @for (image of images(); track image.url) {
             <div class="thumb">
-              <img [src]="image.url" alt="" />
+              <img [src]="image.url" alt="product image" />
               <button
                 mat-icon-button
                 type="button"

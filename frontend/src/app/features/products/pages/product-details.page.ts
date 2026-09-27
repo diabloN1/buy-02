@@ -533,7 +533,7 @@ export class ProductDetailsPage {
 
   addToCart() {
     const p = this.product();
-    if (!p || !p.quantity) return;
+    if (!p?.quantity) return;
     this.cartService
       .addToCart({
         productId: p.id,

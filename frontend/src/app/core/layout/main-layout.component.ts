@@ -87,16 +87,16 @@ import { CurrentUserService } from "@core/services/current-user.service";
         </mat-icon>
       </button>
 
-      <button
-        matMiniFab
-        class="theme desktop-theme"
-        routerLink="/cart"
-        [attr.aria-label]="'Toggle theme'"
-      >
-        <mat-icon>shopping_cart</mat-icon>
-      </button>
-
       @if (auth.isAuthenticated()) {
+        <button
+          matMiniFab
+          class="theme desktop-theme"
+          routerLink="/cart"
+          [attr.aria-label]="'Toggle theme'"
+        >
+          <mat-icon>shopping_cart</mat-icon>
+        </button>
+
         <button
           mat-button
           class="desktop-profile-button"

@@ -14,7 +14,7 @@ import { CartService } from "@core/services/cart.service";
         @if (imageUrl) {
           <img [src]="imageUrl" alt="product image" />
         } @else {
-          <mat-icon>inventory_2</mat-icon>
+          <mat-icon class="image-placeholder">inventory_2</mat-icon>
         }
         <span class="item-name">{{ productName }}</span>
       </div>
@@ -74,16 +74,11 @@ import { CartService } from "@core/services/cart.service";
         flex: 1;
       }
 
-      .item-details mat-icon {
-        width: 24px;
-        height: 24px;
-        color: var(--app-muted);
-      }
-
       .item-name {
         font-weight: 500;
         color: var(--app-fg);
         font-size: 14px;
+        overflow-wrap: anywhere;
       }
 
       .item-quantity {
@@ -112,13 +107,68 @@ import { CartService } from "@core/services/cart.service";
         visibility: hidden;
       }
 
-      img {
+      img,
+      .image-placeholder {
         width: 48px;
         height: 48px;
+        flex-shrink: 0;
+        box-sizing: border-box;
+      }
+
+      img {
         object-fit: cover;
         border-radius: var(--app-radius-sm);
         border: 1px solid var(--app-border);
         display: block;
+      }
+
+      .image-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--app-muted);
+        border: 1px solid var(--app-border);
+        border-radius: var(--app-radius-sm);
+      }
+
+      @media (max-width: 600px) {
+        .cart-item {
+          display: grid;
+          grid-template-columns: 1fr auto auto;
+          grid-template-areas:
+            "details details remove"
+            "quantity price remove";
+          gap: 12px 16px;
+          padding: 16px 4px;
+        }
+
+        .item-details {
+          grid-area: details;
+          min-width: 0;
+        }
+
+        .item-name {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow-wrap: none;
+        }
+
+        .item-quantity {
+          grid-area: quantity;
+          justify-self: start;
+        }
+
+        .item-price {
+          grid-area: price;
+          align-self: center;
+          min-width: auto;
+        }
+
+        .cart-item > .minifab:last-child {
+          grid-area: remove;
+          align-self: center;
+        }
       }
     `,
   ],
@@ -150,7 +200,7 @@ export class CartItemComponent {
 
   deleteItem() {
     this.cartSvc.removeCartItem(this.productId).subscribe({
-      next: (res) => {
+      next: () => {
         this.remove.emit();
       },
       error: (err) => {

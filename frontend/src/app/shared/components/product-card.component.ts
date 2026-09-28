@@ -97,6 +97,9 @@ import { SafeUrlPipe } from "@shared/pipes/safe-url.pipe";
         color: var(--app-fg);
         letter-spacing: -0.01em;
         line-height: 1.4;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .line-clamp {
         display: -webkit-box;

@@ -59,7 +59,7 @@ import { RouterModule } from "@angular/router";
 
             <div class="summary">
               <div class="total">
-                <span>Total ({{ itemCount() }} items)</span>
+                <span>Total ({{ itemCount() }})</span>
                 <span class="total-price">{{ cartTotal() | currency }}</span>
               </div>
 
@@ -153,6 +153,20 @@ import { RouterModule } from "@angular/router";
         display: flex;
         gap: 8px;
         margin-top: 8px;
+      }
+
+      @media (max-width: 600px) {
+        .summary, .total-price, .total {
+          font-size: 0.8rem;
+        }
+        
+        .actions {
+          flex-direction: column;
+        }
+
+        .actions button {
+          width: 100%;
+        }
       }
     `,
   ],

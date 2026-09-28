@@ -300,6 +300,7 @@ import { CartService } from "@core/services/cart.service";
         font-weight: 800;
         letter-spacing: -0.025em;
         line-height: 1.2;
+        overflow-wrap: anywhere;
       }
       .description {
         font-size: 15px;

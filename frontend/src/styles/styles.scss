@@ -13,8 +13,7 @@ $light-theme: mat.m2-define-light-theme(
       accent: $accent,
       warn: $warn,
     ),
-    typography:
-      mat.m2-define-typography-config(
+    typography: mat.m2-define-typography-config(
         $font-family: "Inter, system-ui, sans-serif",
       ),
     density: 0,
@@ -46,7 +45,9 @@ body {
   font-family: "Inter", system-ui, sans-serif;
   background: var(--app-bg);
   color: var(--app-fg);
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
   -webkit-font-smoothing: antialiased;
 }
 :root {
@@ -58,14 +59,17 @@ body {
   --app-muted: #64748b;
   --app-radius: 16px;
   --app-radius-sm: 8px;
-  --app-shadow: 0 1px 3px rgba(15, 23, 42, 0.03),
-    0 8px 30px rgba(15, 23, 42, 0.05);
+  --app-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.03), 0 8px 30px rgba(15, 23, 42, 0.05);
   --app-primary: #6366f1;
   --app-primary-light: #e0e7ff;
   --app-accent: #db2777;
   --app-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   --app-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   --app-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+  --mat-filled-tel-form-background: #f8fafc;
+  --mat-filled-tel-form-focus-background: #f8fafc;
+  --mat-filled-tel-form-hover-background: #f8fafc;
 }
 .dark-theme {
   color-scheme: dark;
@@ -78,8 +82,11 @@ body {
   --app-primary: #818cf8;
   --app-primary-light: #1e1b4b;
   --app-glow: 0 0 25px rgba(129, 140, 248, 0.12);
-  --app-shadow: 0 4px 20px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --app-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --mat-filled-tel-form-background: #0b0f19;
+  --mat-filled-tel-form-focus-background: #0b0f19;
+  --mat-filled-tel-form-hover-background: #0b0f19;
 }
 
 @include mat.all-component-themes($light-theme);
@@ -194,7 +201,6 @@ body {
 .mat-mdc-menu-panel {
   background-color: var(--app-bg) !important;
 }
-
 
 header h1,
 section h1 {

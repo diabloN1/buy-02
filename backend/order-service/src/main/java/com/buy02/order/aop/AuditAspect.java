@@ -47,7 +47,7 @@ public class AuditAspect {
 
                         AuditEvent event = new AuditEvent(
                                         entityId,
-                                        EntityType.CART,
+                                        EntityType.ORDER,
                                         auditable.action(),
                                         userId,
                                         executedByAdmin,

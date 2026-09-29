@@ -12,7 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Document(collection = "product")
+@Document(collection = "order")
 @Builder
 public class OrderAudit {
 

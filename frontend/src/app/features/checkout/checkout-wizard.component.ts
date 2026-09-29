@@ -65,7 +65,7 @@ import { ConfirmationStepComponent } from "./steps/confirmation-step.component";
                 />
               </mat-step>
 
-              <mat-step label="Review Order">
+              <mat-step label="Review Order" [completed]="orderId() !== null">
                 <app-review-order-step
                   [cart]="c"
                   [addressForm]="addressForm"
@@ -140,6 +140,13 @@ import { ConfirmationStepComponent } from "./steps/confirmation-step.component";
         gap: 12px;
         padding: 64px 0;
         color: var(--app-muted);
+      }
+
+      ::ng-deep .mat-step-header:hover,
+      ::ng-deep .mat-step-header[aria-selected="true"] {
+        border: 1px solid transparent !important;
+        border-radius: 8px !important;
+        background-color: rgba(255, 255, 255, 0.1);
       }
     `,
   ],

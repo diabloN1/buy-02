@@ -5,11 +5,12 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatDividerModule } from "@angular/material/divider";
 import { Cart } from "@core/models/cart.model";
 import { FormGroup } from "@angular/forms";
+import { RouterModule } from "@angular/router";
 
 @Component({
   selector: "app-review-order-step",
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDividerModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDividerModule, RouterModule],
   template: `
     <div class="review-section">
       <h3 class="section-title">Shipping to</h3>
@@ -71,7 +72,7 @@ import { FormGroup } from "@angular/forms";
         Back
       </button>
 
-      <button mat-button type="button" (click)="previous.emit()">
+      <button mat-button type="button" routerLink="/cart">
         <mat-icon>shopping_cart</mat-icon>
         Modify cart
       </button>

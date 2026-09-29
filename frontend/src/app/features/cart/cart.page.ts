@@ -68,7 +68,7 @@ import { RouterModule } from "@angular/router";
                   <mat-icon>delete</mat-icon> Clear cart
                 </button>
 
-                <button mat-raised-button type="button" color="primary">
+                <button mat-raised-button type="button" color="primary" routerLink="/checkout">
                   Proceed to checkout
                 </button>
               </div>

@@ -14,6 +14,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { AuthService } from "@core/services/auth.service";
 import { NotificationService } from "@core/services/notification.service";
 import { FieldErrorComponent } from "@shared/components/field-error.component";
+import { applyFormErrors } from "@shared/utils/form-error.util";
 
 @Component({
   selector: "app-login",
@@ -153,7 +154,9 @@ export class LoginPage {
       },
       error: (err) => {
         this.loading.set(false);
-        if (err.status == 401) {
+        if (err.status === 400 && err.error?.details) {
+          applyFormErrors(this.form, err.error.details);
+        } else if (err.status === 401) {
           this.notify.error("Invalid email or password");
         } else if (err.error?.message) {
           this.notify.error(err.error.message);

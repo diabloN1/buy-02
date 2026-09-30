@@ -37,16 +37,20 @@ import { CurrentUserService } from "@core/services/current-user.service";
     EmptyStateComponent,
   ],
   template: `
-    <section class="container">
-      <div class="row">
-        <h1 class="grow">My products</h1>
-        <a mat-flat-button color="primary" routerLink="/seller/products/new"
-          ><mat-icon>add</mat-icon> New product</a
-        >
+    <section class="container page-section">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">My Store Products</h1>
+          <p class="muted">Manage, edit, or delete items in your seller inventory.</p>
+        </div>
+        <a routerLink="/seller/products/new" class="btn btn-primary new-btn">
+          <mat-icon>add</mat-icon>
+          <span>New product</span>
+        </a>
       </div>
 
       @if (loading()) {
-        <app-loading-spinner />
+        <app-loading-spinner label="Loading your store inventory…" />
       } @else if (!items().length) {
         <app-empty-state
           icon="inventory_2"
@@ -56,8 +60,8 @@ import { CurrentUserService } from "@core/services/current-user.service";
       } @else {
         <div class="app-card table-wrap">
           <table mat-table [dataSource]="items()" [trackBy]="trackById">
-            <ng-container matColumnDef="thumb"
-              ><th mat-header-cell *matHeaderCellDef></th>
+            <ng-container matColumnDef="thumb">
+              <th mat-header-cell *matHeaderCellDef>Image</th>
               <td mat-cell *matCellDef="let p">
                 @if (p.images && p.images[0]) {
                   <img [src]="p.images[0].url" alt="" class="thumb" />
@@ -66,22 +70,25 @@ import { CurrentUserService } from "@core/services/current-user.service";
                     <mat-icon>image</mat-icon>
                   </div>
                 }
-              </td></ng-container
-            >
-            <ng-container matColumnDef="name"
-              ><th mat-header-cell *matHeaderCellDef>Product</th>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Product Name</th>
               <td mat-cell *matCellDef="let p">
                 <span class="cell-name">{{ p.name }}</span>
-              </td></ng-container
-            >
-            <ng-container matColumnDef="price"
-              ><th mat-header-cell *matHeaderCellDef>Price</th>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="price">
+              <th mat-header-cell *matHeaderCellDef>Price</th>
               <td mat-cell *matCellDef="let p">
                 <span class="cell-price">{{ p.price | currency }}</span>
-              </td></ng-container
-            >
-            <ng-container matColumnDef="qty"
-              ><th mat-header-cell *matHeaderCellDef>Stock</th>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="qty">
+              <th mat-header-cell *matHeaderCellDef>Stock</th>
               <td mat-cell *matCellDef="let p">
                 <span
                   class="cell-stock"
@@ -90,38 +97,43 @@ import { CurrentUserService } from "@core/services/current-user.service";
                 >
                   {{ p.quantity }}
                 </span>
-              </td></ng-container
-            >
-            <ng-container matColumnDef="actions"
-              ><th mat-header-cell *matHeaderCellDef></th>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
               <td mat-cell *matCellDef="let p">
                 <div class="actions">
                   <a
                     mat-icon-button
                     [routerLink]="['/products', p.id]"
-                    aria-label="View"
-                    ><mat-icon>visibility</mat-icon></a
+                    aria-label="View product"
                   >
+                    <mat-icon>visibility</mat-icon>
+                  </a>
                   <a
                     mat-icon-button
                     [routerLink]="['/seller/products', p.id, 'edit']"
-                    aria-label="Edit"
-                    ><mat-icon>edit</mat-icon></a
+                    aria-label="Edit product"
                   >
+                    <mat-icon>edit</mat-icon>
+                  </a>
                   <button
                     mat-icon-button
                     color="warn"
                     (click)="remove(p)"
-                    aria-label="Delete"
+                    aria-label="Delete product"
                   >
                     <mat-icon>delete</mat-icon>
                   </button>
                 </div>
-              </td></ng-container
-            >
+              </td>
+            </ng-container>
+
             <tr mat-header-row *matHeaderRowDef="cols"></tr>
             <tr mat-row *matRowDef="let r; columns: cols" class="data-row"></tr>
           </table>
+
           <mat-paginator
             [length]="total()"
             [pageSize]="pageSize()"
@@ -135,13 +147,39 @@ import { CurrentUserService } from "@core/services/current-user.service";
   `,
   styles: [
     `
+      .page-section {
+        padding-top: 32px;
+        padding-bottom: 64px;
+      }
+
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+      }
+
+      .page-title {
+        font-size: 1.85rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        margin: 0 0 4px;
+      }
+
+      .new-btn {
+        height: 42px;
+        padding: 0 20px;
+      }
+
       .table-wrap {
         overflow-x: auto;
         overflow-y: hidden;
         border: 1px solid var(--app-border);
         border-radius: var(--app-radius);
-        box-shadow: var(--app-shadow);
-        margin-top: 24px;
+        box-shadow: var(--app-shadow-sm);
+        margin-top: 16px;
         background: var(--app-surface);
       }
 
@@ -153,37 +191,32 @@ import { CurrentUserService } from "@core/services/current-user.service";
         background-color: transparent;
       }
 
-      /* Header */
       th.mat-mdc-header-cell {
-        font-weight: 600;
-        color: var(--app-fg);
+        font-weight: 700;
+        color: var(--app-fg-heading);
         font-size: 12px;
         text-transform: uppercase;
-        letter-spacing: 0.4px;
+        letter-spacing: 0.05em;
         padding: 14px 16px !important;
         border-bottom: 1px solid var(--app-border);
-        background: rgba(0, 0, 0, 0.02);
+        background: var(--app-bg-alt);
         white-space: nowrap;
       }
 
       th.mat-mdc-header-cell:first-of-type {
         padding-left: 24px !important;
-        border-top-left-radius: var(--app-radius);
       }
 
       th.mat-mdc-header-cell:last-of-type {
         padding-right: 24px !important;
-        border-top-right-radius: var(--app-radius);
       }
 
-      /* Rows */
       tr.data-row {
         transition: background-color 0.15s ease;
-        cursor: default;
       }
 
       tr.data-row:hover {
-        background-color: rgba(0, 0, 0, 0.03);
+        background-color: var(--app-surface-hover);
       }
 
       td.mat-mdc-cell {
@@ -207,8 +240,8 @@ import { CurrentUserService } from "@core/services/current-user.service";
       }
 
       .thumb {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         object-fit: cover;
         border-radius: var(--app-radius-sm);
         border: 1px solid var(--app-border);
@@ -216,15 +249,15 @@ import { CurrentUserService } from "@core/services/current-user.service";
       }
 
       .thumb-placeholder {
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         border-radius: var(--app-radius-sm);
         border: 1px dashed var(--app-border);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--app-muted, #888);
-        background: rgba(0, 0, 0, 0.02);
+        color: var(--app-muted);
+        background: var(--app-bg-alt);
       }
 
       .thumb-placeholder mat-icon {
@@ -234,37 +267,37 @@ import { CurrentUserService } from "@core/services/current-user.service";
       }
 
       .cell-name {
-        font-weight: 500;
-        color: var(--app-fg);
+        font-weight: 600;
+        color: var(--app-fg-heading);
       }
 
       .cell-price {
-        font-weight: 600;
-        color: var(--app-fg);
+        font-weight: 700;
+        color: var(--app-fg-heading);
         font-variant-numeric: tabular-nums;
       }
 
       .cell-stock {
-        font-weight: 500;
+        font-weight: 600;
         font-variant-numeric: tabular-nums;
         display: inline-flex;
         align-items: center;
         gap: 6px;
         padding: 2px 10px;
         border-radius: 999px;
-        background: rgba(34, 197, 94, 0.1);
-        color: #15803d;
-        font-size: 13px;
+        background: var(--app-success-light);
+        color: var(--app-success);
+        font-size: 12px;
       }
 
       .cell-stock.low {
-        background: rgba(234, 179, 8, 0.1);
-        color: #a16207;
+        background: var(--app-warning-light);
+        color: var(--app-warning);
       }
 
       .cell-stock.out {
-        background: rgba(239, 68, 68, 0.1);
-        color: #b91c1c;
+        background: var(--app-danger-light);
+        color: var(--app-danger);
       }
 
       .actions {
@@ -276,13 +309,19 @@ import { CurrentUserService } from "@core/services/current-user.service";
 
       .actions a[mat-icon-button],
       .actions button[mat-icon-button] {
-        --mdc-icon-button-state-layer-size: 36px;
-        width: 36px;
-        height: 36px;
-        padding: 6px;
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--app-muted);
+      }
+      .actions a[mat-icon-button]:hover,
+      .actions button[mat-icon-button]:hover {
+        color: var(--app-primary);
+        background: var(--app-surface-hover);
       }
 
-      /* Paginator */
       mat-paginator {
         border-top: 1px solid var(--app-border);
         background-color: transparent;
@@ -327,7 +366,6 @@ export class SellerProductsPage {
 
     this.svc.listBySeller(this.page(), this.pageSize(), user.id).subscribe({
       next: (r) => {
-        // console.log("r.content :", r.content);
         this.items.set(r.content);
         this.total.set(r.totalElements);
         this.loading.set(false);

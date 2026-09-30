@@ -34,22 +34,35 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
     EmptyStateComponent,
   ],
   template: `
-    <section class="container">
-      <div class="row toolbar">
-        <h1 class="grow">Products</h1>
-        <mat-form-field appearance="outline" class="search">
-          <mat-icon matPrefix>search</mat-icon>
-          <mat-label>Search</mat-label>
-          <input matInput [formControl]="q" placeholder="Search products…" />
+    <section class="container catalog-section">
+      <div class="catalog-header">
+        <div class="header-left">
+          <div class="header-tag">Marketplace</div>
+          <h1 class="header-title">
+            All Products
+            <span class="count-badge" *ngIf="!loading()">{{ total() }}</span>
+          </h1>
+        </div>
+
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix class="search-icon">search</mat-icon>
+          <mat-label>Search catalog…</mat-label>
+          <input matInput [formControl]="q" placeholder="Type product name or keywords…" />
+          @if (q.value) {
+            <button matSuffix mat-icon-button (click)="q.setValue('')" aria-label="Clear search">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
         </mat-form-field>
       </div>
+
       @if (loading()) {
-        <app-loading-spinner label="Loading…" />
+        <app-loading-spinner label="Searching products…" />
       } @else if (!items().length) {
         <app-empty-state
           icon="search_off"
-          title="No products found"
-          description="Try a different search."
+          title="No matching products found"
+          description="Try modifying your search keywords or clear filters."
         />
       } @else {
         <div class="grid">
@@ -57,38 +70,89 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
             <app-product-card [product]="p" />
           }
         </div>
-        <mat-paginator
-          [length]="total()"
-          [pageSize]="pageSize()"
-          [pageIndex]="page() - 1"
-          [pageSizeOptions]="[12, 24, 48]"
-          (page)="onPage($event)"
-        />
+
+        <div class="paginator-card">
+          <mat-paginator
+            [length]="total()"
+            [pageSize]="pageSize()"
+            [pageIndex]="page() - 1"
+            [pageSizeOptions]="[12, 24, 48]"
+            (page)="onPage($event)"
+            aria-label="Select page"
+          />
+        </div>
       }
     </section>
   `,
   styles: [
     `
-      .toolbar {
-        margin: 24px 0 32px;
+      .catalog-section {
+        padding-top: 32px;
+        padding-bottom: 64px;
+      }
+
+      .catalog-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        margin-bottom: 36px;
         flex-wrap: wrap;
-        gap: 16px;
+        gap: 20px;
       }
-      .search {
-        width: 360px;
+
+      .header-tag {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--app-primary);
+        margin-bottom: 4px;
+      }
+
+      .header-title {
+        font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .count-badge {
+        font-size: 13px;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: var(--app-radius-full);
+        background: var(--app-primary-light);
+        color: var(--app-primary);
+      }
+
+      .search-field {
+        width: 380px;
         max-width: 100%;
       }
+
+      .search-icon {
+        margin-right: 8px;
+        color: var(--app-muted);
+      }
+
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 24px;
-        margin-bottom: 32px;
+        margin-bottom: 40px;
       }
-      mat-paginator {
-        background: transparent;
+
+      .paginator-card {
+        background: var(--app-surface);
+        border: 1px solid var(--app-border);
+        border-radius: var(--app-radius);
+        padding: 8px 16px;
+        box-shadow: var(--app-shadow-sm);
+        display: flex;
+        justify-content: flex-end;
       }
     `,
   ],
@@ -111,11 +175,13 @@ export class ProductListPage {
         this.load();
       });
   }
+
   onPage(e: PageEvent) {
     this.page.set(e.pageIndex + 1);
     this.pageSize.set(e.pageSize);
     this.load();
   }
+
   private load() {
     this.loading.set(true);
     this.svc

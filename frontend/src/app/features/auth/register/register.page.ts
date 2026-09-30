@@ -11,6 +11,7 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import { MatSelectModule } from "@angular/material/select";
+import { MatIconModule } from "@angular/material/icon";
 import { AuthService } from "@core/services/auth.service";
 import { NotificationService } from "@core/services/notification.service";
 import { FieldErrorComponent } from "@shared/components/field-error.component";
@@ -29,26 +30,36 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
+    MatIconModule,
     FieldErrorComponent,
   ],
   template: `
     <section class="auth-wrap">
-      <div class="app-card auth-card">
-        <h1>Create your account</h1>
-        <p class="muted">Join the marketplace</p>
+      <div class="glass-card auth-card">
+        <div class="auth-header">
+          <div class="brand-badge">
+            <mat-icon>person_add</mat-icon>
+          </div>
+          <h1>Create your account</h1>
+          <p class="muted">Join Marketplace as a buyer or seller</p>
+        </div>
+
         <form [formGroup]="form" (ngSubmit)="submit()" class="stack">
           <mat-form-field appearance="outline">
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name" autocomplete="name" />
+            <mat-label>Full name</mat-label>
+            <mat-icon matPrefix>person</mat-icon>
+            <input matInput formControlName="name" placeholder="John Doe" autocomplete="name" />
           </mat-form-field>
           <app-field-error [control]="form.controls.name" />
 
           <mat-form-field appearance="outline">
-            <mat-label>Email</mat-label>
+            <mat-label>Email address</mat-label>
+            <mat-icon matPrefix>email</mat-icon>
             <input
               matInput
               type="email"
               formControlName="email"
+              placeholder="you@example.com"
               autocomplete="email"
             />
           </mat-form-field>
@@ -56,76 +67,125 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
 
           <mat-form-field appearance="outline">
             <mat-label>Password</mat-label>
+            <mat-icon matPrefix>lock</mat-icon>
             <input
               matInput
               type="password"
               formControlName="password"
+              placeholder="Min. 8 characters"
               autocomplete="new-password"
             />
           </mat-form-field>
           <app-field-error [control]="form.controls.password" />
 
           <mat-form-field appearance="outline">
-            <mat-label>Account type</mat-label>
+            <mat-label>Account role</mat-label>
+            <mat-icon matPrefix>badge</mat-icon>
             <mat-select formControlName="role">
-              <mat-option value="USER">Client — I want to browse</mat-option>
-              <mat-option value="SELLER">Seller — I want to sell</mat-option>
+              <mat-option value="USER">Client — Browse & Buy products</mat-option>
+              <mat-option value="SELLER">Seller — List & Sell products</mat-option>
             </mat-select>
           </mat-form-field>
 
           <button
             mat-flat-button
             color="primary"
+            class="submit-btn"
             [disabled]="form.invalid || loading()"
           >
-            {{ loading() ? "Creating…" : "Create account" }}
+            <span *ngIf="!loading()">Create Account</span>
+            <span *ngIf="loading()">Creating account…</span>
           </button>
         </form>
-        <p class="muted center">
-          Have an account? <a routerLink="/auth/login">Sign in</a>
-        </p>
+
+        <div class="auth-footer">
+          <p class="muted">
+            Already have an account?
+            <a routerLink="/auth/login" class="auth-link">Sign in</a>
+          </p>
+        </div>
       </div>
     </section>
   `,
   styles: [
     `
       .auth-wrap {
+        min-height: calc(100vh - 180px);
         display: flex;
+        align-items: center;
         justify-content: center;
-        padding: 80px 16px;
-        background: radial-gradient(
-          circle at 50% 50%,
-          rgba(99, 102, 241, 0.05) 0%,
-          transparent 50%
-        );
+        padding: 40px 16px;
+        background: var(--app-gradient-hero);
       }
+
       .auth-card {
         width: 100%;
         max-width: 440px;
-        padding: 40px;
-        border: 1px solid var(--app-border);
-        box-shadow: var(--app-shadow);
+        padding: 40px 32px;
+        box-shadow: var(--app-shadow-xl);
       }
+
+      .auth-header {
+        text-align: center;
+        margin-bottom: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .brand-badge {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: var(--app-gradient-primary);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        box-shadow: var(--app-glow);
+      }
+      .brand-badge mat-icon {
+        font-size: 26px;
+        width: 26px;
+        height: 26px;
+      }
+
       h1 {
         margin: 0 0 6px;
+        font-size: 1.75rem;
         font-weight: 800;
-        letter-spacing: -0.02em;
-        text-align: center;
+        letter-spacing: -0.03em;
+        color: var(--app-fg-heading);
       }
+
       p.muted {
-        text-align: center;
-        margin-bottom: 24px;
+        margin: 0;
+        font-size: 14px;
       }
-      .center {
-        text-align: center;
+
+      .submit-btn {
+        height: 46px;
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        border-radius: var(--app-radius-sm) !important;
+        margin-top: 8px;
+      }
+
+      .auth-footer {
         margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid var(--app-border);
+        text-align: center;
       }
-      .center a {
+
+      .auth-link {
         color: var(--app-primary);
         font-weight: 600;
         text-decoration: none;
+        margin-left: 4px;
       }
-      .center a:hover {
+      .auth-link:hover {
         text-decoration: underline;
       }
     `,
@@ -162,7 +222,7 @@ export class RegisterPage {
     this.auth.register(this.form.getRawValue()).subscribe({
       next: () => {
         this.loading.set(false);
-        this.notify.success("Account created");
+        this.notify.success("Account created successfully!");
         this.router.navigateByUrl("/");
       },
       error: (err) => {

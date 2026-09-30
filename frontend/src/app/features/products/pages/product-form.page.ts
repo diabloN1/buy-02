@@ -20,6 +20,7 @@ import { FieldErrorComponent } from "@shared/components/field-error.component";
 import { FileDropDirective } from "@shared/directives/file-drop.directive";
 import { LoadingSpinnerComponent } from "@shared/components/loading-spinner.component";
 import { ProductImage } from "@core/models/product.model";
+import { applyFormErrors } from "@shared/utils/form-error.util";
 
 const MAX_SIZE = 2 * 1024 * 1024;
 
@@ -287,7 +288,7 @@ export class ProductFormPage {
       this.notify.error("Maximum 5 images allowed");
       return;
     }
-    
+
     Array.from(files).forEach((file) => {
       if (!file.type.startsWith("image/")) {
         this.notify.error(`${file.name} is not an image`);
@@ -332,9 +333,6 @@ export class ProductFormPage {
       .filter((image) => !image.existing)
       .map((image) => image.file!);
 
-    // console.log(this.images());
-    // console.log(this.deletedImageIds());
-    // console.log(files);
     const req$ = this.id()
       ? this.svc.update(this.id()!, body, files, this.deletedImageIds())
       : this.svc.create(body, files);
@@ -347,7 +345,11 @@ export class ProductFormPage {
       },
       error: (err) => {
         this.saving.set(false);
-        this.notify.error(err.error?.message || "Failed to save product");
+        if (err.status === 400 && err.error?.details) {
+          applyFormErrors(this.form, err.error.details);
+        } else {
+          this.notify.error(err.error?.message || "Failed to save product");
+        }
       },
     });
   }

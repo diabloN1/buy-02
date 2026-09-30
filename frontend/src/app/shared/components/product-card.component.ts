@@ -21,21 +21,32 @@ import { SafeUrlPipe } from "@shared/pipes/safe-url.pipe";
     <a class="card app-card" [routerLink]="['/products', product.id]">
       <div class="thumb">
         @if (product.images.length) {
-        <img
-          [src]="product.images[0].url | safeUrl"
-          [alt]="product.name"
-          loading="lazy"
-        />
+          <img
+            [src]="product.images[0].url | safeUrl"
+            [alt]="product.name"
+            loading="lazy"
+          />
         } @else {
-        <mat-icon>image</mat-icon>
+          <div class="thumb-placeholder">
+            <mat-icon>storefront</mat-icon>
+            <span>No Image</span>
+          </div>
         }
+        <span class="qty-pill" [class.low-stock]="product.quantity <= 3">
+          {{ product.quantity > 0 ? (product.quantity + ' in stock') : 'Out of stock' }}
+        </span>
       </div>
       <div class="body">
-        <h3>{{ product.name }}</h3>
-        <p class="muted line-clamp">{{ product.description }}</p>
+        <h3 class="product-title" [title]="product.name">{{ product.name }}</h3>
+        <p class="muted line-clamp">{{ product.description || 'No description provided.' }}</p>
         <div class="foot">
-          <span class="price-tag">{{ product.price | currency }}</span>
-          <span class="qty-tag">Qty {{ product.quantity }}</span>
+          <div class="price-container">
+            <span class="currency-symbol">$</span>
+            <span class="price-value">{{ product.price | number:'1.2-2' }}</span>
+          </div>
+          <button mat-icon-button class="view-btn" aria-label="View product details">
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
         </div>
       </div>
     </a>
@@ -48,59 +59,97 @@ import { SafeUrlPipe } from "@shared/pipes/safe-url.pipe";
         text-decoration: none;
         color: inherit;
         overflow: hidden;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: var(--app-radius);
+        background: var(--app-surface);
         border: 1px solid var(--app-border);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
+        height: 100%;
       }
       .card:hover {
-        transform: translateY(-4px);
+        transform: translateY(-5px);
         border-color: var(--app-primary);
-        box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08), var(--app-glow);
+        box-shadow: var(--app-shadow-lg), var(--app-glow);
       }
+
       .thumb {
-        aspect-ratio: 4/3;
-        background: var(--app-bg);
+        aspect-ratio: 4 / 3;
+        background: var(--app-bg-alt);
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        transition: background 0.25s ease;
         position: relative;
       }
       .thumb img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.4s ease;
+        transition: transform 0.5s ease;
       }
       .card:hover .thumb img {
-        transform: scale(1.05);
+        transform: scale(1.06);
       }
-      .thumb mat-icon {
-        font-size: 32px;
-        width: 32px;
-        height: 32px;
-        color: var(--app-muted);
-        opacity: 0.5;
-      }
-      .body {
-        padding: 16px;
+
+      .thumb-placeholder {
         display: flex;
         flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        color: var(--app-muted-light);
+      }
+      .thumb-placeholder mat-icon {
+        font-size: 36px;
+        width: 36px;
+        height: 36px;
+      }
+      .thumb-placeholder span {
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .qty-pill {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--app-glass-bg);
+        backdrop-filter: var(--app-backdrop-blur);
+        -webkit-backdrop-filter: var(--app-backdrop-blur);
+        border: 1px solid var(--app-glass-border);
+        color: var(--app-fg);
+        padding: 4px 10px;
+        border-radius: var(--app-radius-full);
+        font-size: 11px;
+        font-weight: 600;
+        box-shadow: var(--app-shadow-sm);
+      }
+      .qty-pill.low-stock {
+        background: var(--app-warning-light);
+        color: var(--app-warning);
+        border-color: rgba(245, 158, 11, 0.3);
+      }
+
+      .body {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
         gap: 8px;
         background: var(--app-surface);
       }
-      h3 {
+
+      .product-title {
         margin: 0;
-        font-size: 15px;
-        font-weight: 600;
-        color: var(--app-fg);
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--app-fg-heading);
         letter-spacing: -0.01em;
-        line-height: 1.4;
+        line-height: 1.35;
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        white-space: nowrap;
       }
+
       .line-clamp {
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -110,27 +159,49 @@ import { SafeUrlPipe } from "@shared/pipes/safe-url.pipe";
         margin: 0;
         line-height: 1.5;
         color: var(--app-muted);
+        flex: 1;
       }
+
       .foot {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 8px;
+        margin-top: 12px;
         border-top: 1px solid var(--app-border);
-        padding-top: 10px;
+        padding-top: 12px;
       }
-      .price-tag {
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--app-fg);
+
+      .price-container {
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+        color: var(--app-primary);
+        font-weight: 800;
       }
-      .qty-tag {
-        font-size: 12px;
-        font-weight: 500;
+      .currency-symbol {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .price-value {
+        font-size: 1.25rem;
+        letter-spacing: -0.02em;
+      }
+
+      .view-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
         background: var(--app-primary-light);
         color: var(--app-primary);
-        padding: 2px 8px;
-        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+      .card:hover .view-btn {
+        background: var(--app-gradient-primary);
+        color: #ffffff;
+        box-shadow: var(--app-glow);
       }
     `,
   ],

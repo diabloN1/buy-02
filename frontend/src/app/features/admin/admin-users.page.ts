@@ -40,67 +40,72 @@ import { User } from "@core/models/user.model";
       </div>
 
       @if (loading()) {
-      <app-loading-spinner />
+        <app-loading-spinner />
       } @else if (!items().length) {
-      <app-empty-state
-        icon="group"
-        title="No users found"
-        description="There are currently no registered users."
-      />
+        <app-empty-state
+          icon="group"
+          title="No users found"
+          description="There are currently no registered users."
+        />
       } @else {
-      <div class="app-card table-wrap">
-        <table mat-table [dataSource]="items()">
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let u">
-              {{ u.name }}
-            </td>
-          </ng-container>
+        <div class="app-card table-wrap">
+          <table mat-table [dataSource]="items()">
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Name</th>
+              <td mat-cell *matCellDef="let u">
+                {{ u.name }}
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="email">
-            <th mat-header-cell *matHeaderCellDef>Email</th>
-            <td mat-cell *matCellDef="let u">
-              {{ u.email }}
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef>Email</th>
+              <td mat-cell *matCellDef="let u">
+                {{ u.email }}
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="role">
-            <th mat-header-cell *matHeaderCellDef>Role</th>
-            <td mat-cell *matCellDef="let u">
-              {{ u.role }}
-            </td>
-          </ng-container>
+            <ng-container matColumnDef="role">
+              <th mat-header-cell *matHeaderCellDef>Role</th>
+              <td mat-cell *matCellDef="let u">
+                {{ u.role }}
+              </td>
+            </ng-container>
 
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef></th>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
 
-            <td mat-cell *matCellDef="let u">
-              <div class="actions">
-                <button
-                  mat-icon-button
-                  color="warn"
-                  (click)="remove(u)"
-                  aria-label="Delete user"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </td>
-          </ng-container>
+              <td mat-cell *matCellDef="let u">
+                <div class="actions">
+                  <button
+                    *ngIf="u.role != 'ADMIN'"
+                    mat-icon-button
+                    color="warn"
+                    (click)="remove(u)"
+                    aria-label="Delete user"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="cols"></tr>
-          <tr mat-row *matRowDef="let row; columns: cols" class="data-row"></tr>
-        </table>
+            <tr mat-header-row *matHeaderRowDef="cols"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: cols"
+              class="data-row"
+            ></tr>
+          </table>
 
-        <mat-paginator
-          [length]="total()"
-          [pageSize]="pageSize()"
-          [pageIndex]="page() - 1"
-          [pageSizeOptions]="[10, 25, 50]"
-          (page)="onPage($event)"
-        >
-        </mat-paginator>
-      </div>
+          <mat-paginator
+            [length]="total()"
+            [pageSize]="pageSize()"
+            [pageIndex]="page() - 1"
+            [pageSizeOptions]="[10, 25, 50]"
+            (page)="onPage($event)"
+          >
+          </mat-paginator>
+        </div>
       }
     </section>
   `,

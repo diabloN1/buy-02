@@ -30,107 +30,218 @@ import { CurrentUserService } from "@core/services/current-user.service";
     LoadingSpinnerComponent,
   ],
   template: `
-    <section class="container">
-      <h1>Welcome, {{ currentUser.user()?.name }}</h1>
-      <p class="muted">Here's a snapshot of your store.</p>
+    <section class="container dashboard-section">
+      <div class="welcome-header">
+        <div>
+          <div class="welcome-tag">Seller Portal</div>
+          <h1 class="welcome-title">Welcome back, {{ currentUser.user()?.name }} 👋</h1>
+          <p class="muted">Manage your store products, media assets, and inventory performance.</p>
+        </div>
 
-      <div class="stats">
-        <div class="app-card stat">
-          <div class="k">Total products</div>
-          <div class="v">{{ items().length }}</div>
+        <a routerLink="/seller/products/new" class="btn btn-primary create-btn">
+          <mat-icon>add</mat-icon>
+          <span>Create New Product</span>
+        </a>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stats-grid">
+        <div class="app-card stat-card">
+          <div class="stat-icon p-icon"><mat-icon>inventory_2</mat-icon></div>
+          <div class="stat-content">
+            <div class="stat-label">Total Products</div>
+            <div class="stat-value">{{ items().length }}</div>
+          </div>
         </div>
-        <div class="app-card stat">
-          <div class="k">Total images</div>
-          <div class="v">{{ totalImages() }}</div>
+
+        <div class="app-card stat-card">
+          <div class="stat-icon m-icon"><mat-icon>collections</mat-icon></div>
+          <div class="stat-content">
+            <div class="stat-label">Media Assets</div>
+            <div class="stat-value">{{ totalImages() }}</div>
+          </div>
         </div>
-        <div class="app-card stat">
-          <div class="k">Latest upload</div>
-          <div class="v small">{{ items().length ? latest().name : "—" }}</div>
+
+        <div class="app-card stat-card">
+          <div class="stat-icon l-icon"><mat-icon>schedule</mat-icon></div>
+          <div class="stat-content">
+            <div class="stat-label">Latest Item</div>
+            <div class="stat-value text-truncate">{{ items().length ? latest().name : '—' }}</div>
+          </div>
         </div>
       </div>
 
-      <div class="actions">
-        <a mat-flat-button color="primary" routerLink="/seller/products/new"
-          ><mat-icon>add</mat-icon> New product</a
-        >
+      <!-- Secondary Navigation Shortcuts -->
+      <div class="shortcuts-bar">
+        <a routerLink="/seller/products" class="btn btn-secondary shortcut-btn">
+          <mat-icon>list_alt</mat-icon>
+          <span>Manage All Products</span>
+        </a>
 
-        <a mat-stroked-button routerLink="/seller/products"
-          ><mat-icon>inventory_2</mat-icon> My products</a
-        >
-
-        <a mat-stroked-button routerLink="/seller/media"
-          ><mat-icon>collections</mat-icon> Media management</a
-        >
+        <a routerLink="/seller/media" class="btn btn-secondary shortcut-btn">
+          <mat-icon>perm_media</mat-icon>
+          <span>Media Gallery</span>
+        </a>
       </div>
 
-      <h2>Latest products</h2>
-      @if (loading()) { <app-loading-spinner /> } @else {
-      <div class="grid">
-        @for (p of items().slice(0, 4); track p.id) {
-        <app-product-card [product]="p" /> }
+      <!-- Recent Products Grid -->
+      <div class="recent-section">
+        <div class="section-title-row">
+          <h2>Recent Products</h2>
+          <a routerLink="/seller/products" class="btn btn-ghost link-btn">
+            <span>View all</span>
+            <mat-icon>arrow_forward</mat-icon>
+          </a>
+        </div>
+
+        @if (loading()) {
+          <app-loading-spinner label="Loading seller store items…" />
+        } @else {
+          <div class="grid">
+            @for (p of items().slice(0, 4); track p.id) {
+              <app-product-card [product]="p" />
+            }
+          </div>
+        }
       </div>
-      }
     </section>
   `,
   styles: [
     `
-      .stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      .dashboard-section {
+        padding-top: 32px;
+        padding-bottom: 64px;
+      }
+
+      .welcome-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
         gap: 20px;
-        margin: 24px 0;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
       }
-      .stat {
-        padding: 24px;
-        position: relative;
-        border: 1px solid var(--app-border);
-        overflow: hidden;
-      }
-      .stat::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: var(--app-gradient);
-      }
-      .k {
-        color: var(--app-muted);
-        font-size: 13.5px;
-        font-weight: 500;
+
+      .welcome-tag {
+        font-size: 12px;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
+        color: var(--app-primary);
+        margin-bottom: 4px;
       }
-      .v {
-        font-size: 32px;
+
+      .welcome-title {
+        font-size: clamp(1.8rem, 3.5vw, 2.4rem);
         font-weight: 800;
-        margin-top: 8px;
-        color: var(--app-fg);
+        letter-spacing: -0.03em;
+        margin: 0 0 4px;
+        color: var(--app-fg-heading);
+      }
+
+      .create-btn {
+        height: 44px;
+        padding: 0 22px;
+        font-size: 15px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 28px;
+      }
+
+      .stat-card {
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .stat-icon mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+
+      .p-icon {
+        background: var(--app-primary-lighter);
+        color: var(--app-primary);
+      }
+      .m-icon {
+        background: rgba(168, 85, 247, 0.12);
+        color: #a855f7;
+      }
+      .l-icon {
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--app-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--app-fg-heading);
+        margin-top: 2px;
         letter-spacing: -0.02em;
       }
-      .v.small {
-        font-size: 16px;
-        font-weight: 600;
-        text-overflow: ellipsis;
-        overflow: hidden;
+      .stat-value.text-truncate {
+        font-size: 1.05rem;
+        font-weight: 700;
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 170px;
       }
-      .actions {
+
+      .shortcuts-bar {
         display: flex;
-        gap: 14px;
+        gap: 12px;
+        margin-bottom: 40px;
         flex-wrap: wrap;
-        margin: 24px 0 40px;
       }
+
+      .recent-section {
+        margin-top: 16px;
+      }
+      .section-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .section-title-row h2 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0;
+      }
+
+      .link-btn {
+        color: var(--app-primary) !important;
+        font-weight: 600;
+      }
+
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 24px;
-      }
-      h1 {
-        margin-bottom: 4px;
-        font-weight: 800;
-        letter-spacing: -0.025em;
       }
     `,
   ],

@@ -41,4 +41,10 @@ export const API = {
     item: (productId: string) => `/carts/items/${productId}`,
     itemQuantity: (productId: string) => `/carts/items/${productId}/quantity`,
   },
+
+  orders: {
+    root: "/orders",
+    item: (orderId: string) => `/orders/${orderId}`,
+    user: "/orders/user",
+  },
 } as const;

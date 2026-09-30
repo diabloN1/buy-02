@@ -16,6 +16,7 @@ import { FieldErrorComponent } from "@shared/components/field-error.component";
 import { LoadingSpinnerComponent } from "@shared/components/loading-spinner.component";
 import { MediaService } from "@core/services/media.service";
 import { CurrentUserService } from "@core/services/current-user.service";
+import { applyFormErrors } from "@shared/utils/form-error.util";
 
 @Component({
   selector: "app-profile",
@@ -341,7 +342,11 @@ export class ProfilePage {
         },
         error: (err) => {
           this.saving.set(false);
-          this.notify.error(err.error?.message || "Failed to update profile");
+          if (err.status === 400 && err.error?.details) {
+            applyFormErrors(this.form, err.error.details);
+          } else {
+            this.notify.error(err.error?.message || "Failed to update profile");
+          }
         },
       });
   }

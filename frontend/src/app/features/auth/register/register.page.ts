@@ -15,6 +15,7 @@ import { AuthService } from "@core/services/auth.service";
 import { NotificationService } from "@core/services/notification.service";
 import { FieldErrorComponent } from "@shared/components/field-error.component";
 import { passwordStrength } from "@shared/validators/validators";
+import { applyFormErrors } from "@shared/utils/form-error.util";
 
 @Component({
   selector: "app-register",
@@ -166,7 +167,11 @@ export class RegisterPage {
       },
       error: (err) => {
         this.loading.set(false);
-        this.notify.error(err.error?.message || "An error occurred during registration.");
+        if (err.status === 400 && err.error?.details) {
+          applyFormErrors(this.form, err.error.details);
+        } else {
+          this.notify.error(err.error?.message || "An error occurred during registration.");
+        }
       },
     });
   }

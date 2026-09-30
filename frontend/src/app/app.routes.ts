@@ -130,6 +130,13 @@ export const APP_ROUTES: Routes = [
   },
 
   {
+    path: "orders",
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import("./features/orders/orders.page").then((m) => m.OrdersPage),
+  },
+
+  {
     path: "**",
     loadComponent: () =>
       import("./features/not-found/not-found.page").then((m) => m.NotFoundPage),

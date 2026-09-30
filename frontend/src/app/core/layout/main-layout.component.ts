@@ -197,10 +197,6 @@ import { CurrentUserService } from "@core/services/current-user.service";
           }
 
           <mat-divider />
-          <a mat-menu-item routerLink="/cart">
-          <mat-icon>shopping_cart</mat-icon>
-            <span>Cart</span>
-          </a>
 
           <button mat-menu-item (click)="theme.toggle()">
             <mat-icon>

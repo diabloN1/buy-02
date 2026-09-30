@@ -76,17 +76,21 @@ public class UserServiceImpl implements UserService {
     @Override
     @Auditable(action = AuditAction.MODIFIED, entityId = "#id")
     public UserResponse updateUser(String id, UpdateUserRequest updateReq) {
+
         User user = userRepo.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
+        String newEmail = updateReq.getEmail();
 
+        if (!user.getEmail().equalsIgnoreCase(newEmail)) {
+            if (userRepo.findByEmail(newEmail).isPresent()) {
+                throw new EmailAlreadyExistsException(newEmail);
+            }
 
-        if (userRepo.findByEmail(updateReq.getEmail()).isPresent())  {
-            throw new EmailAlreadyExistsException(updateReq.getEmail());
+            user.setEmail(newEmail);
         }
 
         user.setName(updateReq.getName());
-        user.setEmail(updateReq.getEmail());
 
         userRepo.save(user);
 

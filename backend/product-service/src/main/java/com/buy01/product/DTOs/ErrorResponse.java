@@ -1,4 +1,4 @@
-package com.__buy.user_service.dto;
+package com.buy01.product.DTOs;
 
 import java.time.LocalDateTime;
 
@@ -19,4 +19,3 @@ public class ErrorResponse {
     private Object details;
     private LocalDateTime timestamp;
 }
-

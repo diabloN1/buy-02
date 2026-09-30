@@ -38,9 +38,12 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
             response.getWriter().write("""
                     {
-                        "error":"Too many requests"
+                        "code": "TOO_MANY_REQUESTS",
+                        "message": "Too many requests. Please try again later.",
+                        "details": null,
+                        "timestamp": "%s"
                     }
-                    """);
+                    """.formatted(java.time.LocalDateTime.now()));
 
             return;
         }

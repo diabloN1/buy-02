@@ -4,7 +4,7 @@ RUN apk add --no-cache git curl
 
 WORKDIR /src
 
-RUN git clone https://github.com/minio/minio.git .
+RUN git clone https://github.com/anlazaar/minio.git .
 
 RUN go build -o /minio .
 

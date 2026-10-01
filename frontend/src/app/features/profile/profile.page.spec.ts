@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { signal } from "@angular/core";
 import { of } from "rxjs";
 
 import { ProfilePage } from "./profile.page";
@@ -13,7 +14,7 @@ describe("ProfilePage", () => {
   let profileSvcSpy: jasmine.SpyObj<ProfileService>;
   let notifySpy: jasmine.SpyObj<NotificationService>;
   let mediaSvcSpy: jasmine.SpyObj<MediaService>;
-  let currentUserSpy: jasmine.SpyObj<CurrentUserService>;
+  let currentUserSpy: any;
 
   const mockUser = {
     id: "u1",
@@ -27,7 +28,11 @@ describe("ProfilePage", () => {
     profileSvcSpy = jasmine.createSpyObj("ProfileService", ["me", "update", "uploadAvatar"]);
     notifySpy = jasmine.createSpyObj("NotificationService", ["success", "error"]);
     mediaSvcSpy = jasmine.createSpyObj("MediaService", ["deleteAvatar"]);
-    currentUserSpy = jasmine.createSpyObj("CurrentUserService", ["load"]);
+    
+    currentUserSpy = {
+      load: jasmine.createSpy("load"),
+      user: signal(mockUser as any)
+    };
 
     profileSvcSpy.me.and.returnValue(of(mockUser as any));
 

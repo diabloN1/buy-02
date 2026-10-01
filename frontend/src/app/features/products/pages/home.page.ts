@@ -29,44 +29,68 @@ import { AuthService } from "@core/services/auth.service";
     EmptyStateComponent,
   ],
   template: `
+    <!-- Hero Section -->
     <section class="hero">
       <div class="container hero-inner">
-        <div>
-          <h1>Discover products from independent sellers</h1>
-          <p class="hero-subtitle">
-            A modern marketplace for buyers and sellers.
-          </p>
-          <div class="cta">
-            <a mat-flat-button color="primary" routerLink="/products"
-              >Browse products</a
-            >
-            @if (authSvc.isAuthenticated()) {
-              <a mat-stroked-button routerLink="/profile">
-                View your profile
-              </a>
-            } @else {
-              <a mat-stroked-button routerLink="/auth/register">
-                Become a seller
-              </a>
-            }
-          </div>
+        <h1 class="hero-title">
+          Discover & Trade Products From
+          <span class="gradient-text">Independent Sellers</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          A seamless marketplace designed for buyers and sellers. High
+          performance, zero friction, and instant product discovery.
+        </p>
+
+        <div class="cta-group">
+          <a routerLink="/products" class="btn btn-primary hero-btn">
+            <mat-icon>storefront</mat-icon>
+            <span>Browse Catalog</span>
+          </a>
+
+          @if (authSvc.isAuthenticated()) {
+            <a routerLink="/profile" class="btn btn-secondary hero-btn">
+              <mat-icon>person</mat-icon>
+              <span>View Profile</span>
+            </a>
+          } @else {
+            <a routerLink="/auth/register" class="btn btn-secondary hero-btn">
+              <mat-icon>store</mat-icon>
+              <span>Become a Seller</span>
+            </a>
+          }
         </div>
       </div>
+
+      <!-- <div class="hero-banner">
+        <img
+          src="/marketplace-banner.png.png"
+          alt="Products available on the marketplace"
+        />
+      </div> -->
     </section>
-    <section class="container">
-      <div class="row">
-        <h2 class="grow">Latest products</h2>
-        <a mat-button routerLink="/products"
-          >See all <mat-icon>arrow_forward</mat-icon></a
-        >
+
+    <!-- Latest Products Section -->
+    <section class="container products-section">
+      <div class="section-header">
+        <div>
+          <div class="section-tag">Featured Catalog</div>
+          <h2 class="section-title">Latest Arrivals</h2>
+        </div>
+
+        <a routerLink="/products" class="btn btn-ghost see-all-btn">
+          <span>See all products</span>
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
       </div>
+
       @if (loading()) {
-        <app-loading-spinner label="Loading products…" />
+        <app-loading-spinner label="Loading latest products…" />
       } @else if (!items().length) {
         <app-empty-state
           icon="storefront"
           title="No products yet"
-          description="Check back soon."
+          description="Check back soon for new arrivals."
         />
       } @else {
         <div class="grid">
@@ -80,70 +104,205 @@ import { AuthService } from "@core/services/auth.service";
   styles: [
     `
       .hero {
-        background:
-          radial-gradient(
-            circle at 10% 20%,
-            rgba(99, 102, 241, 0.08) 0%,
-            transparent 60%
-          ),
-          radial-gradient(
-            circle at 90% 80%,
-            rgba(139, 92, 246, 0.06) 0%,
-            transparent 70%
-          );
-        border-bottom: 1px solid var(--app-border);
-        overflow: hidden;
         position: relative;
+        background: var(--app-gradient-hero);
+        border-bottom: 1px solid var(--app-border);
+        padding: 64px 0 52px;
       }
-      .hero::before {
-        content: "";
-        position: absolute;
-        top: -100px;
-        right: -100px;
-        width: 300px;
-        height: 300px;
-        background: rgba(99, 102, 241, 0.15);
-        filter: blur(80px);
-        border-radius: 50%;
-        pointer-events: none;
-      }
+
       .hero-inner {
-        padding: 96px 24px;
+        position: relative;
+        z-index: 2;
         text-align: center;
-        max-width: 800px;
-        margin: 0 auto;
+        max-width: 880px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
-      h1 {
-        font-size: clamp(2.2rem, 5vw, 3.5rem);
-        margin: 0 0 16px;
-        letter-spacing: -0.03em;
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: var(--app-radius-full);
+        background: var(--app-surface);
+        border: 1px solid var(--app-border);
+        box-shadow: var(--app-shadow-sm);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--app-fg);
+        margin-bottom: 24px;
+      }
+
+      .badge-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--app-primary);
+      }
+
+      .hero-title {
+        font-size: clamp(2.2rem, 5vw, 3.6rem);
+        margin: 0 0 20px;
         line-height: 1.15;
         font-weight: 800;
-        color: var(--app-fg);
+        letter-spacing: -0.035em;
+        color: var(--app-fg-heading);
       }
+
+      .gradient-text {
+        background: var(--app-gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
       .hero-subtitle {
-        font-size: clamp(1.1rem, 2vw, 1.3rem);
+        font-size: clamp(1.05rem, 1.8vw, 1.2rem);
         line-height: 1.6;
-        max-width: 600px;
-        margin: 0 auto;
+        max-width: 640px;
+        margin: 0 auto 32px;
         color: var(--app-muted);
       }
-      .cta {
+
+      .cta-group {
         display: flex;
-        gap: 16px;
+        gap: 14px;
         justify-content: center;
-        margin-top: 32px;
+        align-items: center;
         flex-wrap: wrap;
+        margin-bottom: 48px;
       }
-      h2 {
-        margin: 40px 0 24px;
+
+      .hero-btn {
+        height: 46px;
+        padding: 0 26px;
+        font-size: 15px;
+        border-radius: var(--app-radius-sm);
+      }
+
+      .hero {
+        overflow: hidden;
+        padding-top: 80px;
+      }
+
+      .hero-inner {
+        text-align: center;
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero-banner {
+        width: 100%;
+        margin-top: 70px;
+        line-height: 0;
+        position: relative;
+
+        img {
+          display: block;
+          width: 100%;
+          height: auto;
+          max-height: 360px;
+          object-fit: cover;
+          object-position: center;
+        }
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        width: 100%;
+        margin-top: 8px;
+      }
+
+      .feature-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 20px;
+        background: var(--app-surface);
+        border: 1px solid var(--app-border);
+        border-radius: var(--app-radius);
+        text-align: left;
+        box-shadow: var(--app-shadow-sm);
+        transition: all 0.2s ease;
+      }
+
+      .feature-card:hover {
+        border-color: var(--app-border-hover);
+        transform: translateY(-2px);
+      }
+
+      .feature-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--app-primary-lighter);
+        color: var(--app-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .feature-icon mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+
+      .feature-info h4 {
+        margin: 0 0 2px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--app-fg-heading);
+      }
+
+      .feature-info p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--app-muted);
+        line-height: 1.4;
+      }
+
+      .products-section {
+        padding-top: 48px;
+        padding-bottom: 64px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .section-tag {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--app-primary);
+        margin-bottom: 4px;
+      }
+
+      .section-title {
+        font-size: 1.85rem;
         font-weight: 800;
-        font-size: 1.75rem;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.025em;
+        margin: 0;
       }
+
+      .see-all-btn {
+        color: var(--app-primary) !important;
+        font-weight: 600;
+      }
+
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 24px;
       }
     `,
@@ -154,6 +313,7 @@ export class HomePage {
   readonly authSvc = inject(AuthService);
   readonly items = signal<Product[]>([]);
   readonly loading = signal(true);
+
   constructor() {
     this.svc.list(1, 8).subscribe({
       next: (r) => {

@@ -1,6 +1,7 @@
 configuration-as-code
 workflow-aggregator
 git
+github-branch-source
 docker-workflow
 credentials
 credentials-binding
@@ -10,3 +11,4 @@ theme-manager
 pipeline-stage-view
 job-dsl
 role-strategy
+sonar

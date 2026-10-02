@@ -37,24 +37,32 @@ import { CartService } from "@core/services/cart.service";
     ImagePreviewComponent,
   ],
   template: `
-    <section class="container">
+    <section class="container details-section">
       @if (product(); as p) {
-        <a mat-button routerLink="/products"
-          ><mat-icon>arrow_back</mat-icon> Back</a
-        >
+        <a mat-button class="back-btn" routerLink="/products">
+          <mat-icon>arrow_back</mat-icon>
+          <span>Back to products</span>
+        </a>
+
         <div class="grid">
+          <!-- Image Gallery Column -->
           <div class="gallery app-card">
-            @if (activeImage(); as img) {
-              <img
-                [src]="img | safeUrl"
-                [alt]="p.name"
-                (click)="previewOpen.set(true)"
-                style="cursor:pointer"
-              />
-            } @else {
-              <div class="ph"><mat-icon>image</mat-icon></div>
-            }
-            @if (p.images.length) {
+            <div class="main-image-wrap" (click)="previewOpen.set(true)" title="Click to expand view">
+              @if (activeImage(); as img) {
+                <img [src]="img | safeUrl" [alt]="p.name" />
+                <div class="expand-overlay">
+                  <mat-icon>zoom_in</mat-icon>
+                  <span>Click to view full image</span>
+                </div>
+              } @else {
+                <div class="ph">
+                  <mat-icon>storefront</mat-icon>
+                  <span>No image available</span>
+                </div>
+              }
+            </div>
+
+            @if (p.images.length > 1) {
               <div class="thumbs">
                 @for (image of p.images; track image.id) {
                   <button
@@ -62,6 +70,7 @@ import { CartService } from "@core/services/cart.service";
                     class="thumb"
                     (click)="active.set($index)"
                     [class.on]="active() === $index"
+                    [attr.aria-label]="'View image ' + ($index + 1)"
                   >
                     <img [src]="image.url | safeUrl" alt="" />
                   </button>
@@ -69,11 +78,26 @@ import { CartService } from "@core/services/cart.service";
               </div>
             }
           </div>
-          <div class="info stack">
-            <h1>{{ p.name }}</h1>
-            <div class="price">{{ p.price | currency }}</div>
+
+          <!-- Product Details Column -->
+          <div class="info-card app-card stack">
+            <div class="header-area">
+              <span class="stock-pill" [class.out-of-stock]="p.quantity <= 0">
+                <mat-icon>inventory_2</mat-icon>
+                <span>{{ p.quantity > 0 ? ('In Stock: ' + p.quantity) : 'Out of Stock' }}</span>
+              </span>
+
+              <h1 class="title">{{ p.name }}</h1>
+
+              <div class="price-box">
+                <span class="currency">$</span>
+                <span class="amount">{{ p.price | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+            <!-- Seller Information Badge -->
             @if (seller(); as seller) {
-              <div class="seller">
+              <div class="seller-card">
                 @if (seller.avatar) {
                   <img
                     class="seller-avatar"
@@ -82,17 +106,17 @@ import { CartService } from "@core/services/cart.service";
                   />
                 } @else {
                   <div class="seller-avatar-placeholder">
-                    <mat-icon>person</mat-icon>
+                    <span>{{ (seller.name || 'S').charAt(0).toUpperCase() }}</span>
                   </div>
                 }
 
-                <div class="">
-                  <span class="seller-label">Seller</span>
-                  <strong> - {{ seller.name }}</strong>
+                <div class="seller-details">
+                  <span class="seller-role">Verified Seller</span>
+                  <strong class="seller-name">{{ seller.name }}</strong>
                 </div>
               </div>
             }
-            <p class="description">{{ p.description }}</p>
+
             <div class="stock-tag">
               @if (p.quantity > 0) {
                 <mat-icon
@@ -114,7 +138,7 @@ import { CartService } from "@core/services/cart.service";
                   <label>Quantity:</label>
                   <div class="quantity-stepper">
                     <button
-                      matMiniFab
+                      mat-mini-fab
                       class="minifab"
                       (click)="quantity.set(quantity() - 1)"
                       [disabled]="quantity() <= 1"
@@ -124,7 +148,7 @@ import { CartService } from "@core/services/cart.service";
                     </button>
                     <span class="quantity-value">{{ quantity() }}</span>
                     <button
-                      matMiniFab
+                      mat-mini-fab
                       class="minifab"
                       (click)="quantity.set(quantity() + 1)"
                       [disabled]="quantity() >= (p.quantity || 1)"
@@ -139,13 +163,32 @@ import { CartService } from "@core/services/cart.service";
                 </a>
               </div>
             }
-            <div class="actions">
+
+            <div class="divider"></div>
+
+            <!-- Description -->
+            <div class="description-block">
+              <h3>Product Description</h3>
+              <p class="description-text">{{ p.description || 'No detailed description provided by the seller.' }}</p>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="actions-group">
               @if (ownedByMe()) {
                 <a
-                  mat-stroked-button
+                  mat-flat-button
+                  color="primary"
+                  class="edit-btn"
                   [routerLink]="['/seller/products', p.id, 'edit']"
-                  ><mat-icon>edit</mat-icon> Edit product</a
                 >
+                  <mat-icon>edit</mat-icon>
+                  <span>Edit Product Details</span>
+                </a>
+              } @else {
+                <button mat-flat-button color="primary" class="buy-btn" [disabled]="p.quantity <= 0">
+                  <mat-icon>shopping_bag</mat-icon>
+                  <span>{{ p.quantity > 0 ? 'Buy Now' : 'Out of Stock' }}</span>
+                </button>
               }
 
               @if (!currentUser.user()) {
@@ -207,59 +250,110 @@ import { CartService } from "@core/services/cart.service";
             </div>
           </div>
         </div>
+
         <app-image-preview
           [open]="previewOpen()"
           [imageUrl]="activeImage() ?? ''"
-          [title]="product()?.name ?? 'Image'"
+          [title]="product()?.name ?? 'Image Preview'"
           (closed)="previewOpen.set(false)"
         />
       } @else {
-        <app-loading-spinner label="Loading…" />
+        <app-loading-spinner label="Loading product details…" />
       }
     </section>
   `,
   styles: [
     `
+      .details-section {
+        padding-top: 24px;
+        padding-bottom: 64px;
+      }
+
+      .back-btn {
+        margin-bottom: 24px;
+        font-weight: 500;
+        color: var(--app-muted) !important;
+        border-radius: var(--app-radius-sm);
+      }
+      .back-btn:hover {
+        color: var(--app-primary) !important;
+        background: var(--app-primary-lighter) !important;
+      }
+
       .grid {
         display: grid;
-        grid-template-columns: 1.2fr 1fr;
+        grid-template-columns: 1.1fr 1fr;
         gap: 32px;
-        margin-top: 24px;
         align-items: start;
       }
-      @media (max-width: 800px) {
+      @media (max-width: 860px) {
         .grid {
           grid-template-columns: 1fr;
           gap: 24px;
         }
       }
+
       .gallery {
-        padding: 16px;
+        padding: 20px;
+        background: var(--app-surface);
       }
-      .gallery img {
+
+      .main-image-wrap {
+        position: relative;
+        border-radius: var(--app-radius-sm);
+        overflow: hidden;
+        aspect-ratio: 4 / 3;
+        background: var(--app-bg-alt);
+        cursor: pointer;
+      }
+      .main-image-wrap img {
         width: 100%;
-        aspect-ratio: 4/3;
+        height: 100%;
         object-fit: cover;
-        border-radius: var(--app-radius);
+        transition: transform 0.4s ease;
       }
-      .ph {
-        aspect-ratio: 4/3;
+      .main-image-wrap:hover img {
+        transform: scale(1.03);
+      }
+
+      .expand-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 12px;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+        color: #ffffff;
         display: flex;
         align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .main-image-wrap:hover .expand-overlay {
+        opacity: 1;
+      }
+
+      .ph {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         justify-content: center;
-        background: var(--app-bg);
-        border-radius: var(--app-radius);
+        gap: 8px;
+        color: var(--app-muted);
       }
       .ph mat-icon {
         font-size: 48px;
         width: 48px;
         height: 48px;
-        color: var(--app-muted);
-        opacity: 0.5;
       }
+
       .thumbs {
         display: flex;
-        gap: 10px;
+        gap: 12px;
         margin-top: 16px;
         flex-wrap: wrap;
       }
@@ -271,7 +365,7 @@ import { CartService } from "@core/services/cart.service";
         overflow: hidden;
         cursor: pointer;
         transition: all 0.2s ease;
-        box-shadow: var(--app-shadow);
+        box-shadow: var(--app-shadow-sm);
       }
       .thumb.on {
         border-color: var(--app-primary);
@@ -284,47 +378,84 @@ import { CartService } from "@core/services/cart.service";
         object-fit: cover;
         display: block;
       }
-      .info {
-        padding: 8px 0;
+
+      .info-card {
+        padding: 28px;
+        background: var(--app-surface);
       }
-      .price {
-        font-size: 28px;
-        font-weight: 800;
-        color: var(--app-fg);
-        letter-spacing: -0.01em;
-        margin: 12px 0 20px;
-      }
-      h1 {
-        margin: 0;
-        font-size: clamp(1.8rem, 4vw, 2.5rem);
-        font-weight: 800;
-        letter-spacing: -0.025em;
-        line-height: 1.2;
-        overflow-wrap: anywhere;
-      }
-      .description {
-        font-size: 15px;
-        line-height: 1.6;
-        color: var(--app-fg);
-        opacity: 0.9;
-        margin-bottom: 24px;
-      }
-      .stock-tag {
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--app-muted);
-        margin: 16px 0;
+
+      .stock-pill {
         display: inline-flex;
         align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: var(--app-radius-full);
+        background: var(--app-success-light);
+        color: var(--app-success);
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 12px;
       }
-      .actions {
-        margin-top: 24px;
+      .stock-pill.out-of-stock {
+        background: var(--app-danger-light);
+        color: var(--app-danger);
+      }
+      .stock-pill mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+
+      .title {
+        font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.25;
+        margin: 0 0 16px;
+        color: var(--app-fg-heading);
+        overflow-wrap: anywhere;
+      }
+
+      .price-box {
+        display: flex;
+        align-items: baseline;
+        gap: 2px;
+        color: var(--app-primary);
+        font-weight: 800;
+        margin-bottom: 20px;
+      }
+      .price-box .currency {
+        font-size: 1.2rem;
+      }
+      .price-box .amount {
+        font-size: 2.2rem;
+        letter-spacing: -0.02em;
+      }
+
+      .stock-tag {
+        margin-top: 16px;
+        font-size: 14px;
+        color: var(--app-fg);
+        display: flex;
+        align-items: center;
+      }
+      .out-of-stock {
+        color: var(--app-muted);
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .actions-group {
+        margin-top: 12px;
         display: flex;
         gap: 12px;
         align-items: center;
         flex-wrap: wrap;
       }
-      .actions a {
+      .actions-group > a,
+      .actions-group > button {
         margin: 0;
       }
 
@@ -365,49 +496,79 @@ import { CartService } from "@core/services/cart.service";
         background-color: var(--app-primary);
         color: var(--app-primary-contrast, #fff);
       }
-      .out-of-stock {
-        color: var(--app-muted);
-        font-size: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-      }
-      .seller {
+
+      .seller-card {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 14px;
+        padding: 12px 16px;
+        background: var(--app-bg-alt);
+        border: 1px solid var(--app-border);
+        border-radius: var(--app-radius-sm);
       }
-
-      .seller-avatar,
-      .seller-avatar-placeholder {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-      }
-
       .seller-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
         object-fit: cover;
       }
-
       .seller-avatar-placeholder {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--app-gradient-primary);
+        color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: var(--app-bg);
-        color: var(--app-muted);
+        font-weight: 700;
       }
-
-      .seller-info {
+      .seller-details {
         display: flex;
         flex-direction: column;
-        gap: 2px;
+      }
+      .seller-role {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--app-primary);
+        letter-spacing: 0.05em;
+      }
+      .seller-name {
+        font-size: 14px;
+        color: var(--app-fg-heading);
       }
 
-      .seller-label {
-        font-size: 12px;
-        color: var(--app-muted);
+      .divider {
+        height: 1px;
+        background: var(--app-border);
+        margin: 16px 0;
       }
-      
+
+      .description-block h3 {
+        font-size: 15px;
+        font-weight: 700;
+        margin: 0 0 8px;
+        color: var(--app-fg-heading);
+      }
+      .description-text {
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--app-muted);
+        margin: 0;
+      }
+
+      .edit-btn, .buy-btn {
+        width: 100%;
+        height: 48px;
+        font-size: 15px !important;
+        border-radius: var(--app-radius-sm) !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
       .minifab {
         box-shadow: none;
         color: var(--app-fg);
@@ -427,6 +588,7 @@ import { CartService } from "@core/services/cart.service";
         border: 2px solid var(--app-primary);
         border-radius: var(--app-radius);
         margin-top: 16px;
+        width: 100%;
       }
 
       .quantity-display {

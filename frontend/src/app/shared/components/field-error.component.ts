@@ -5,9 +5,10 @@ import { AbstractControl } from '@angular/forms';
   selector: 'app-field-error',
   standalone: true,
   template: `
-    @if (control && control.touched && control.errors) {
+    @if (control && (control.touched || control.dirty) && control.errors) {
       <div class="error-text">
-        @if (control.errors['required']) { This field is required. }
+        @if (control.errors['serverError']) { {{ control.errors['serverError'] }} }
+        @else if (control.errors['required']) { This field is required. }
         @else if (control.errors['email']) { Enter a valid email. }
         @else if (control.errors['minlength']) { Too short (min {{ control.errors['minlength'].requiredLength }}). }
         @else if (control.errors['maxlength']) { Too long. }

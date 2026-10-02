@@ -66,7 +66,7 @@ services:
       ADMIN_NAME: ${ADMIN_NAME}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      
+
     healthcheck:
       test:
         [
@@ -93,7 +93,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
-    
+
     healthcheck:
       test:
         [
@@ -126,7 +126,7 @@ services:
       MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
-    
+
     healthcheck:
       test:
         [
@@ -156,7 +156,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
-    
+
     healthcheck:
       test:
         [
@@ -202,9 +202,8 @@ services:
       retries: 20
 
   api-gateway:
-
     build: ./backend/api-gateway
-  
+
     depends_on:
       product:
         condition: service_healthy
@@ -216,10 +215,10 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
-  
+
     ports:
       - "8080:8080"
-  
+
     environment:
       SPRING_PROFILES_ACTIVE: docker
       JWT_SECRET: ${JWT_SECRET}
@@ -227,7 +226,14 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka:8761/eureka
 
     healthcheck:
-      test: ["CMD", "curl", "--insecure", "--fail", "https://localhost:8080/actuator/health"]
+      test:
+        [
+          "CMD",
+          "curl",
+          "--insecure",
+          "--fail",
+          "https://localhost:8080/actuator/health",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -241,25 +247,20 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-      
+
     volumes:
       - mongo-data:/data/db
 
   minio:
-    image: minio/minio
-
-    # ports:
-    #   - "9001:9001"
-
+    build:
+      context: ./deps-setup/minio
+    image: anlazaar/minio:latest
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-
     command: server /data --console-address ":9001"
-
     volumes:
       - minio-data:/data
-
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 5s

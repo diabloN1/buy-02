@@ -49,15 +49,15 @@ public class SecurityConfig {
                     res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     res.setContentType("application/json");
                     res.getWriter().write("""
-                                {"error":"Token expired or invalid"}
-                            """);
+                                {"code":"UNAUTHORIZED","message":"Token expired or invalid","details":null,"timestamp":"%s"}
+                            """.formatted(java.time.LocalDateTime.now()));
                 })
                 .accessDeniedHandler((req, res, accessDeniedEx) -> {
                     res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     res.setContentType("application/json");
                     res.getWriter().write("""
-                                {"error":"You do not have permission to access this resource"}
-                            """);
+                                {"code":"FORBIDDEN","message":"You do not have permission to access this resource","details":null,"timestamp":"%s"}
+                            """.formatted(java.time.LocalDateTime.now()));
                 }));
         return http.build();
     }

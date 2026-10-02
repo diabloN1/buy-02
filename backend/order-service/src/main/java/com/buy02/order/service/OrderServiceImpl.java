@@ -22,6 +22,7 @@ import com.buy02.order.entity.Order;
 import com.buy02.order.entity.SubOrder;
 import com.buy02.order.event.AuditAction;
 import com.buy02.order.exception.custom.BadRequestException;
+import com.buy02.order.exception.custom.ForbiddenException;
 import com.buy02.order.exception.custom.NotFoundException;
 import com.buy02.order.mapper.OrderMapper;
 import com.buy02.order.repository.OrderRepository;
@@ -39,11 +40,7 @@ public class OrderServiceImpl implements OrderService {
 
         @Override
         @Auditable(action = AuditAction.CREATED, entityId = "#result.id")
-        public OrderResponse createOrder(
-                        String userId,
-                        CreateOrderRequest request) {
-
-                log.info("Creating order for user {}", userId);
+        public OrderResponse createOrder(String userId, CreateOrderRequest request) {
 
                 CartResponse cart = cartClient.getCart();
 
@@ -85,12 +82,7 @@ public class OrderServiceImpl implements OrderService {
                 List<SubOrder> savedSubOrders = subOrderRepository.saveAll(subOrders);
 
                 cartClient.clearCart();
-
-                log.info("Created order {} with {} sub-orders for user {}",
-                                savedOrder.getId(),
-                                savedSubOrders.size(),
-                                userId);
-
+                
                 OrderResponse response = orderMapper.toResponse(savedOrder);
 
                 response.setSubOrders(orderMapper.toSubOrderResponses(savedSubOrders));
@@ -107,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
                                                 "Order not found with id: " + orderId));
 
                 if (!order.getUserId().equals(userId)) {
-                        throw new com.buy02.order.exception.custom.ForbiddenException(
+                        throw new ForbiddenException(
                                         "You don't have permission to view this order");
                 }
 

@@ -12,39 +12,44 @@ import { CartService } from "@core/services/cart.service";
     <div class="cart-item">
       <div class="item-details">
         @if (imageUrl) {
-          <img [src]="imageUrl" alt="product image" />
+          <img [src]="imageUrl" alt="product image" class="thumb" />
         } @else {
-          <mat-icon class="image-placeholder">inventory_2</mat-icon>
+          <div class="thumb-placeholder">
+            <mat-icon>inventory_2</mat-icon>
+          </div>
         }
         <span class="item-name">{{ productName }}</span>
       </div>
 
       <div class="item-quantity">
-        <button
-          mat-mini-fab
-          class="minifab"
-          (click)="updateItemQuantity(quantity - 1)"
-          [disabled]="quantity <= 1"
-          aria-label="Decrease quantity"
-        >
-          <mat-icon>remove</mat-icon>
-        </button>
-        <span class="quantity-value">{{ quantity }}</span>
-        <button
-          mat-mini-fab
-          class="minifab"
-          (click)="updateItemQuantity(quantity + 1)"
-          [disabled]="quantity >= availableStock"
-          aria-label="Increase quantity"
-        >
-          <mat-icon>add</mat-icon>
-        </button>
+        <div class="qty-group">
+          <button
+            mat-icon-button
+            class="qty-btn"
+            (click)="updateItemQuantity(quantity - 1)"
+            [disabled]="quantity <= 1"
+            aria-label="Decrease quantity"
+          >
+            <mat-icon>remove</mat-icon>
+          </button>
+          <span class="quantity-value">{{ quantity }}</span>
+          <button
+            mat-icon-button
+            class="qty-btn"
+            (click)="updateItemQuantity(quantity + 1)"
+            [disabled]="quantity >= availableStock"
+            aria-label="Increase quantity"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
       </div>
+
       <span class="item-price">{{ price | currency }}</span>
 
       <button
-        mat-mini-fab
-        class="minifab"
+        mat-icon-button
+        class="remove-btn"
         (click)="deleteItem()"
         aria-label="Remove item"
       >
@@ -58,7 +63,7 @@ import { CartService } from "@core/services/cart.service";
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 16px 8px;
+        padding: 16px 4px;
         border-bottom: 1px solid var(--app-border);
         gap: 16px;
       }
@@ -70,65 +75,128 @@ import { CartService } from "@core/services/cart.service";
       .item-details {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 16px;
         flex: 1;
       }
 
-      .item-name {
-        font-weight: 500;
-        color: var(--app-fg);
-        font-size: 14px;
-        overflow-wrap: anywhere;
-      }
-
-      .item-quantity {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--app-muted);
-        font-size: 13px;
-      }
-
-      .item-price {
-        color: var(--app-fg);
-        font-weight: 500;
-        font-size: 14px;
-        min-width: 60px;
-        text-align: right;
-      }
-
-      .minifab {
-        box-shadow: none;
-        color: var(--app-fg);
-        background-color: transparent;
-      }
-
-      .minifab:disabled {
-        visibility: hidden;
-      }
-
-      img,
-      .image-placeholder {
+      .thumb {
         width: 48px;
         height: 48px;
-        flex-shrink: 0;
-        box-sizing: border-box;
-      }
-
-      img {
         object-fit: cover;
         border-radius: var(--app-radius-sm);
         border: 1px solid var(--app-border);
         display: block;
+        flex-shrink: 0;
       }
 
-      .image-placeholder {
+      .thumb-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--app-radius-sm);
+        border: 1px dashed var(--app-border-hover);
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--app-muted);
+        background: var(--app-bg-alt);
+        flex-shrink: 0;
+      }
+
+      .item-name {
+        font-weight: 500;
+        color: var(--app-fg-heading);
+        font-size: 14px;
+        overflow-wrap: anywhere;
+      }
+
+      /* Unified Shadcn-style Quantity Stepper */
+      .qty-group {
+        display: inline-flex;
+        align-items: center;
         border: 1px solid var(--app-border);
         border-radius: var(--app-radius-sm);
+        background: var(--app-surface);
+        height: 32px;
+      }
+
+      .qty-btn {
+        width: 30px !important;
+        height: 30px !important;
+        padding: 0 !important;
+        color: var(--app-muted) !important;
+        border-radius: 0 !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .qty-btn:first-child {
+        border-top-left-radius: var(--app-radius-sm) !important;
+        border-bottom-left-radius: var(--app-radius-sm) !important;
+      }
+
+      .qty-btn:last-child {
+        border-top-right-radius: var(--app-radius-sm) !important;
+        border-bottom-right-radius: var(--app-radius-sm) !important;
+      }
+
+      .qty-btn mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+      }
+
+      .qty-btn:not(:disabled):hover {
+        background: var(--app-surface-hover) !important;
+        color: var(--app-fg) !important;
+      }
+
+      .qty-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .quantity-value {
+        width: 32px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--app-fg);
+        font-variant-numeric: tabular-nums;
+        border-left: 1px solid var(--app-border);
+        border-right: 1px solid var(--app-border);
+        line-height: 30px;
+      }
+
+      .item-price {
+        color: var(--app-fg-heading);
+        font-weight: 600;
+        font-size: 14px;
+        min-width: 70px;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* Shadcn Ghost Remove Button */
+      .remove-btn {
+        width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important;
+        color: var(--app-muted) !important;
+        border-radius: var(--app-radius-sm) !important;
+      }
+
+      .remove-btn mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+      }
+
+      .remove-btn:hover {
+        background: var(--app-danger-light) !important;
+        color: var(--app-danger) !important;
       }
 
       @media (max-width: 600px) {
@@ -151,7 +219,7 @@ import { CartService } from "@core/services/cart.service";
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          overflow-wrap: none;
+          overflow-wrap: normal;
         }
 
         .item-quantity {
@@ -163,9 +231,10 @@ import { CartService } from "@core/services/cart.service";
           grid-area: price;
           align-self: center;
           min-width: auto;
+          text-align: left;
         }
 
-        .cart-item > .minifab:last-child {
+        .remove-btn {
           grid-area: remove;
           align-self: center;
         }

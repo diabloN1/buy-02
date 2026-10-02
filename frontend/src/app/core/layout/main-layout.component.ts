@@ -115,7 +115,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
           <!-- Theme Toggle Circular Button -->
           <button
             type="button"
-            class="theme-toggle-btn desktop-theme"
+            class="icon-btn hide-on-mobile"
             (click)="theme.toggle()"
             [attr.aria-label]="'Toggle theme mode'"
             [title]="
@@ -130,9 +130,17 @@ import { CurrentUserService } from "@core/services/current-user.service";
           </button>
 
           @if (auth.isAuthenticated()) {
+            <a
+              class="icon-btn hide-on-mobile cart-btn"
+              routerLink="/cart"
+              aria-label="View Cart"
+            >
+              <mat-icon>shopping_cart</mat-icon>
+            </a>
+
             <button
               type="button"
-              class="user-profile-btn desktop-profile-button"
+              class="user-profile-btn hide-on-mobile"
               [matMenuTriggerFor]="menu"
               aria-label="User menu"
             >
@@ -145,16 +153,11 @@ import { CurrentUserService } from "@core/services/current-user.service";
               <mat-icon class="dropdown-icon">expand_more</mat-icon>
             </button>
 
-            <button
-              matMiniFab
-              class="theme desktop-theme"
-              routerLink="/cart"
-              [attr.aria-label]="'Toggle theme'"
+            <mat-menu
+              #menu="matMenu"
+              class="user-dropdown-menu"
+              xPosition="before"
             >
-              <mat-icon>shopping_cart</mat-icon>
-            </button>
-
-            <mat-menu #menu="matMenu" class="user-dropdown-menu">
               <a mat-menu-item routerLink="/profile">
                 <mat-icon>person</mat-icon>
                 <span>My Profile</span>
@@ -168,19 +171,16 @@ import { CurrentUserService } from "@core/services/current-user.service";
               </button>
             </mat-menu>
           } @else {
-            <div class="auth-buttons desktop-auth">
-              <a routerLink="/auth/login" class="btn btn-ghost"> Login </a>
-
-              <a routerLink="/auth/register" class="btn btn-primary">
-                Sign up
-              </a>
+            <div class="auth-buttons hide-on-mobile">
+              <a routerLink="/auth/login" class="btn btn-ghost">Login</a>
+              <a routerLink="/auth/register" class="btn btn-primary">Sign up</a>
             </div>
           }
 
           <!-- Mobile Hamburger Button -->
           <button
             type="button"
-            class="mobile-menu-btn"
+            class="icon-btn mobile-menu-btn"
             [matMenuTriggerFor]="mobileMenu"
             aria-label="Open navigation menu"
           >
@@ -197,17 +197,14 @@ import { CurrentUserService } from "@core/services/current-user.service";
 
           @if (auth.isSeller()) {
             <mat-divider />
-
             <a mat-menu-item routerLink="/dashboard">
               <mat-icon>dashboard</mat-icon>
               <span>Dashboard</span>
             </a>
-
             <a mat-menu-item routerLink="/seller/products">
               <mat-icon>inventory_2</mat-icon>
               <span>My Products</span>
             </a>
-
             <a mat-menu-item routerLink="/seller/media">
               <mat-icon>perm_media</mat-icon>
               <span>Media Management</span>
@@ -216,17 +213,14 @@ import { CurrentUserService } from "@core/services/current-user.service";
 
           @if (auth.isAdmin()) {
             <mat-divider />
-
             <a mat-menu-item routerLink="/admin/dashboard">
               <mat-icon>dashboard</mat-icon>
               <span>Dashboard</span>
             </a>
-
             <a mat-menu-item routerLink="/admin/products">
               <mat-icon>inventory_2</mat-icon>
               <span>Products</span>
             </a>
-
             <a mat-menu-item routerLink="/cart">
               <mat-icon>shopping_cart</mat-icon>
               <span>Cart</span>
@@ -253,21 +247,17 @@ import { CurrentUserService } from "@core/services/current-user.service";
               <mat-icon>person</mat-icon>
               <span>Profile</span>
             </a>
-
             <mat-divider />
-
             <button mat-menu-item (click)="logout()">
               <mat-icon>logout</mat-icon>
               <span>Log out</span>
             </button>
           } @else {
             <mat-divider />
-
             <a mat-menu-item routerLink="/auth/login">
               <mat-icon>login</mat-icon>
               <span>Login</span>
             </a>
-
             <a mat-menu-item routerLink="/auth/register">
               <mat-icon>person_add</mat-icon>
               <span>Sign up</span>
@@ -288,7 +278,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
           <span>Marketplace</span>
         </div>
         <p class="muted copyright">
-          Â© {{ year }} Marketplace Inc. All rights reserved.
+          © {{ year }} Marketplace Inc. All rights reserved.
         </p>
       </div>
     </footer>
@@ -301,10 +291,11 @@ import { CurrentUserService } from "@core/services/current-user.service";
         min-height: 100vh;
       }
 
+      /* Pro App Header (Shadcn/Vercel) */
       .app-header {
         position: sticky;
         top: 0;
-        z-index: 100;
+        z-index: 50;
         background: var(--app-glass-bg);
         backdrop-filter: var(--app-backdrop-blur);
         -webkit-backdrop-filter: var(--app-backdrop-blur);
@@ -315,51 +306,50 @@ import { CurrentUserService } from "@core/services/current-user.service";
       }
 
       .header-container {
-        height: 68px;
+        height: 64px; /* Crisp Shadcn standard height */
         padding-top: 0 !important;
         padding-bottom: 0 !important;
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 24px;
       }
 
+      /* Minimalist Brand Logo */
       .brand {
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        text-decoration: none !important;
         color: var(--app-fg-heading);
-        font-weight: 800;
-        font-size: 1.25rem;
-        letter-spacing: -0.03em;
-        margin-right: 12px;
+        font-weight: 700;
+        font-size: 1.125rem;
+        letter-spacing: -0.04em;
+        margin-right: 8px;
+        transition: opacity 0.2s ease;
+      }
+      .brand:hover {
+        opacity: 0.85;
       }
 
       .brand-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: var(--app-gradient-primary);
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: var(--app-fg-heading); /* High contrast logo */
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #ffffff;
-        box-shadow: var(--app-shadow-sm);
+        color: var(--app-bg);
       }
-
       .brand-icon mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
       }
 
-      .title-accent {
-        color: var(--app-primary);
-      }
-
+      /* Pro App Navigation Links */
       .nav-links {
         display: flex;
-        gap: 4px;
+        gap: 6px;
         align-items: center;
       }
 
@@ -367,146 +357,144 @@ import { CurrentUserService } from "@core/services/current-user.service";
         font-weight: 500;
         font-size: 14px;
         color: var(--app-muted);
-        transition: all 0.2s ease;
+        transition:
+          color 0.15s ease,
+          background-color 0.15s ease;
         border-radius: var(--app-radius-sm);
-        padding: 0 14px;
-        height: 38px;
+        padding: 0 12px;
+        height: 36px;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        text-decoration: none !important;
       }
-
       .nav-link mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
         color: var(--app-muted);
-        transition: color 0.2s ease;
+        transition: color 0.15s ease;
       }
 
       .nav-link:hover {
-        color: var(--app-fg);
-        background: var(--app-surface-hover);
+        color: var(--app-fg-heading);
       }
-
       .nav-link:hover mat-icon {
-        color: var(--app-primary);
+        color: var(--app-fg-heading);
       }
 
+      /* Subtle Shadcn Active State */
       .nav-link.active {
-        background: var(--app-primary-lighter) !important;
-        color: var(--app-primary) !important;
-        font-weight: 600;
+        background: var(--app-surface-hover);
+        color: var(--app-fg-heading) !important;
       }
-
       .nav-link.active mat-icon {
-        color: var(--app-primary) !important;
+        color: var(--app-fg-heading) !important;
       }
 
       .grow {
         flex: 1;
       }
 
+      /* Controls Section */
       .header-controls {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
       }
 
-      .theme-toggle-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        color: var(--app-fg);
-        background: var(--app-surface);
-        border: 1px solid var(--app-border);
-        transition: all 0.2s ease;
+      /* Standardized Icon Buttons (Replacing MDC defaults) */
+      .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--app-radius-sm);
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--app-muted);
         display: inline-flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        outline: none;
+        transition: all 0.15s ease;
       }
-
-      .theme-toggle-btn:hover {
+      .icon-btn mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+      .icon-btn:hover {
         background: var(--app-surface-hover);
+        color: var(--app-fg-heading);
+      }
+      .icon-btn:focus-visible {
+        outline: none;
+        box-shadow: var(--app-glow);
         border-color: var(--app-primary);
-        color: var(--app-primary);
       }
 
-      .theme-toggle-btn mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
+      /* Cart Button Special Polish */
+      .cart-btn {
+        border: 1px solid var(--app-border);
+        background: var(--app-surface);
       }
 
+      /* User Profile Pill Dropdown */
       .user-profile-btn {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 4px 12px 4px 6px;
-        height: 38px;
-        border-radius: 9999px;
+        padding: 4px 12px 4px 4px;
+        height: 36px;
+        border-radius: var(--app-radius-full);
         background: var(--app-surface);
         border: 1px solid var(--app-border);
-        color: var(--app-fg);
+        color: var(--app-fg-heading);
         cursor: pointer;
-        transition: all 0.2s ease;
-        outline: none;
+        transition: all 0.15s ease;
         font-family: inherit;
-        font-size: 14px;
       }
-
       .user-profile-btn:hover {
-        border-color: var(--app-primary);
         background: var(--app-surface-hover);
+      }
+      .user-profile-btn:focus-visible {
+        outline: none;
+        box-shadow: var(--app-glow);
       }
 
       .avatar-circle {
-        width: 28px;
-        height: 28px;
+        width: 26px;
+        height: 26px;
         border-radius: 50%;
         background: var(--app-gradient-primary);
         color: #ffffff;
-        font-weight: 700;
-        font-size: 13px;
+        font-weight: 600;
+        font-size: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
       }
-
       .user-name {
-        font-weight: 600;
+        font-weight: 500;
         font-size: 14px;
         white-space: nowrap;
       }
-
       .dropdown-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
         color: var(--app-muted);
       }
 
       .auth-buttons {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 12px;
       }
 
       .mobile-menu-btn {
         display: none;
-        width: 38px;
-        height: 38px;
-        border-radius: 8px;
-        background: var(--app-surface);
         border: 1px solid var(--app-border);
-        color: var(--app-fg);
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
+        background: var(--app-surface);
       }
 
       .app-main {
@@ -514,10 +502,11 @@ import { CurrentUserService } from "@core/services/current-user.service";
         background: var(--app-bg);
       }
 
+      /* Clean Shadcn Footer */
       .app-footer {
-        padding: 36px 0;
+        padding: 40px 0;
         border-top: 1px solid var(--app-border);
-        background: var(--app-surface);
+        background: var(--app-bg);
         transition:
           background-color 0.25s ease,
           border-color 0.25s ease;
@@ -527,10 +516,8 @@ import { CurrentUserService } from "@core/services/current-user.service";
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 10px;
+        gap: 12px;
         text-align: center;
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
       }
 
       .footer-brand {
@@ -538,12 +525,13 @@ import { CurrentUserService } from "@core/services/current-user.service";
         align-items: center;
         gap: 8px;
         font-weight: 700;
-        font-size: 1rem;
-        color: var(--app-fg);
+        font-size: 14px;
+        color: var(--app-fg-heading);
       }
-
       .footer-brand mat-icon {
-        color: var(--app-primary);
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
       }
 
       .copyright {
@@ -551,17 +539,12 @@ import { CurrentUserService } from "@core/services/current-user.service";
         margin: 0;
       }
 
-      @media (max-width: 880px) {
-        .nav-links {
-          display: none;
+      /* Responsive Setup */
+      @media (max-width: 900px) {
+        .nav-links,
+        .hide-on-mobile {
+          display: none !important;
         }
-
-        .desktop-theme,
-        .desktop-profile-button,
-        .desktop-auth {
-          display: none;
-        }
-
         .mobile-menu-btn {
           display: inline-flex;
         }

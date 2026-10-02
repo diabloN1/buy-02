@@ -47,7 +47,11 @@ import { CartService } from "@core/services/cart.service";
         <div class="grid">
           <!-- Image Gallery Column -->
           <div class="gallery app-card">
-            <div class="main-image-wrap" (click)="previewOpen.set(true)" title="Click to expand view">
+            <div
+              class="main-image-wrap"
+              (click)="previewOpen.set(true)"
+              title="Click to expand view"
+            >
               @if (activeImage(); as img) {
                 <img [src]="img | safeUrl" [alt]="p.name" />
                 <div class="expand-overlay">
@@ -84,14 +88,16 @@ import { CartService } from "@core/services/cart.service";
             <div class="header-area">
               <span class="stock-pill" [class.out-of-stock]="p.quantity <= 0">
                 <mat-icon>inventory_2</mat-icon>
-                <span>{{ p.quantity > 0 ? ('In Stock: ' + p.quantity) : 'Out of Stock' }}</span>
+                <span>{{
+                  p.quantity > 0 ? "In Stock: " + p.quantity : "Out of Stock"
+                }}</span>
               </span>
 
               <h1 class="title">{{ p.name }}</h1>
 
               <div class="price-box">
                 <span class="currency">$</span>
-                <span class="amount">{{ p.price | number:'1.2-2' }}</span>
+                <span class="amount">{{ p.price | number: "1.2-2" }}</span>
               </div>
             </div>
 
@@ -106,7 +112,9 @@ import { CartService } from "@core/services/cart.service";
                   />
                 } @else {
                   <div class="seller-avatar-placeholder">
-                    <span>{{ (seller.name || 'S').charAt(0).toUpperCase() }}</span>
+                    <span>{{
+                      (seller.name || "S").charAt(0).toUpperCase()
+                    }}</span>
                   </div>
                 }
 
@@ -116,13 +124,12 @@ import { CartService } from "@core/services/cart.service";
                 </div>
               </div>
             }
-
+            <p class="description">{{ p.description }}</p>
             <div class="stock-tag">
               @if (p.quantity > 0) {
-                <mat-icon
-                  style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px;"
-                  >inventory_2</mat-icon
-                >
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px;">
+                  inventory_2
+                </mat-icon>
                 In stock: {{ p.quantity }}
               } @else {
                 <span class="out-of-stock">
@@ -138,7 +145,7 @@ import { CartService } from "@core/services/cart.service";
                   <label>Quantity:</label>
                   <div class="quantity-stepper">
                     <button
-                      mat-mini-fab
+                      matMiniFab
                       class="minifab"
                       (click)="quantity.set(quantity() - 1)"
                       [disabled]="quantity() <= 1"
@@ -148,7 +155,7 @@ import { CartService } from "@core/services/cart.service";
                     </button>
                     <span class="quantity-value">{{ quantity() }}</span>
                     <button
-                      mat-mini-fab
+                      matMiniFab
                       class="minifab"
                       (click)="quantity.set(quantity() + 1)"
                       [disabled]="quantity() >= (p.quantity || 1)"
@@ -163,13 +170,17 @@ import { CartService } from "@core/services/cart.service";
                 </a>
               </div>
             }
-
             <div class="divider"></div>
 
             <!-- Description -->
             <div class="description-block">
               <h3>Product Description</h3>
-              <p class="description-text">{{ p.description || 'No detailed description provided by the seller.' }}</p>
+              <p class="description-text">
+                {{
+                  p.description ||
+                    "No detailed description provided by the seller."
+                }}
+              </p>
             </div>
 
             <!-- Action Controls -->
@@ -185,12 +196,16 @@ import { CartService } from "@core/services/cart.service";
                   <span>Edit Product Details</span>
                 </a>
               } @else {
-                <button mat-flat-button color="primary" class="buy-btn" [disabled]="p.quantity <= 0">
+                <button
+                  mat-flat-button
+                  color="primary"
+                  class="buy-btn"
+                  [disabled]="p.quantity <= 0"
+                >
                   <mat-icon>shopping_bag</mat-icon>
-                  <span>{{ p.quantity > 0 ? 'Buy Now' : 'Out of Stock' }}</span>
+                  <span>{{ p.quantity > 0 ? "Buy Now" : "Out of Stock" }}</span>
                 </button>
               }
-
               @if (!currentUser.user()) {
                 <span>Want to buy ?</span>
                 <a
@@ -409,11 +424,13 @@ import { CartService } from "@core/services/cart.service";
       .title {
         font-size: clamp(1.8rem, 3.5vw, 2.4rem);
         font-weight: 800;
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+        overflow-wrap: anywhere;
         letter-spacing: -0.03em;
         line-height: 1.25;
         margin: 0 0 16px;
         color: var(--app-fg-heading);
-        overflow-wrap: anywhere;
       }
 
       .price-box {
@@ -427,35 +444,14 @@ import { CartService } from "@core/services/cart.service";
       .price-box .currency {
         font-size: 1.2rem;
       }
-      .price-box .amount {
-        font-size: 2.2rem;
-        letter-spacing: -0.02em;
-      }
-
-      .stock-tag {
-        margin-top: 16px;
-        font-size: 14px;
-        color: var(--app-fg);
-        display: flex;
-        align-items: center;
-      }
-      .out-of-stock {
-        color: var(--app-muted);
-        font-size: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-      }
-
-      .actions-group {
-        margin-top: 12px;
+      .actions {
+        margin-top: 24px;
         display: flex;
         gap: 12px;
         align-items: center;
         flex-wrap: wrap;
       }
-      .actions-group > a,
-      .actions-group > button {
+      .actions a {
         margin: 0;
       }
 
@@ -495,6 +491,17 @@ import { CartService } from "@core/services/cart.service";
       .connect-btn:hover {
         background-color: var(--app-primary);
         color: var(--app-primary-contrast, #fff);
+      }
+      .out-of-stock {
+        color: var(--app-muted);
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .price-box .amount {
+        font-size: 2.2rem;
+        letter-spacing: -0.02em;
       }
 
       .seller-card {
@@ -558,6 +565,9 @@ import { CartService } from "@core/services/cart.service";
         margin: 0;
       }
 
+      .actions-group {
+        margin-top: 12px;
+      }
       .edit-btn, .buy-btn {
         width: 100%;
         height: 48px;
@@ -568,7 +578,7 @@ import { CartService } from "@core/services/cart.service";
         justify-content: center;
         gap: 8px;
       }
-
+      
       .minifab {
         box-shadow: none;
         color: var(--app-fg);
@@ -588,7 +598,6 @@ import { CartService } from "@core/services/cart.service";
         border: 2px solid var(--app-primary);
         border-radius: var(--app-radius);
         margin-top: 16px;
-        width: 100%;
       }
 
       .quantity-display {

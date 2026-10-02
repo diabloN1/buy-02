@@ -14,6 +14,8 @@ import { RouterModule } from "@angular/router";
 import { OrderService } from "@core/services/order.service";
 import { NotificationService } from "@core/services/notification.service";
 import { Order, OrderStatus } from "@core/models/checkout.model";
+import { ConfirmDialogComponent } from "@shared/components/confirm-dialog.component";
+import { MatDialog, MatDialogModule } from "@angular/material/dialog";
 
 @Component({
   selector: "app-orders",
@@ -25,6 +27,7 @@ import { Order, OrderStatus } from "@core/models/checkout.model";
     MatCardModule,
     MatTableModule,
     MatPaginatorModule,
+    MatDialogModule,
     MatSortModule,
     MatProgressSpinnerModule,
     MatChipsModule,
@@ -98,10 +101,7 @@ import { Order, OrderStatus } from "@core/models/checkout.model";
 
                   <td mat-cell *matCellDef="let order">
                     <mat-chip-set>
-                      <mat-chip
-                        [color]="getStatusColor(order.status)"
-                        selected
-                      >
+                      <mat-chip [color]="getStatusColor(order.status)" selected>
                         {{ order.status }}
                       </mat-chip>
                     </mat-chip-set>
@@ -123,20 +123,16 @@ import { Order, OrderStatus } from "@core/models/checkout.model";
 
                 <!-- Items -->
                 <ng-container matColumnDef="itemsCount">
-                  <th mat-header-cell *matHeaderCellDef>
-                    Items
-                  </th>
+                  <th mat-header-cell *matHeaderCellDef>Items</th>
 
                   <td mat-cell *matCellDef="let order">
-                    {{ order.items?.length || 0 }}
+                    {{ countTotalItems(order) }}
                   </td>
                 </ng-container>
 
                 <!-- Actions -->
                 <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef>
-                    Actions
-                  </th>
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
 
                   <td mat-cell *matCellDef="let order">
                     <button
@@ -147,13 +143,22 @@ import { Order, OrderStatus } from "@core/models/checkout.model";
                     >
                       <mat-icon>visibility</mat-icon>
                     </button>
+
+                    @if (canCancel(order.status)) {
+                      <button
+                        mat-icon-button
+                        color="warn"
+                        (click)="cancelOrder(order.id)"
+                        matTooltip="Cancel Order"
+                        [disabled]="isLoading()"
+                      >
+                        <mat-icon>cancel</mat-icon>
+                      </button>
+                    }
                   </td>
                 </ng-container>
 
-                <tr
-                  mat-header-row
-                  *matHeaderRowDef="displayedColumns"
-                ></tr>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
 
                 <tr
                   mat-row
@@ -281,6 +286,7 @@ import { Order, OrderStatus } from "@core/models/checkout.model";
 export class OrdersPage implements OnInit {
   private readonly orderSvc = inject(OrderService);
   private readonly notify = inject(NotificationService);
+  private readonly dialog = inject(MatDialog);
 
   readonly orders = signal<Order[]>([]);
   readonly isLoading = signal(false);
@@ -324,8 +330,7 @@ export class OrdersPage implements OnInit {
           this.isLoading.set(false);
 
           this.notify.error(
-            err?.error?.message ??
-              "Failed to load orders. Please try again.",
+            err?.error?.message ?? "Failed to load orders. Please try again.",
           );
         },
       });
@@ -333,9 +338,7 @@ export class OrdersPage implements OnInit {
 
   onSortChange(event: Sort): void {
     this.sortActive.set(event.active);
-    this.sortDirection.set(
-      event.direction === "asc" ? "asc" : "desc",
-    );
+    this.sortDirection.set(event.direction === "asc" ? "asc" : "desc");
 
     this.loadOrders();
   }
@@ -351,6 +354,30 @@ export class OrdersPage implements OnInit {
     return status === "PENDING";
   }
 
+  cancelOrder(orderId: string): void {
+    this.dialog
+      .open(ConfirmDialogComponent, {
+        data: {
+          title: "Cancel order",
+          message: `Do you want to cancel "#${orderId}"? This cannot be undone.`,
+          danger: true,
+          confirmLabel: "Confirm",
+        },
+      })
+      .afterClosed()
+      .subscribe((ok) => {
+        if (!ok) {
+          return;
+        }
+
+        // this.isLoading.set(true);
+        // this.svc.delete(p.id).subscribe(() => {
+        //   this.notify.success("Product deleted");
+        //   this.load();
+        //   this.isLoading.set(false);
+        // });
+      });
+  }
 
   formatDate(dateString: string): string {
     const date = new Date(dateString);
@@ -382,5 +409,12 @@ export class OrdersPage implements OnInit {
 
     return colors[status] || "primary";
   }
-}
 
+  countTotalItems(order: Order): number {
+    return order.subOrders.reduce(
+      (total, subOrder) =>
+        total + subOrder.items.reduce((sum, item) => sum + item.quantity, 0),
+      0,
+    );
+  }
+}

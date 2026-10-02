@@ -1,5 +1,4 @@
 export interface Address {
-  fullName: string;
   street: string;
   city: string;
   state: string;
@@ -13,27 +12,73 @@ export interface OrderItem {
   productName: string;
   price: number;
   quantity: number;
+  imageUrl?: string;
 }
 
-export interface Order {
+export interface SubOrder {
   id: string;
-  userId: string;
+  orderId: string;
+  sellerId: string;
   items: OrderItem[];
-  shippingAddress: Address;
   totalAmount: number;
+  paymentMethod: string;
   status: OrderStatus;
   createdAt: string;
   updatedAt: string;
 }
 
-export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export interface Order {
+  id: string;
+  userId: string;
+  totalAmount: number;
+  shippingAddress: Address;
+  paymentMethod: string;
+  status: OrderStatus;
+  subOrders: SubOrder[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type OrderStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED";
 
 export interface CreateOrderRequest {
-  items: OrderItem[];
   shippingAddress: Address;
+  paymentMethod: string;
+  totalAmount: number;
 }
 
 export interface CreateOrderResponse {
   orderId: string;
   totalAmount: number;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      sorted: boolean;
+      unsorted: boolean;
+      empty: boolean;
+    };
+  };
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+  size: number;
+  number: number;
+  sort: {
+    sorted: boolean;
+    unsorted: boolean;
+    empty: boolean;
+  };
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
 }

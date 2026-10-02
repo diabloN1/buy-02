@@ -199,14 +199,12 @@ export class CheckoutWizardComponent {
     if (!c || c.items.length === 0) return;
 
     const address = this.addressForm.value as Address;
+    const totalAmount = this.getCartTotal(c);
+
     const body: CreateOrderRequest = {
-      items: c.items.map((item: CartItem) => ({
-        productId: item.productId,
-        productName: item.productName,
-        price: item.price,
-        quantity: item.quantity,
-      })),
       shippingAddress: address,
+      paymentMethod: 'pay_on_delivery',
+      totalAmount: totalAmount
     };
 
     this.orderSvc.createOrder(body).subscribe({

@@ -38,6 +38,12 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
+    @PermitAll
+    @PostMapping("/batch")
+    public List<ProductResponse> getProductsByIds(@RequestBody List<String> productIds) {
+        return productService.getProductsByIds(productIds);
+    }
+
     @GetMapping("/user/{userId}")
     public Page<ProductResponse> getProductsByUser(
             @PathVariable String userId,

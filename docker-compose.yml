@@ -201,6 +201,36 @@ services:
       timeout: 3s
       retries: 20
 
+  order:
+    build: ./backend/order-service
+
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "-",
+          "http://localhost:8086/actuator/health",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
   api-gateway:
 
     build: ./backend/api-gateway

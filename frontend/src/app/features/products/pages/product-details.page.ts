@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   signal,
 } from "@angular/core";
@@ -19,6 +20,8 @@ import { UserService } from "@core/services/user.service";
 import { UserWidget } from "@core/models/user.model";
 import { CurrentUserService } from "@core/services/current-user.service";
 import { ImagePreviewComponent } from "@shared/components/image-preview.component";
+import { NotificationService } from "@core/services/notification.service";
+import { CartService } from "@core/services/cart.service";
 
 @Component({
   selector: "app-product-details",
@@ -44,7 +47,11 @@ import { ImagePreviewComponent } from "@shared/components/image-preview.componen
         <div class="grid">
           <!-- Image Gallery Column -->
           <div class="gallery app-card">
-            <div class="main-image-wrap" (click)="previewOpen.set(true)" title="Click to expand view">
+            <div
+              class="main-image-wrap"
+              (click)="previewOpen.set(true)"
+              title="Click to expand view"
+            >
               @if (activeImage(); as img) {
                 <img [src]="img | safeUrl" [alt]="p.name" />
                 <div class="expand-overlay">
@@ -81,14 +88,16 @@ import { ImagePreviewComponent } from "@shared/components/image-preview.componen
             <div class="header-area">
               <span class="stock-pill" [class.out-of-stock]="p.quantity <= 0">
                 <mat-icon>inventory_2</mat-icon>
-                <span>{{ p.quantity > 0 ? ('In Stock: ' + p.quantity) : 'Out of Stock' }}</span>
+                <span>{{
+                  p.quantity > 0 ? "In Stock: " + p.quantity : "Out of Stock"
+                }}</span>
               </span>
 
               <h1 class="title">{{ p.name }}</h1>
 
               <div class="price-box">
                 <span class="currency">$</span>
-                <span class="amount">{{ p.price | number:'1.2-2' }}</span>
+                <span class="amount">{{ p.price | number: "1.2-2" }}</span>
               </div>
             </div>
 
@@ -103,7 +112,9 @@ import { ImagePreviewComponent } from "@shared/components/image-preview.componen
                   />
                 } @else {
                   <div class="seller-avatar-placeholder">
-                    <span>{{ (seller.name || 'S').charAt(0).toUpperCase() }}</span>
+                    <span>{{
+                      (seller.name || "S").charAt(0).toUpperCase()
+                    }}</span>
                   </div>
                 }
 
@@ -113,13 +124,63 @@ import { ImagePreviewComponent } from "@shared/components/image-preview.componen
                 </div>
               </div>
             }
+            <p class="description">{{ p.description }}</p>
+            <div class="stock-tag">
+              @if (p.quantity > 0) {
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px;">
+                  inventory_2
+                </mat-icon>
+                In stock: {{ p.quantity }}
+              } @else {
+                <span class="out-of-stock">
+                  <mat-icon>outlined_flag</mat-icon>
+                  Out of stock
+                </span>
+              }
+            </div>
 
+            @if (ableToBuy() && cartQuantity() == 0) {
+              <div class="in-cart-card">
+                <div class="quantity-selector">
+                  <label>Quantity:</label>
+                  <div class="quantity-stepper">
+                    <button
+                      matMiniFab
+                      class="minifab"
+                      (click)="quantity.set(quantity() - 1)"
+                      [disabled]="quantity() <= 1"
+                      aria-label="Decrease quantity"
+                    >
+                      <mat-icon>remove</mat-icon>
+                    </button>
+                    <span class="quantity-value">{{ quantity() }}</span>
+                    <button
+                      matMiniFab
+                      class="minifab"
+                      (click)="quantity.set(quantity() + 1)"
+                      [disabled]="quantity() >= (p.quantity || 1)"
+                      aria-label="Increase quantity"
+                    >
+                      <mat-icon>add</mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <a mat-flat-button color="primary" (click)="addToCart()">
+                  <mat-icon>add_shopping_cart</mat-icon> Add to cart
+                </a>
+              </div>
+            }
             <div class="divider"></div>
 
             <!-- Description -->
             <div class="description-block">
               <h3>Product Description</h3>
-              <p class="description-text">{{ p.description || 'No detailed description provided by the seller.' }}</p>
+              <p class="description-text">
+                {{
+                  p.description ||
+                    "No detailed description provided by the seller."
+                }}
+              </p>
             </div>
 
             <!-- Action Controls -->
@@ -135,10 +196,71 @@ import { ImagePreviewComponent } from "@shared/components/image-preview.componen
                   <span>Edit Product Details</span>
                 </a>
               } @else {
-                <button mat-flat-button color="primary" class="buy-btn" [disabled]="p.quantity <= 0">
+                <button
+                  mat-flat-button
+                  color="primary"
+                  class="buy-btn"
+                  [disabled]="p.quantity <= 0"
+                >
                   <mat-icon>shopping_bag</mat-icon>
-                  <span>{{ p.quantity > 0 ? 'Buy Now' : 'Out of Stock' }}</span>
+                  <span>{{ p.quantity > 0 ? "Buy Now" : "Out of Stock" }}</span>
                 </button>
+              }
+              @if (!currentUser.user()) {
+                <span>Want to buy ?</span>
+                <a
+                  mat-stroked-button
+                  routerLink="/auth/register"
+                  class="connect-btn"
+                >
+                  <mat-icon>login</mat-icon> Create account!
+                </a>
+              }
+
+              @if (cartQuantity() > 0) {
+                <div class="in-cart-card">
+                  <div class="quantity-display">
+                    <span>Update quantity:</span>
+                    <div class="quantity-stepper">
+                      <button
+                        mat-mini-fab
+                        class="minifab"
+                        (click)="quantity.set(quantity() - 1)"
+                        [disabled]="quantity() <= 1"
+                        aria-label="Decrease quantity"
+                      >
+                        <mat-icon>remove</mat-icon>
+                      </button>
+                      <span class="quantity-value">{{ quantity() }}</span>
+                      <button
+                        mat-mini-fab
+                        class="minifab"
+                        (click)="quantity.set(quantity() + 1)"
+                        [disabled]="quantity() >= (p.quantity || 1)"
+                        aria-label="Increase quantity"
+                      >
+                        <mat-icon>add</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="in-cart-message">
+                    <mat-icon class="check-icon">check_circle</mat-icon>
+                    <span>{{ cartQuantity() }} already in cart</span>
+                  </div>
+                  <div class="in-cart-actions">
+                    <button
+                      mat-stroked-button
+                      color="primary"
+                      (click)="updateCart()"
+                      [disabled]="quantity() == cartQuantity()"
+                    >
+                      <mat-icon>cached</mat-icon> Update quantity
+                    </button>
+                    <a mat-flat-button color="primary" routerLink="/cart">
+                      <mat-icon>shopping_cart</mat-icon> View Cart
+                    </a>
+                  </div>
+                </div>
               }
             </div>
           </div>
@@ -302,6 +424,9 @@ import { ImagePreviewComponent } from "@shared/components/image-preview.componen
       .title {
         font-size: clamp(1.8rem, 3.5vw, 2.4rem);
         font-weight: 800;
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+        overflow-wrap: anywhere;
         letter-spacing: -0.03em;
         line-height: 1.25;
         margin: 0 0 16px;
@@ -318,6 +443,61 @@ import { ImagePreviewComponent } from "@shared/components/image-preview.componen
       }
       .price-box .currency {
         font-size: 1.2rem;
+      }
+      .actions {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .actions a {
+        margin: 0;
+      }
+
+      .quantity-stepper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--app-fg);
+      }
+
+      .quantity-stepper mat-icon {
+        width: 20px;
+        height: 20px;
+        color: var(--app-muted);
+      }
+
+      .quantity-value {
+        min-width: 24px;
+        text-align: center;
+        font-size: 16px;
+      }
+
+      .quantity-selector {
+        margin: 16px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--app-fg);
+      }
+
+      .connect-btn {
+        border-color: var(--app-primary);
+        color: var(--app-primary);
+      }
+      .connect-btn:hover {
+        background-color: var(--app-primary);
+        color: var(--app-primary-contrast, #fff);
+      }
+      .out-of-stock {
+        color: var(--app-muted);
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
       }
       .price-box .amount {
         font-size: 2.2rem;
@@ -398,6 +578,58 @@ import { ImagePreviewComponent } from "@shared/components/image-preview.componen
         justify-content: center;
         gap: 8px;
       }
+      
+      .minifab {
+        box-shadow: none;
+        color: var(--app-fg);
+        background-color: transparent;
+      }
+
+      .minifab:disabled {
+        visibility: hidden;
+      }
+
+      .in-cart-card {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+        background: var(--app-surface);
+        border: 2px solid var(--app-primary);
+        border-radius: var(--app-radius);
+        margin-top: 16px;
+      }
+
+      .quantity-display {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+        color: var(--app-fg);
+      }
+
+      .in-cart-message {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--app-primary);
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .check-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: var(--app-primary);
+      }
+
+      .in-cart-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
     `,
   ],
 })
@@ -405,8 +637,9 @@ export class ProductDetailsPage {
   private readonly route = inject(ActivatedRoute);
   private readonly svc = inject(ProductService);
   private readonly userService = inject(UserService);
+  private readonly cartService = inject(CartService);
+  private readonly toast = inject(NotificationService);
   readonly currentUser = inject(CurrentUserService);
-  readonly previewOpen = signal(false);
 
   private readonly product$ = this.route.paramMap.pipe(
     switchMap((params) => this.svc.get(params.get("id")!)),
@@ -424,7 +657,11 @@ export class ProductDetailsPage {
     { initialValue: undefined },
   );
 
+  readonly previewOpen = signal(false);
+
   readonly active = signal(0);
+  readonly quantity = signal(1);
+  readonly cartQuantity = signal(0);
 
   readonly activeImage = computed(
     () => this.product()?.images?.[this.active()]?.url ?? null,
@@ -436,4 +673,66 @@ export class ProductDetailsPage {
 
     return !!p && !!u && p.userId === u.id;
   });
+
+  readonly ableToBuy = computed(() => {
+    const p = this.product();
+    const u = this.currentUser.user();
+
+    return !!u && !!p && !this.ownedByMe() && p.quantity > 0;
+  });
+
+  constructor() {
+    effect(() => {
+      const product = this.product();
+      const user = this.currentUser.user();
+
+      if (!product || !user) {
+        this.quantity.set(1);
+        return;
+      }
+
+      this.cartService.getItemQuantity(product.id).subscribe({
+        next: (qty) => {
+          if (qty) {
+            this.quantity.set(qty);
+            this.cartQuantity.set(qty);
+          }
+        },
+        error: () => this.quantity.set(1),
+      });
+    });
+  }
+
+  addToCart() {
+    const p = this.product();
+    if (!p?.quantity) return;
+    this.cartService
+      .addToCart({
+        productId: p.id,
+        quantity: this.quantity(),
+      })
+      .subscribe({
+        next: () => {
+          this.toast.success("Product added! go to cart for checkout");
+          this.cartQuantity.set(this.quantity());
+        },
+        error: (err) => {
+          console.error(err);
+        },
+      });
+  }
+
+  updateCart(): void {
+    const p = this.product();
+    if (!p) return;
+    this.cartService.updateItemQuantity(p.id, this.quantity()).subscribe({
+      next: () => {
+        this.cartQuantity.set(this.quantity());
+        this.toast.success("Cart updated!");
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
 }

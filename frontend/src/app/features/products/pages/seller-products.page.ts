@@ -39,11 +39,15 @@ import { CurrentUserService } from "@core/services/current-user.service";
   template: `
     <section class="container page-section">
       <div class="page-header">
-        <div>
+        <div class="header-text">
+          <div class="header-tag">Inventory</div>
           <h1 class="page-title">My Store Products</h1>
-          <p class="muted">Manage, edit, or delete items in your seller inventory.</p>
+          <p class="muted">
+            Manage, edit, or delete items in your seller inventory.
+          </p>
         </div>
-        <a routerLink="/seller/products/new" class="btn btn-primary new-btn">
+
+        <a routerLink="/seller/products/new" class="btn btn-primary">
           <mat-icon>add</mat-icon>
           <span>New product</span>
         </a>
@@ -108,6 +112,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
                     mat-icon-button
                     [routerLink]="['/products', p.id]"
                     aria-label="View product"
+                    class="action-btn"
                   >
                     <mat-icon>visibility</mat-icon>
                   </a>
@@ -115,14 +120,15 @@ import { CurrentUserService } from "@core/services/current-user.service";
                     mat-icon-button
                     [routerLink]="['/seller/products', p.id, 'edit']"
                     aria-label="Edit product"
+                    class="action-btn"
                   >
                     <mat-icon>edit</mat-icon>
                   </a>
                   <button
                     mat-icon-button
-                    color="warn"
                     (click)="remove(p)"
                     aria-label="Delete product"
+                    class="action-btn delete-btn"
                   >
                     <mat-icon>delete</mat-icon>
                   </button>
@@ -134,13 +140,16 @@ import { CurrentUserService } from "@core/services/current-user.service";
             <tr mat-row *matRowDef="let r; columns: cols" class="data-row"></tr>
           </table>
 
-          <mat-paginator
-            [length]="total()"
-            [pageSize]="pageSize()"
-            [pageIndex]="page() - 1"
-            [pageSizeOptions]="[10, 25, 50]"
-            (page)="onPage($event)"
-          />
+          <div class="paginator-wrapper">
+            <mat-paginator
+              [length]="total()"
+              [pageSize]="pageSize()"
+              [pageIndex]="page() - 1"
+              [pageSizeOptions]="[10, 25, 50]"
+              (page)="onPage($event)"
+              class="pro-paginator"
+            />
+          </div>
         </div>
       }
     </section>
@@ -148,39 +157,58 @@ import { CurrentUserService } from "@core/services/current-user.service";
   styles: [
     `
       .page-section {
-        padding-top: 32px;
+        padding-top: 40px;
         padding-bottom: 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
       }
 
       .page-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
-        gap: 16px;
-        margin-bottom: 24px;
+        align-items: flex-start;
         flex-wrap: wrap;
+        gap: 24px;
+      }
+
+      .header-text {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .header-tag {
+        display: inline-flex;
+        align-items: center;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--app-primary);
+        background: var(--app-primary-lighter);
+        padding: 4px 10px;
+        border-radius: var(--app-radius-full);
+        align-self: flex-start;
+        margin-bottom: 4px;
       }
 
       .page-title {
-        font-size: 1.85rem;
-        font-weight: 800;
-        letter-spacing: -0.025em;
-        margin: 0 0 4px;
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        margin: 0;
       }
 
-      .new-btn {
-        height: 42px;
-        padding: 0 20px;
+      .header-text .muted {
+        margin: 0;
+        font-size: 15px;
       }
 
       .table-wrap {
         overflow-x: auto;
         overflow-y: hidden;
         border: 1px solid var(--app-border);
-        border-radius: var(--app-radius);
-        box-shadow: var(--app-shadow-sm);
-        margin-top: 16px;
         background: var(--app-surface);
+        /* Uses global .app-card for border-radius and shadow automatically */
       }
 
       table {
@@ -191,9 +219,10 @@ import { CurrentUserService } from "@core/services/current-user.service";
         background-color: transparent;
       }
 
+      /* Crisp Shadcn-style Table Headers */
       th.mat-mdc-header-cell {
-        font-weight: 700;
-        color: var(--app-fg-heading);
+        font-weight: 600;
+        color: var(--app-muted);
         font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -236,12 +265,12 @@ import { CurrentUserService } from "@core/services/current-user.service";
       }
 
       tr.data-row:last-child td.mat-mdc-cell {
-        border-bottom: none;
+        border-bottom: none; /* Let paginator handle the top border */
       }
 
       .thumb {
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
         object-fit: cover;
         border-radius: var(--app-radius-sm);
         border: 1px solid var(--app-border);
@@ -249,10 +278,10 @@ import { CurrentUserService } from "@core/services/current-user.service";
       }
 
       .thumb-placeholder {
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
         border-radius: var(--app-radius-sm);
-        border: 1px dashed var(--app-border);
+        border: 1px dashed var(--app-border-hover);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -267,13 +296,13 @@ import { CurrentUserService } from "@core/services/current-user.service";
       }
 
       .cell-name {
-        font-weight: 600;
+        font-weight: 500;
         color: var(--app-fg-heading);
       }
 
       .cell-price {
-        font-weight: 700;
-        color: var(--app-fg-heading);
+        font-weight: 500;
+        color: var(--app-muted);
         font-variant-numeric: tabular-nums;
       }
 
@@ -282,9 +311,8 @@ import { CurrentUserService } from "@core/services/current-user.service";
         font-variant-numeric: tabular-nums;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
         padding: 2px 10px;
-        border-radius: 999px;
+        border-radius: var(--app-radius-full);
         background: var(--app-success-light);
         color: var(--app-success);
         font-size: 12px;
@@ -303,28 +331,45 @@ import { CurrentUserService } from "@core/services/current-user.service";
       .actions {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 8px;
         justify-content: flex-end;
       }
 
-      .actions a[mat-icon-button],
-      .actions button[mat-icon-button] {
-        width: 34px;
-        height: 34px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--app-muted);
-      }
-      .actions a[mat-icon-button]:hover,
-      .actions button[mat-icon-button]:hover {
-        color: var(--app-primary);
-        background: var(--app-surface-hover);
+      .action-btn {
+        width: 36px !important;
+        height: 36px !important;
+        padding: 0 !important;
+        color: var(--app-muted) !important;
+        border-radius: var(
+          --app-radius-sm
+        ) !important;
       }
 
-      mat-paginator {
+      .action-btn mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+      }
+
+      .action-btn:hover {
+        color: var(--app-fg-heading) !important;
+        background: var(--app-border) !important;
+      }
+
+      .delete-btn:hover {
+        color: var(--app-danger) !important;
+        background: var(--app-danger-light) !important;
+      }
+
+      .paginator-wrapper {
         border-top: 1px solid var(--app-border);
-        background-color: transparent;
+        background: var(--app-surface);
+      }
+
+      .pro-paginator {
+        background: transparent !important;
+        color: var(--app-fg) !important;
         min-width: 700px;
       }
     `,

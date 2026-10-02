@@ -8,6 +8,8 @@ import { ProductService } from "@core/services/product.service";
 import { UserService } from "@core/services/user.service";
 import { CurrentUserService } from "@core/services/current-user.service";
 import { Product } from "@core/models/product.model";
+import { provideHttpClient } from "@angular/common/http";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 
 describe("ProductDetailsPage", () => {
   let component: ProductDetailsPage;
@@ -24,14 +26,19 @@ describe("ProductDetailsPage", () => {
     quantity: 5,
     userId: "u1",
     images: [{ id: "i1", url: "http://example.com/phone.jpg", existing: true }],
-    createdAt: "2026-01-01"
+    createdAt: "2026-01-01",
   };
 
   beforeEach(async () => {
     productSvcSpy = jasmine.createSpyObj("ProductService", ["get"]);
     userSvcSpy = jasmine.createSpyObj("UserService", ["getWidget"]);
     currentUserSpy = jasmine.createSpyObj("CurrentUserService", ["clear"], {
-      user: signal({ id: "u1", email: "user@test.com", name: "User One", role: "USER" })
+      user: signal({
+        id: "u1",
+        email: "user@test.com",
+        name: "User One",
+        role: "USER",
+      }),
     });
 
     productSvcSpy.get.and.returnValue(of(mockProduct));
@@ -40,17 +47,19 @@ describe("ProductDetailsPage", () => {
     await TestBed.configureTestingModule({
       imports: [ProductDetailsPage],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter([]),
         {
           provide: ActivatedRoute,
           useValue: {
-            paramMap: of(new Map([["id", "p1"]]))
-          }
+            paramMap: of(new Map([["id", "p1"]])),
+          },
         },
         { provide: ProductService, useValue: productSvcSpy },
         { provide: UserService, useValue: userSvcSpy },
-        { provide: CurrentUserService, useValue: currentUserSpy }
-      ]
+        { provide: CurrentUserService, useValue: currentUserSpy },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProductDetailsPage);

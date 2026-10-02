@@ -2,7 +2,6 @@ package com.buy02.order.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -22,15 +21,8 @@ public class Order {
     @Id
     private String id;
 
+    @Indexed
     private String userId;
-
-    @Indexed
-    private String sellerId;
-
-    @Indexed
-    private String groupId;
-
-    private List<Item> items;
 
     private BigDecimal totalAmount;
 
@@ -38,9 +30,6 @@ public class Order {
 
     @Builder.Default
     private PaymentMethod paymentMethod = PaymentMethod.PAY_ON_DELIVERY;
-
-    @Builder.Default
-    private OrderStatus status = OrderStatus.PENDING;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -53,12 +42,19 @@ public class Order {
 
     @Data
     @Builder
-    public static class Item {
-        private String productId;
-        private String productName;
-        private BigDecimal price;
-        private Integer quantity;
-        private String imageUrl;
+    public static class ShippingAddress {
+
+        private String street;
+
+        private String city;
+
+        private String state;
+
+        private String zipCode;
+
+        private String country;
+
+        private String phone;
     }
 
     public enum OrderStatus {
@@ -71,16 +67,5 @@ public class Order {
 
     public enum PaymentMethod {
         PAY_ON_DELIVERY
-    }
-
-    @Data
-    @Builder
-    public static class ShippingAddress {
-        private String street;
-        private String city;
-        private String state;
-        private String zipCode;
-        private String country;
-        private String phone;
     }
 }

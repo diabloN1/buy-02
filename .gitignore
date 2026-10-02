@@ -4,4 +4,5 @@
 **/*.p12
 docs/
 generateCerts.sh
+frontend/coverage
 e2e

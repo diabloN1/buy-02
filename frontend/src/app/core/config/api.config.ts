@@ -46,5 +46,6 @@ export const API = {
     root: "/orders",
     item: (orderId: string) => `/orders/${orderId}`,
     user: "/orders/user",
+    cancel: (orderId: string) => `/orders/${orderId}/cancel`,
   },
 } as const;

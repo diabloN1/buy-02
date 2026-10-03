@@ -37,6 +37,9 @@ public class SubOrder {
     @Builder.Default
     private Order.OrderStatus status = Order.OrderStatus.PENDING;
 
+    @Builder.Default
+    private boolean deleted = false;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

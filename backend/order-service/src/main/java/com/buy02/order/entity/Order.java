@@ -33,6 +33,9 @@ public class Order {
     @Builder.Default
     private PaymentMethod paymentMethod = PaymentMethod.PAY_ON_DELIVERY;
 
+    @Builder.Default
+    private boolean deleted = false;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

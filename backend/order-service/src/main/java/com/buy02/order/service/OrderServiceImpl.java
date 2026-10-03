@@ -213,6 +213,24 @@ public class OrderServiceImpl implements OrderService {
                 subOrderRepository.saveAll(newSubOrders);
         }
 
+        @Override
+        @Auditable(action = AuditAction.DELETED, entityId = "#orderId")
+        public void deleteOrder(String orderId, String userId) {
+
+                Order order = orderRepository.findById(orderId)
+                                .orElseThrow(() -> new NotFoundException(
+                                                "Order not found with id: " + orderId));
+
+                if (!order.getUserId().equals(userId)) {
+                        throw new ForbiddenException(
+                                        "You don't have permission to delete this order");
+                }
+
+                order.setDeleted(true);
+
+                orderRepository.save(order);
+        }
+
         private void validateStockAvailability(List<SubOrder> subOrders) {
 
                 List<String> productIds = subOrders.stream()

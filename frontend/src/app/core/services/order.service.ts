@@ -78,4 +78,8 @@ export class OrderService {
   redoOrder(orderId: string) {
     return this.http.post(API.base + API.orders.redo(orderId), {});
   }
+
+  deleteOrder(orderId: string) {
+    return this.http.delete(API.base + API.orders.delete(orderId), {});
+  }
 }

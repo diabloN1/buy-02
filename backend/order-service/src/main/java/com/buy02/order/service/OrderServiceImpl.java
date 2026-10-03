@@ -154,6 +154,16 @@ public class OrderServiceImpl implements OrderService {
         }
 
         public void cancelOrder(String orderId, String userId) {
+
+                Order order = orderRepository.findById(orderId)
+                                .orElseThrow(() -> new NotFoundException(
+                                                "Order not found with id: " + orderId));
+
+                if (!order.getUserId().equals(userId)) {
+                        throw new ForbiddenException(
+                                        "You don't have permission to view this order");
+                }
+
                 var subOrders = subOrderRepository
                                 .findByOrderId(orderId);
 

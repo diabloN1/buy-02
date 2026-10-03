@@ -53,8 +53,7 @@ export interface CreateOrderRequest {
 }
 
 export interface CreateOrderResponse {
-  orderId: string;
-  totalAmount: number;
+  id: string;
 }
 
 export interface PageResponse<T> {

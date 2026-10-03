@@ -70,4 +70,8 @@ export class OrderService {
         })),
       );
   }
+
+  cancelOrder(orderId: string) {
+    return this.http.patch(API.base + API.orders.cancel(orderId), {});
+  }
 }

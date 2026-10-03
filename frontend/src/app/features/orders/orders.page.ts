@@ -370,13 +370,36 @@ export class OrdersPage implements OnInit {
           return;
         }
 
-        // this.isLoading.set(true);
-        // this.svc.delete(p.id).subscribe(() => {
-        //   this.notify.success("Product deleted");
-        //   this.load();
-        //   this.isLoading.set(false);
-        // });
+        this.isLoading.set(true);
+
+        this.orderSvc.cancelOrder(orderId).subscribe({
+          next: () => {
+            this.updateOrderStatus(orderId, "CANCELLED");
+            this.notify.success("Order cancelled");
+            this.isLoading.set(false);
+          },
+          error: (err) => {
+            this.isLoading.set(false);
+            this.notify.error(
+              err?.error?.message ??
+                "Failed to cancel order. Please try again.",
+            );
+          },
+        });
       });
+  }
+
+  private updateOrderStatus(orderId: string, status: OrderStatus): void {
+    this.orders.update((orders) =>
+      orders.map((order) =>
+        order.id === orderId
+          ? {
+              ...order,
+              status,
+            }
+          : order,
+      ),
+    );
   }
 
   formatDate(dateString: string): string {

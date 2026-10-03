@@ -76,4 +76,17 @@ public class OrderController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{orderId}/redo")
+    public ResponseEntity<Void> redoOrder(
+            @PathVariable String orderId,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        String userId = jwt.getSubject();
+
+        orderService.redoOrder(orderId, userId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -137,6 +137,15 @@ export const APP_ROUTES: Routes = [
   },
 
   {
+    path: "orders/:orderId",
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import("./features/orders/order-details/order-details.page").then(
+        (m) => m.OrderDetailsPage
+      ),
+  },
+
+  {
     path: "**",
     loadComponent: () =>
       import("./features/not-found/not-found.page").then((m) => m.NotFoundPage),

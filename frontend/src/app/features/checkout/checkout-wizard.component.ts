@@ -209,15 +209,11 @@ export class CheckoutWizardComponent {
 
     this.orderSvc.createOrder(body).subscribe({
       next: (res) => {
-        this.orderId.set(res.orderId);
-        this.notify.success(`Order #${res.orderId} placed successfully!`);
-        stepper.next();
+        this.orderId.set(res.id);
+        this.notify.success(`Order #${res.id} placed successfully!`);
+        setTimeout(() => {stepper.next()}, 500);
       },
-      error: (err) => {
-        this.notify.error(
-          err?.error?.message ?? "Failed to place order. Please try again.",
-        );
-      },
+      error: () => {},
     });
   }
 

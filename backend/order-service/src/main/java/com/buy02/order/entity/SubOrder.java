@@ -2,6 +2,7 @@ package com.buy02.order.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -38,6 +39,9 @@ public class SubOrder {
     private Order.OrderStatus status = Order.OrderStatus.PENDING;
 
     @Builder.Default
+    private List<StatusHistory> statusHistory = new ArrayList<>();
+
+    @Builder.Default
     private boolean deleted = false;
 
     @CreatedDate
@@ -64,5 +68,18 @@ public class SubOrder {
         private Integer quantity;
 
         private String imageUrl;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StatusHistory {
+
+        private Order.OrderStatus status;
+
+        private LocalDateTime timestamp;
+
+        private String changedBy;
     }
 }

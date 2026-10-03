@@ -1,6 +1,7 @@
 package com.buy02.order.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import com.buy02.order.dto.CreateOrderRequest;
 import com.buy02.order.dto.OrderResponse;
 import com.buy02.order.dto.ProductResponse;
 import com.buy02.order.entity.Order;
+import com.buy02.order.entity.Order.OrderStatus;
 import com.buy02.order.entity.SubOrder;
 import com.buy02.order.event.AuditAction;
 import com.buy02.order.exception.custom.BadRequestException;
@@ -41,12 +43,12 @@ public class OrderServiceImpl implements OrderService {
         private final ProductClient productClient;
         private final OrderMapper orderMapper;
 
-        private static final List<Order.OrderStatus> STATUS_FLOW = List.of(
-                        Order.OrderStatus.PENDING,
-                        Order.OrderStatus.CONFIRMED,
-                        Order.OrderStatus.SHIPPED,
-                        Order.OrderStatus.DELIVERED,
-                        Order.OrderStatus.CANCELLED);
+        private static final List<OrderStatus> STATUS_FLOW = List.of(
+                        OrderStatus.PENDING,
+                        OrderStatus.CONFIRMED,
+                        OrderStatus.SHIPPED,
+                        OrderStatus.DELIVERED,
+                        OrderStatus.CANCELLED);
 
         @Override
         @Auditable(action = AuditAction.CREATED, entityId = "#result.id")
@@ -104,7 +106,7 @@ public class OrderServiceImpl implements OrderService {
         @Auditable(action = AuditAction.SELECTED, entityId = "#orderId")
         public OrderResponse getOrder(String orderId, String userId) {
 
-                Order order = orderRepository.findById(orderId)
+                Order order = orderRepository.findByIdAndDeletedFalse(orderId)
                                 .orElseThrow(() -> new NotFoundException(
                                                 "Order not found with id: " + orderId));
 
@@ -125,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
         @Override
         public Page<OrderResponse> getOrdersByUser(String userId, Pageable pageable) {
 
-                Page<Order> orders = orderRepository.findByUserId(userId, pageable);
+                Page<Order> orders = orderRepository.findByUserIdAndDeletedFalse(userId, pageable);
 
                 List<String> orderIds = orders.getContent()
                                 .stream()
@@ -158,7 +160,7 @@ public class OrderServiceImpl implements OrderService {
 
         public void cancelOrder(String orderId, String userId) {
 
-                Order order = orderRepository.findById(orderId)
+                Order order = orderRepository.findByIdAndDeletedFalse(orderId)
                                 .orElseThrow(() -> new NotFoundException(
                                                 "Order not found with id: " + orderId));
 
@@ -167,19 +169,24 @@ public class OrderServiceImpl implements OrderService {
                                         "You don't have permission to view this order");
                 }
 
-                var subOrders = subOrderRepository
-                                .findByOrderId(orderId);
+                var subOrders = subOrderRepository.findByOrderId(orderId);
 
-                if (!resolveOrderStatus(subOrders).equals(Order.OrderStatus.PENDING)) {
+                if (!resolveOrderStatus(subOrders).equals(OrderStatus.PENDING)) {
                         throw new BadRequestException(
                                         "Can't cancel order if passed PENDING!");
                 }
 
                 List<SubOrder> canceledSubOrders = subOrders
                                 .stream()
-                                .map((suborder) -> {
-                                        suborder.setStatus(Order.OrderStatus.CANCELLED);
-                                        return suborder;
+                                .map((subOrder) -> {
+                                        subOrder.setStatus(OrderStatus.CANCELLED);
+                                        subOrder.getStatusHistory().add(
+                                                        SubOrder.StatusHistory.builder()
+                                                                        .status(OrderStatus.CANCELLED)
+                                                                        .timestamp(LocalDateTime.now())
+                                                                        .changedBy(userId)
+                                                                        .build());
+                                        return subOrder;
                                 })
                                 .toList();
 
@@ -190,7 +197,7 @@ public class OrderServiceImpl implements OrderService {
         @Auditable(action = AuditAction.CREATED)
         public void redoOrder(String orderId, String userId) {
 
-                Order originalOrder = orderRepository.findById(orderId)
+                Order originalOrder = orderRepository.findByIdAndDeletedFalse(orderId)
                                 .orElseThrow(() -> new NotFoundException(
                                                 "Order not found with id: " + orderId));
 
@@ -217,13 +224,21 @@ public class OrderServiceImpl implements OrderService {
         @Auditable(action = AuditAction.DELETED, entityId = "#orderId")
         public void deleteOrder(String orderId, String userId) {
 
-                Order order = orderRepository.findById(orderId)
+                Order order = orderRepository.findByIdAndDeletedFalse(orderId)
                                 .orElseThrow(() -> new NotFoundException(
                                                 "Order not found with id: " + orderId));
 
                 if (!order.getUserId().equals(userId)) {
                         throw new ForbiddenException(
                                         "You don't have permission to delete this order");
+                }
+
+                List<SubOrder> subOrders = subOrderRepository.findByOrderId(orderId);
+
+                if (!resolveOrderStatus(subOrders).equals(OrderStatus.CANCELLED) &&
+                                !resolveOrderStatus(subOrders).equals(OrderStatus.DELIVERED)) {
+                        throw new BadRequestException(
+                                        "Can't delete order if still in progress!");
                 }
 
                 order.setDeleted(true);
@@ -301,14 +316,14 @@ public class OrderServiceImpl implements OrderService {
                 return subOrders;
         }
 
-        private Order.OrderStatus resolveOrderStatus(List<SubOrder> subOrders) {
-                for (Order.OrderStatus status : STATUS_FLOW) {
+        private OrderStatus resolveOrderStatus(List<SubOrder> subOrders) {
+                for (OrderStatus status : STATUS_FLOW) {
                         boolean anyMatch = subOrders.stream()
                                         .anyMatch(sub -> sub.getStatus() == status);
                         if (anyMatch) {
                                 return status;
                         }
                 }
-                return Order.OrderStatus.PENDING;
+                return OrderStatus.PENDING;
         }
 }

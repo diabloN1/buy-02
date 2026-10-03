@@ -14,7 +14,7 @@ public interface OrderService {
 
     Page<OrderResponse> getOrdersByUser(String userId, Pageable pageable);
 
-    // OrderResponse cancelOrder(String orderId, String userId);
+    void cancelOrder(String orderId, String userId);
 
     // OrderResponse confirmOrder(String orderId, String userId);
 

@@ -38,6 +38,13 @@ public class OrderServiceImpl implements OrderService {
         private final CartClient cartClient;
         private final OrderMapper orderMapper;
 
+        private static final List<Order.OrderStatus> STATUS_FLOW = List.of(
+                        Order.OrderStatus.PENDING,
+                        Order.OrderStatus.CONFIRMED,
+                        Order.OrderStatus.SHIPPED,
+                        Order.OrderStatus.DELIVERED,
+                        Order.OrderStatus.CANCELLED);
+
         @Override
         @Auditable(action = AuditAction.CREATED, entityId = "#result.id")
         public OrderResponse createOrder(String userId, CreateOrderRequest request) {
@@ -82,7 +89,7 @@ public class OrderServiceImpl implements OrderService {
                 List<SubOrder> savedSubOrders = subOrderRepository.saveAll(subOrders);
 
                 cartClient.clearCart();
-                
+
                 OrderResponse response = orderMapper.toResponse(savedOrder);
 
                 response.setSubOrders(orderMapper.toSubOrderResponses(savedSubOrders));
@@ -146,6 +153,26 @@ public class OrderServiceImpl implements OrderService {
                 });
         }
 
+        public void cancelOrder(String orderId, String userId) {
+                var subOrders = subOrderRepository
+                                .findByOrderId(orderId);
+
+                if (!resolveOrderStatus(subOrders).equals(Order.OrderStatus.PENDING)) {
+                        throw new BadRequestException(
+                                        "Can cancel order if passed PENDING!");
+                }
+
+                List<SubOrder> canceledSubOrders = subOrders
+                                .stream()
+                                .map((suborder) -> {
+                                        suborder.setStatus(Order.OrderStatus.CANCELLED);
+                                        return suborder;
+                                })
+                                .toList();
+
+                subOrderRepository.saveAll(canceledSubOrders);
+        };
+
         private List<SubOrder> createSubOrdersBySeller(
                         String orderId,
                         List<CartResponse.CartItemResponse> cartItems) {
@@ -180,5 +207,16 @@ public class OrderServiceImpl implements OrderService {
                 }
 
                 return subOrders;
+        }
+
+        private Order.OrderStatus resolveOrderStatus(List<SubOrder> subOrders) {
+                for (Order.OrderStatus status : STATUS_FLOW) {
+                        boolean anyMatch = subOrders.stream()
+                                        .anyMatch(sub -> sub.getStatus() == status);
+                        if (anyMatch) {
+                                return status;
+                        }
+                }
+                return Order.OrderStatus.PENDING;
         }
 }

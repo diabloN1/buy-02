@@ -46,9 +46,9 @@ import { MatDialog, MatDialogModule } from "@angular/material/dialog";
           <span class="muted">Loading orders…</span>
         </div>
       } @else if (orders().length === 0) {
-        <mat-card class="empty-card">
+        <mat-card class="orders-card">
           <mat-card-content class="empty-state">
-            <mat-icon>receipt_long</mat-icon>
+            <mat-icon class="icon-xl" >receipt_long</mat-icon>
             <p>No orders found</p>
             <p class="muted">Start shopping to see your orders here.</p>
 
@@ -239,14 +239,12 @@ import { MatDialog, MatDialogModule } from "@angular/material/dialog";
       .empty-state {
         text-align: center;
         padding: 64px 24px;
-        color: var(--app-muted);
       }
 
-      .empty-state mat-icon {
+      .icon-xl {
         font-size: 64px;
         width: 64px;
         height: 64px;
-        color: var(--app-bg);
         margin-bottom: 16px;
       }
 

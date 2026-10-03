@@ -16,6 +16,5 @@ public interface OrderService {
 
     void cancelOrder(String orderId, String userId);
 
-    // OrderResponse confirmOrder(String orderId, String userId);
-
+    void redoOrder(String orderId, String userId);
 }

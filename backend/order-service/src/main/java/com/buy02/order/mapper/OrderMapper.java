@@ -3,6 +3,7 @@ package com.buy02.order.mapper;
 import java.util.List;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import com.buy02.order.dto.CartResponse;
 import com.buy02.order.dto.CreateOrderRequest;
@@ -38,4 +39,20 @@ public interface OrderMapper {
 
         OrderResponse.ShippingAddressResponse toShippingAddressResponse(
                         Order.ShippingAddress address);
+
+        @Mapping(target = "id", ignore = true)
+        @Mapping(target = "createdAt", ignore = true)
+        @Mapping(target = "updatedAt", ignore = true)
+        @Mapping(target = "version", ignore = true)
+        Order copyOrder(Order order);
+
+        @Mapping(target = "id", ignore = true)
+        @Mapping(target = "orderId", ignore = true)
+        @Mapping(target = "status", ignore = true)
+        @Mapping(target = "createdAt", ignore = true)
+        @Mapping(target = "updatedAt", ignore = true)
+        @Mapping(target = "version", ignore = true)
+        SubOrder copySubOrder(SubOrder subOrder);
+
+        SubOrder.Item copyItem(SubOrder.Item item);
 }

@@ -15,9 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.buy02.order.aop.Auditable;
 import com.buy02.order.client.CartClient;
+import com.buy02.order.client.ProductClient;
 import com.buy02.order.dto.CartResponse;
 import com.buy02.order.dto.CreateOrderRequest;
 import com.buy02.order.dto.OrderResponse;
+import com.buy02.order.dto.ProductResponse;
 import com.buy02.order.entity.Order;
 import com.buy02.order.entity.SubOrder;
 import com.buy02.order.event.AuditAction;
@@ -36,6 +38,7 @@ public class OrderServiceImpl implements OrderService {
         private final OrderRepository orderRepository;
         private final SubOrderRepository subOrderRepository;
         private final CartClient cartClient;
+        private final ProductClient productClient;
         private final OrderMapper orderMapper;
 
         private static final List<Order.OrderStatus> STATUS_FLOW = List.of(
@@ -169,7 +172,7 @@ public class OrderServiceImpl implements OrderService {
 
                 if (!resolveOrderStatus(subOrders).equals(Order.OrderStatus.PENDING)) {
                         throw new BadRequestException(
-                                        "Can cancel order if passed PENDING!");
+                                        "Can't cancel order if passed PENDING!");
                 }
 
                 List<SubOrder> canceledSubOrders = subOrders
@@ -182,6 +185,67 @@ public class OrderServiceImpl implements OrderService {
 
                 subOrderRepository.saveAll(canceledSubOrders);
         };
+
+        @Override
+        @Auditable(action = AuditAction.CREATED)
+        public void redoOrder(String orderId, String userId) {
+
+                Order originalOrder = orderRepository.findById(orderId)
+                                .orElseThrow(() -> new NotFoundException(
+                                                "Order not found with id: " + orderId));
+
+                if (!originalOrder.getUserId().equals(userId)) {
+                        throw new ForbiddenException(
+                                        "You don't have permission to redo this order");
+                }
+
+                List<SubOrder> originalSubOrders = subOrderRepository.findByOrderId(orderId);
+
+                validateStockAvailability(originalSubOrders);
+
+                Order newOrder = orderMapper.copyOrder(originalOrder);
+                Order savedOrder = orderRepository.save(newOrder);
+
+                List<SubOrder> newSubOrders = originalSubOrders.stream()
+                                .map(orderMapper::copySubOrder)
+                                .peek(sub -> sub.setOrderId(savedOrder.getId()))
+                                .toList();
+                subOrderRepository.saveAll(newSubOrders);
+        }
+
+        private void validateStockAvailability(List<SubOrder> subOrders) {
+
+                List<String> productIds = subOrders.stream()
+                                .flatMap(sub -> sub.getItems().stream())
+                                .map(SubOrder.Item::getProductId)
+                                .distinct()
+                                .toList();
+
+                Map<String, ProductResponse> productsById = productClient
+                                .getProductsByIds(productIds)
+                                .stream()
+                                .collect(Collectors.toMap(ProductResponse::getId, p -> p));
+
+                for (SubOrder subOrder : subOrders) {
+                        for (SubOrder.Item item : subOrder.getItems()) {
+
+                                ProductResponse product = productsById.get(item.getProductId());
+
+                                if (product == null) {
+                                        throw new BadRequestException(
+                                                        "Product no longer available: " + item.getProductName());
+                                }
+
+                                if (product.getQuantity() < item.getQuantity()) {
+                                        throw new BadRequestException(
+                                                        "Insufficient stock for product: "
+                                                                        + product.getName()
+                                                                        + ". Available: " + product.getQuantity()
+                                                                        + ", requested: " + item.getQuantity());
+                                }
+                        }
+                }
+        }
 
         private List<SubOrder> createSubOrdersBySeller(
                         String orderId,

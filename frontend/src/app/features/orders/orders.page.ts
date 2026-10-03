@@ -48,7 +48,7 @@ import { MatDialog, MatDialogModule } from "@angular/material/dialog";
       } @else if (orders().length === 0) {
         <mat-card class="orders-card">
           <mat-card-content class="empty-state">
-            <mat-icon class="icon-xl" >receipt_long</mat-icon>
+            <mat-icon class="icon-xl">receipt_long</mat-icon>
             <p>No orders found</p>
             <p class="muted">Start shopping to see your orders here.</p>
 
@@ -142,6 +142,15 @@ import { MatDialog, MatDialogModule } from "@angular/material/dialog";
                       [disabled]="isLoading()"
                     >
                       <mat-icon>visibility</mat-icon>
+                    </button>
+
+                    <button
+                      mat-icon-button
+                      (click)="redoOrder(order.id)"
+                      matTooltip="Redo Order"
+                      [disabled]="isLoading()"
+                    >
+                      <mat-icon>low_priority</mat-icon>
                     </button>
 
                     @if (canCancel(order.status)) {
@@ -376,12 +385,39 @@ export class OrdersPage implements OnInit {
             this.notify.success("Order cancelled");
             this.isLoading.set(false);
           },
-          error: (err) => {
+          error: () => {
             this.isLoading.set(false);
-            this.notify.error(
-              err?.error?.message ??
-                "Failed to cancel order. Please try again.",
-            );
+          },
+        });
+      });
+  }
+
+  redoOrder(orderId: string): void {
+    this.dialog
+      .open(ConfirmDialogComponent, {
+        data: {
+          title: "Redo order",
+          message: `Do you want to redo "#${orderId}"?`,
+          danger: true,
+          confirmLabel: "Confirm",
+        },
+      })
+      .afterClosed()
+      .subscribe((ok) => {
+        if (!ok) {
+          return;
+        }
+
+        this.isLoading.set(true);
+
+        this.orderSvc.redoOrder(orderId).subscribe({
+          next: () => {
+            this.notify.success("Order Redone");
+            this.isLoading.set(false);
+            this.loadOrders();
+          },
+          error: () => {
+            this.isLoading.set(false);
           },
         });
       });

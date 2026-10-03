@@ -35,11 +35,11 @@ export class OrderService {
     return this.http.get<Order>(API.base + API.orders.item(orderId)).pipe(
       map((order) => ({
         ...order,
-          // lowest status in sub orders
-          status:
-            STATUS_FLOW.find((status) =>
-              order.subOrders.some((sub) => sub.status === status),
-            ) ?? "PENDING",
+        // lowest status in sub orders
+        status:
+          STATUS_FLOW.find((status) =>
+            order.subOrders.some((sub) => sub.status === status),
+          ) ?? "PENDING",
       })),
     );
   }
@@ -73,5 +73,9 @@ export class OrderService {
 
   cancelOrder(orderId: string) {
     return this.http.patch(API.base + API.orders.cancel(orderId), {});
+  }
+
+  redoOrder(orderId: string) {
+    return this.http.post(API.base + API.orders.redo(orderId), {});
   }
 }

@@ -164,6 +164,17 @@ import { MatDialog, MatDialogModule } from "@angular/material/dialog";
                         <mat-icon>cancel</mat-icon>
                       </button>
                     }
+                    @if (canDelete(order.status)) {
+                      <button
+                        mat-icon-button
+                        color="warn"
+                        (click)="deleteOrder(order.id)"
+                        matTooltip="Delete Order"
+                        [disabled]="isLoading()"
+                      >
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    }
                   </td>
                 </ng-container>
 
@@ -361,6 +372,10 @@ export class OrdersPage implements OnInit {
     return status === "PENDING";
   }
 
+  canDelete(status: OrderStatus): boolean {
+    return status === "CANCELLED" || status === "DELIVERED";
+  }
+
   cancelOrder(orderId: string): void {
     this.dialog
       .open(ConfirmDialogComponent, {
@@ -413,6 +428,37 @@ export class OrdersPage implements OnInit {
         this.orderSvc.redoOrder(orderId).subscribe({
           next: () => {
             this.notify.success("Order Redone");
+            this.isLoading.set(false);
+            this.loadOrders();
+          },
+          error: () => {
+            this.isLoading.set(false);
+          },
+        });
+      });
+  }
+
+  deleteOrder(orderId: string): void {
+    this.dialog
+      .open(ConfirmDialogComponent, {
+        data: {
+          title: "Delete order",
+          message: `Do you want to delete "#${orderId}"? cannot be undone.`,
+          danger: true,
+          confirmLabel: "Delete",
+        },
+      })
+      .afterClosed()
+      .subscribe((ok) => {
+        if (!ok) {
+          return;
+        }
+
+        this.isLoading.set(true);
+
+        this.orderSvc.deleteOrder(orderId).subscribe({
+          next: () => {
+            this.notify.success("Order deleted");
             this.isLoading.set(false);
             this.loadOrders();
           },

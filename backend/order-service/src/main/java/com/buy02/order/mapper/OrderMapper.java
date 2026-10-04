@@ -41,6 +41,7 @@ public interface OrderMapper {
                         Order.ShippingAddress address);
 
         @Mapping(target = "id", ignore = true)
+        @Mapping(target = "deleted", ignore = true)
         @Mapping(target = "createdAt", ignore = true)
         @Mapping(target = "updatedAt", ignore = true)
         @Mapping(target = "version", ignore = true)
@@ -49,6 +50,7 @@ public interface OrderMapper {
         @Mapping(target = "id", ignore = true)
         @Mapping(target = "orderId", ignore = true)
         @Mapping(target = "status", ignore = true)
+        @Mapping(target = "deleted", ignore = true)
         @Mapping(target = "createdAt", ignore = true)
         @Mapping(target = "updatedAt", ignore = true)
         @Mapping(target = "version", ignore = true)

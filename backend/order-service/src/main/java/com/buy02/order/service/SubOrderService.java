@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.buy02.order.dto.OrderResponse;
+import com.buy02.order.entity.Order.OrderStatus;
 
 public interface SubOrderService {
 
@@ -11,7 +12,7 @@ public interface SubOrderService {
 
     Page<OrderResponse> getOrdersBySellerId(String sellerId, Pageable pageable);
 
-    void updateStatus(String subOrderId, String sellerId);
+    void updateStatus(String subOrderId, String sellerId, OrderStatus status);
 
     void deleteSubOrder(String orderId, String userId);
 }

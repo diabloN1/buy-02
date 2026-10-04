@@ -47,12 +47,10 @@ export class OrderService {
   getUserOrders(
     page = 0,
     size = 10,
-    sort = "createdAt,desc",
   ): Observable<PageResponse<Order>> {
     const params = new HttpParams()
       .set("page", page)
       .set("size", size)
-      .set("sort", sort);
 
     return this.http
       .get<PageResponse<Order>>(API.base + API.orders.root, { params })

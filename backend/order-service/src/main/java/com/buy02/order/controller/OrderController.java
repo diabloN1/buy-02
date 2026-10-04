@@ -32,37 +32,35 @@ public class OrderController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(
+    public OrderResponse createOrder(
             @RequestBody @Valid CreateOrderRequest request,
             @AuthenticationPrincipal Jwt jwt) {
+
         String userId = jwt.getSubject();
 
-        return ResponseEntity.ok(orderService.createOrder(userId, request));
+        return orderService.createOrder(userId, request);
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderResponse> getOrder(
+    public OrderResponse getOrder(
             @PathVariable String orderId,
             @AuthenticationPrincipal Jwt jwt) {
+
         String userId = jwt.getSubject();
 
-        OrderResponse response = orderService.getOrder(orderId, userId);
-
-        return ResponseEntity.ok(response);
+        return orderService.getOrder(orderId, userId);
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping
-    public ResponseEntity<Page<OrderResponse>> getOrdersByUser(
+    public Page<OrderResponse> getOrdersByUser(
             @AuthenticationPrincipal Jwt jwt,
             Pageable pageable) {
 
         String userId = jwt.getSubject();
 
-        Page<OrderResponse> orders = orderService.getOrdersByUser(userId, pageable);
-
-        return ResponseEntity.ok(orders);
+        return orderService.getOrdersByUser(userId, pageable);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -87,7 +85,6 @@ public class OrderController {
         String userId = jwt.getSubject();
 
         orderService.redoOrder(orderId, userId);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -100,7 +97,6 @@ public class OrderController {
         String userId = jwt.getSubject();
 
         orderService.deleteOrder(orderId, userId);
-
         return ResponseEntity.noContent().build();
     }
 }

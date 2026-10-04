@@ -47,9 +47,8 @@ public class SubOrderServiceImpl implements SubOrderService {
     @Auditable(action = AuditAction.SELECTED, entityId = "#subOrderId")
     public OrderResponse getSubOrder(String subOrderId, String sellerId) {
 
-        SubOrder subOrder = subOrderRepository.findByIdAndDeletedFalse(subOrderId)
-                .orElseThrow(() -> new NotFoundException(
-                        "SubOrder not found with id: " + subOrderId));
+        SubOrder subOrder = resolveSubOrder(subOrderId);
+        verifySellerOwnership(subOrder, sellerId);
 
         if (!subOrder.getSellerId().equals(sellerId)) {
             throw new ForbiddenException(
@@ -95,14 +94,8 @@ public class SubOrderServiceImpl implements SubOrderService {
     @Auditable(action = AuditAction.MODIFIED, entityId = "#subOrderId")
     public void updateStatus(String subOrderId, String sellerId, OrderStatus nextStatus) {
 
-        SubOrder subOrder = subOrderRepository.findByIdAndDeletedFalse(subOrderId)
-                .orElseThrow(() -> new NotFoundException(
-                        "SubOrder not found with id: " + subOrderId));
-
-        if (!subOrder.getSellerId().equals(sellerId)) {
-            throw new ForbiddenException(
-                    "You don't have permission to update this suborder");
-        }
+        SubOrder subOrder = resolveSubOrder(subOrderId);
+        verifySellerOwnership(subOrder, sellerId);
 
         OrderStatus currentStatus = subOrder.getStatus();
         Set<OrderStatus> allowedTransitions = SELLER_TRANSITIONS.get(currentStatus);
@@ -110,13 +103,13 @@ public class SubOrderServiceImpl implements SubOrderService {
         if (allowedTransitions == null || allowedTransitions.isEmpty()) {
             throw new BadRequestException(
                     "Cannot update status from " + currentStatus
-                     + ". No further transitions are allowed.");
+                            + ". No further transitions are allowed.");
         }
 
         if (!allowedTransitions.contains(nextStatus)) {
             throw new BadRequestException(
                     "Cannot update status from "
-                     + currentStatus + " to " + nextStatus + ".");
+                            + currentStatus + " to " + nextStatus + ".");
 
         }
 
@@ -132,18 +125,32 @@ public class SubOrderServiceImpl implements SubOrderService {
 
     @Override
     @Auditable(action = AuditAction.DELETED, entityId = "#orderId")
-    public void deleteSubOrder(String orderId, String userId) {
+    public void deleteSubOrder(String subOrderId, String userId) {
 
-        SubOrder subOrder = subOrderRepository.findByIdAndDeletedFalse(orderId)
-                .orElseThrow(() -> new NotFoundException(
-                        "SubOrder not found with id: " + orderId));
+        SubOrder subOrder = resolveSubOrder(subOrderId);
+        verifySellerOwnership(subOrder, userId);
 
-        if (!subOrder.getSellerId().equals(userId)) {
-            throw new ForbiddenException(
-                    "You don't have permission to delete this suborder");
+        OrderStatus currentStatus = subOrder.getStatus();
+        if (!currentStatus.equals(OrderStatus.CANCELLED) &&
+                !currentStatus.equals(OrderStatus.DELIVERED)) {
+            throw new BadRequestException(
+                    "Can't delete order if still in progress!");
         }
 
         subOrder.setDeleted(true);
         subOrderRepository.save(subOrder);
+    }
+
+    private SubOrder resolveSubOrder(String subOrderId) {
+        return subOrderRepository.findByIdAndDeletedFalse(subOrderId)
+                .orElseThrow(() -> new NotFoundException(
+                        "SubOrder not found with id: " + subOrderId));
+    }
+
+    private void verifySellerOwnership(SubOrder subOrder, String sellerId) {
+        if (!subOrder.getSellerId().equals(sellerId)) {
+            throw new ForbiddenException(
+                    "You don't have permission to access this suborder");
+        }
     }
 }

@@ -1,12 +1,10 @@
 import { Injectable, inject } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
-import { map } from "rxjs";
+import { map } from "rxjs/operators";
 
 import { API } from "@core/config/api.config";
 import {
-  CreateOrderRequest,
-  CreateOrderResponse,
   Order,
   OrderStatus,
   PageResponse,
@@ -21,21 +19,13 @@ const STATUS_FLOW: OrderStatus[] = [
 ];
 
 @Injectable({ providedIn: "root" })
-export class OrderService {
+export class SubOrderService {
   private readonly http = inject(HttpClient);
 
-  createOrder(body: CreateOrderRequest): Observable<CreateOrderResponse> {
-    return this.http.post<CreateOrderResponse>(
-      API.base + API.orders.root,
-      body,
-    );
-  }
-
-  getOrder(orderId: string): Observable<Order> {
-    return this.http.get<Order>(API.base + API.orders.item(orderId)).pipe(
+  getSubOrder(subOrderId: string): Observable<Order> {
+    return this.http.get<Order>(API.base + API.subOrders.item(subOrderId)).pipe(
       map((order) => ({
         ...order,
-        // lowest status in sub orders
         status:
           STATUS_FLOW.find((status) =>
             order.subOrders.some((sub) => sub.status === status),
@@ -44,7 +34,7 @@ export class OrderService {
     );
   }
 
-  getUserOrders(
+  getOrdersBySeller(
     page = 0,
     size = 10,
   ): Observable<PageResponse<Order>> {
@@ -53,13 +43,12 @@ export class OrderService {
       .set("size", size)
 
     return this.http
-      .get<PageResponse<Order>>(API.base + API.orders.root, { params })
+      .get<PageResponse<Order>>(API.base + API.subOrders.root, { params })
       .pipe(
         map((page) => ({
           ...page,
           content: page.content.map((order) => ({
             ...order,
-            // lowest status in sub orders
             status:
               STATUS_FLOW.find((status) =>
                 order.subOrders.some((sub) => sub.status === status),
@@ -69,15 +58,16 @@ export class OrderService {
       );
   }
 
-  cancelOrder(orderId: string) {
-    return this.http.patch(API.base + API.orders.cancel(orderId), {});
+  updateStatus(subOrderId: string, status: OrderStatus) {
+    const params = new HttpParams().set("status", status);
+    return this.http.patch(
+      API.base + API.subOrders.status(subOrderId),
+      {},
+      { params },
+    );
   }
 
-  redoOrder(orderId: string) {
-    return this.http.post(API.base + API.orders.redo(orderId), {});
-  }
-
-  deleteOrder(orderId: string) {
-    return this.http.delete(API.base + API.orders.delete(orderId), {});
+  deleteSubOrder(subOrderId: string) {
+    return this.http.delete(API.base + API.subOrders.delete(subOrderId), {});
   }
 }

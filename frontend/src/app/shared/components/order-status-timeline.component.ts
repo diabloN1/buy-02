@@ -37,7 +37,7 @@ import { OrderStatus, StatusHistory, SubOrder } from "@core/models/order.model";
 
           <div class="timeline-content">
             <div class="timeline-header">
-              <strong>{{ "PENDING" }}</strong>
+              <strong>PENDING</strong>
 
               @if (timeline.length == 0) {
                 <mat-chip [color]="getStatusColor('PENDING')" selected>
@@ -85,7 +85,7 @@ import { OrderStatus, StatusHistory, SubOrder } from "@core/models/order.model";
               </span>
 
               <span class="timeline-user">
-                Changed by {{ history.changedBy }}
+                Changed by {{ getChangedByLabel(history) }}
               </span>
             </div>
           </div>
@@ -203,6 +203,7 @@ import { OrderStatus, StatusHistory, SubOrder } from "@core/models/order.model";
 export class OrderStatusTimelineComponent {
   @Input({ required: true }) subOrder!: SubOrder;
   @Input({ required: true }) createdAt!: string;
+  @Input({ required: true }) isSeller!: boolean;
 
   get timeline(): StatusHistory[] {
     return [...this.subOrder.statusHistory].sort(
@@ -247,5 +248,9 @@ export class OrderStatusTimelineComponent {
       default:
         return "accent";
     }
+  }
+
+  getChangedByLabel(history: StatusHistory): string {
+    return history.changedBy === this.subOrder.sellerId ? "Seller" : "Buyer";
   }
 }

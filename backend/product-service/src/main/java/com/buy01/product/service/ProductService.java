@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.buy01.product.DTOs.CreateRequest;
 import com.buy01.product.DTOs.ProductResponse;
+import com.buy01.product.DTOs.ProductSearchFilter;
 import com.buy01.product.DTOs.UpdateRequest;
 
 public interface ProductService {
@@ -32,4 +33,6 @@ public interface ProductService {
     long countProducts();
 
     void removeImageFromProduct(String productId, String imageId);
+
+    Page<ProductResponse> searchProducts(ProductSearchFilter filter, Pageable pageable);
 }

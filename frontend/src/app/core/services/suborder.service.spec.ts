@@ -22,7 +22,6 @@ describe("SubOrderService", () => {
     shippingAddress: {
       street: "Street 1",
       city: "Oujda",
-      state: "Oriental",
       zipCode: "60000",
       country: "Morocco",
       phone: "0600000000",

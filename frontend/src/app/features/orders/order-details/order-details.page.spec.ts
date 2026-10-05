@@ -36,7 +36,6 @@ describe("OrderDetailsPage", () => {
     shippingAddress: {
       street: "123 Street",
       city: "Oujda",
-      state: "Oriental",
       zipCode: "60000",
       country: "Morocco",
       phone: "0600000000",

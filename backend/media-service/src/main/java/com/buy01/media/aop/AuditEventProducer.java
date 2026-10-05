@@ -1,6 +1,6 @@
-package com.buy02.cart.service;
+package com.buy01.media.aop;
 
-import com.buy02.cart.event.AuditEvent;
+import com.buy01.media.event.AuditEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;

@@ -197,7 +197,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
-    
+
     healthcheck:
       test:
         [
@@ -227,7 +227,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
-    
+
     healthcheck:
       test:
         [
@@ -293,20 +293,15 @@ services:
       - mongo-data:/data/db
 
   minio:
-    image: minio/minio
-
-    # ports:
-    #   - "9001:9001"
-
+    build:
+      context: ./deps-setup/minio
+    image: anlazaar/minio:latest
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-
     command: server /data --console-address ":9001"
-
     volumes:
       - minio-data:/data
-
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 5s

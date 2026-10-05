@@ -16,7 +16,7 @@ import { OrderService } from "@core/services/order.service";
 import { SubOrderService } from "@core/services/suborder.service";
 import { NotificationService } from "@core/services/notification.service";
 import { ConfirmDialogComponent } from "@shared/components/confirm-dialog.component";
-import { Order, OrderStatus } from "@core/models/checkout.model";
+import { Order, OrderStatus } from "@core/models/order.model";
 
 export const STATUS_FLOW: OrderStatus[] = [
   "PENDING",
@@ -111,7 +111,7 @@ export const STATUS_FLOW: OrderStatus[] = [
                   </th>
 
                   <td mat-cell *matCellDef="let order">
-                    {{ order.createdAt | date:'MMM d, y, h:mm a' }}
+                    {{ order.createdAt | date: "MMM d, y, h:mm a" }}
                   </td>
                 </ng-container>
 
@@ -141,7 +141,7 @@ export const STATUS_FLOW: OrderStatus[] = [
 
                   <td mat-cell *matCellDef="let order">
                     <span class="amount">
-                      {{ order.totalAmount | currency:'USD' }}
+                      {{ order.totalAmount | currency: "USD" }}
                     </span>
                   </td>
                 </ng-container>

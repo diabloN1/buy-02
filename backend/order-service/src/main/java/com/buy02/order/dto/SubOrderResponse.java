@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import com.buy02.order.entity.Order;
+import com.buy02.order.entity.SubOrder.StatusHistory;
 
 @Data
 @Builder
@@ -30,6 +31,8 @@ public class SubOrderResponse {
     private String paymentMethod;
 
     private Order.OrderStatus status;
+
+    private List<StatusHistory> statusHistory;
 
     private LocalDateTime createdAt;
 

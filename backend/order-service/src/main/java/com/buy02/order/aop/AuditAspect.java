@@ -2,7 +2,7 @@ package com.buy02.order.aop;
 
 import com.buy02.order.event.AuditEvent;
 import com.buy02.order.event.EntityType;
-import com.buy02.order.service.AuditEventProducer;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

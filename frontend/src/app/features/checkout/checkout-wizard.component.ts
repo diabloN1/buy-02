@@ -17,8 +17,8 @@ import { RouterModule } from "@angular/router";
 import { CartService } from "@core/services/cart.service";
 import { OrderService } from "@core/services/order.service";
 import { NotificationService } from "@core/services/notification.service";
-import { CartItem, Cart } from "@core/models/cart.model";
-import { Address, CreateOrderRequest } from "@core/models/checkout.model";
+import { Cart } from "@core/models/cart.model";
+import { Address, CreateOrderRequest } from "@core/models/order.model";
 
 import { ShippingAddressStepComponent } from "./steps/shipping-address-step.component";
 import { ReviewOrderStepComponent } from "./steps/review-order-step.component";
@@ -203,15 +203,17 @@ export class CheckoutWizardComponent {
 
     const body: CreateOrderRequest = {
       shippingAddress: address,
-      paymentMethod: 'pay_on_delivery',
-      totalAmount: totalAmount
+      paymentMethod: "pay_on_delivery",
+      totalAmount: totalAmount,
     };
 
     this.orderSvc.createOrder(body).subscribe({
       next: (res) => {
         this.orderId.set(res.id);
         this.notify.success(`Order #${res.id} placed successfully!`);
-        setTimeout(() => {stepper.next()}, 500);
+        setTimeout(() => {
+          stepper.next();
+        }, 500);
       },
       error: () => {},
     });

@@ -16,6 +16,7 @@ import { SubOrderService } from "@core/services/suborder.service";
 import { NotificationService } from "@core/services/notification.service";
 import { ConfirmDialogComponent } from "@shared/components/confirm-dialog.component";
 import { Order, OrderStatus } from "@core/models/order.model";
+import { OrderStatusTimelineComponent } from "@shared/components/order-status-timeline.component";
 
 @Component({
   selector: "app-order-details",
@@ -32,6 +33,7 @@ import { Order, OrderStatus } from "@core/models/order.model";
     MatDividerModule,
     MatExpansionModule,
     MatDialogModule,
+    OrderStatusTimelineComponent,
   ],
   template: `
     <section class="container">
@@ -173,6 +175,9 @@ import { Order, OrderStatus } from "@core/models/order.model";
                         {{ subOrder.status }}
                       </mat-chip>
                     </div>
+
+                    <mat-divider></mat-divider>
+                    <app-order-status-timeline [subOrder]="subOrder" [createdAt]="currentOrder.createdAt" />
 
                     <mat-divider></mat-divider>
 
@@ -528,6 +533,7 @@ export class OrderDetailsComponent implements OnInit {
 
     obs.subscribe({
       next: (order) => {
+        console.log("order:", order);
         this.order.set(order);
         this.isLoading.set(false);
       },

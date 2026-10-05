@@ -21,7 +21,6 @@ describe("OrderService", () => {
   const mockAddress = {
     street: "123 Main Street",
     city: "Oujda",
-    state: "Oriental",
     zipCode: "60000",
     country: "Morocco",
     phone: "0612345678",

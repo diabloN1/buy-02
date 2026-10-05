@@ -118,10 +118,10 @@ import { OrderStatusTimelineComponent } from "@shared/components/order-status-ti
                   {{ currentOrder.shippingAddress.street }}<br />
 
                   {{ currentOrder.shippingAddress.city }},
-                  {{ currentOrder.shippingAddress.state }}
+                  {{ currentOrder.shippingAddress.country }}<br />
+
                   {{ currentOrder.shippingAddress.zipCode }}<br />
 
-                  {{ currentOrder.shippingAddress.country }}<br />
 
                   {{ currentOrder.shippingAddress.phone }}
                 </p>

@@ -177,7 +177,7 @@ import { OrderStatusTimelineComponent } from "@shared/components/order-status-ti
                     </div>
 
                     <mat-divider></mat-divider>
-                    <app-order-status-timeline [subOrder]="subOrder" [createdAt]="currentOrder.createdAt" />
+                    <app-order-status-timeline [subOrder]="subOrder" [createdAt]="currentOrder.createdAt" [isSeller] ="isSeller" />
 
                     <mat-divider></mat-divider>
 

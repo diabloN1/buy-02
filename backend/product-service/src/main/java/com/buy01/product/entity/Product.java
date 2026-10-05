@@ -35,6 +35,13 @@ public class Product {
     @Field("owner_id")
     private String userId;
 
+    @Indexed
+    @Field("category_id")
+    private String categoryId;
+
+    @Field("category_name")
+    private String categoryName;
+
     private List<String> imageIds;
 
     @CreatedDate

@@ -22,6 +22,7 @@ export interface SubOrder {
   items: OrderItem[];
   totalAmount: number;
   paymentMethod: string;
+  statusHistory: StatusHistory[];
   status: OrderStatus;
   createdAt: string;
   updatedAt: string;
@@ -46,6 +47,12 @@ export type OrderStatus =
   | "DELIVERED"
   | "CANCELLED";
 
+export interface StatusHistory {
+  status: OrderStatus;
+  timestamp: string;
+  changedBy: string;
+}
+
 export interface CreateOrderRequest {
   shippingAddress: Address;
   paymentMethod: string;
@@ -54,30 +61,4 @@ export interface CreateOrderRequest {
 
 export interface CreateOrderResponse {
   id: string;
-}
-
-export interface PageResponse<T> {
-  content: T[];
-  pageable: {
-    pageNumber: number;
-    pageSize: number;
-    sort: {
-      sorted: boolean;
-      unsorted: boolean;
-      empty: boolean;
-    };
-  };
-  totalPages: number;
-  totalElements: number;
-  last: boolean;
-  size: number;
-  number: number;
-  sort: {
-    sorted: boolean;
-    unsorted: boolean;
-    empty: boolean;
-  };
-  numberOfElements: number;
-  first: boolean;
-  empty: boolean;
 }

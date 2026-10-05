@@ -4,11 +4,8 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
 import { API } from "@core/config/api.config";
-import {
-  Order,
-  OrderStatus,
-  PageResponse,
-} from "@core/models/checkout.model";
+import { Order, OrderStatus } from "@core/models/order.model";
+import { Paginated } from "@core/models/paginated.model";
 
 const STATUS_FLOW: OrderStatus[] = [
   "PENDING",
@@ -34,16 +31,11 @@ export class SubOrderService {
     );
   }
 
-  getOrdersBySeller(
-    page = 0,
-    size = 10,
-  ): Observable<PageResponse<Order>> {
-    const params = new HttpParams()
-      .set("page", page)
-      .set("size", size)
+  getOrdersBySeller(page = 0, size = 10): Observable<Paginated<Order>> {
+    const params = new HttpParams().set("page", page).set("size", size);
 
     return this.http
-      .get<PageResponse<Order>>(API.base + API.subOrders.root, { params })
+      .get<Paginated<Order>>(API.base + API.subOrders.root, { params })
       .pipe(
         map((page) => ({
           ...page,

@@ -16,7 +16,6 @@ import { SubOrderService } from "@core/services/suborder.service";
 import { NotificationService } from "@core/services/notification.service";
 import { ConfirmDialogComponent } from "@shared/components/confirm-dialog.component";
 import { Order, OrderStatus } from "@core/models/order.model";
-import { STATUS_FLOW } from "../order-list/order-list.component";
 
 @Component({
   selector: "app-order-details",

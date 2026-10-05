@@ -8,8 +8,8 @@ import {
   CreateOrderResponse,
   Order,
   OrderStatus,
-  PageResponse,
-} from "@core/models/checkout.model";
+} from "@core/models/order.model";
+import { Paginated } from "@core/models/paginated.model";
 
 export const STATUS_FLOW: OrderStatus[] = [
   "PENDING",
@@ -36,11 +36,11 @@ export class OrderService {
       .pipe(map((order) => this.withOverallStatus(order)));
   }
 
-  getUserOrders(page = 0, size = 10): Observable<PageResponse<Order>> {
+  getUserOrders(page = 0, size = 10): Observable<Paginated<Order>> {
     const params = new HttpParams().set("page", page).set("size", size);
 
     return this.http
-      .get<PageResponse<Order>>(API.base + API.orders.root, { params })
+      .get<Paginated<Order>>(API.base + API.orders.root, { params })
       .pipe(map((page) => this.withOverallStatusForPage(page)));
   }
 
@@ -66,9 +66,7 @@ export class OrderService {
     };
   }
 
-  private withOverallStatusForPage(
-    page: PageResponse<Order>,
-  ): PageResponse<Order> {
+  private withOverallStatusForPage(page: Paginated<Order>): Paginated<Order> {
     return {
       ...page,
       content: page.content.map((order) => this.withOverallStatus(order)),
@@ -92,11 +90,14 @@ export class OrderService {
   }
 
   getAvailableStatusTransitions(currentStatus: OrderStatus): OrderStatus[] {
-
     const FLOW_WITHOUT_CANCELED = STATUS_FLOW.slice(0, -1);
     const index = FLOW_WITHOUT_CANCELED.indexOf(currentStatus);
 
-    if (index < 0 || currentStatus === "CANCELLED") {
+    if (
+      index < 0 ||
+      currentStatus === "DELIVERED" ||
+      currentStatus === "CANCELLED"
+    ) {
       return [];
     }
 

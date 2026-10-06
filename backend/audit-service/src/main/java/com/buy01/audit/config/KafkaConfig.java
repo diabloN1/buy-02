@@ -29,7 +29,7 @@ public class KafkaConfig {
         }
 
         @Bean
-        ConcurrentKafkaListenerContainerFactory<String, AuditEvent> auditKafkaListenerContainerFactory(
+        ConcurrentKafkaListenerContainerFactory<String, AuditEvent> auditContainer(
                         ConsumerFactory<String, AuditEvent> auditConsumerFactory) {
 
                 return createListenerContainerFactory(auditConsumerFactory);
@@ -44,7 +44,7 @@ public class KafkaConfig {
         }
 
         @Bean
-        ConcurrentKafkaListenerContainerFactory<String, SalesAuditEvent> saleKafkaListenerContainerFactory(
+        ConcurrentKafkaListenerContainerFactory<String, SalesAuditEvent> salesContainer(
                         ConsumerFactory<String, SalesAuditEvent> saleConsumerFactory) {
 
                 return createListenerContainerFactory(saleConsumerFactory);

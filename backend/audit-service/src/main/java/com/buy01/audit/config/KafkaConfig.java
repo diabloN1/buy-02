@@ -8,56 +8,84 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
 
-import com.buy01.audit.event.AuditEvent;
+import com.buy01.audit.event.audit.AuditEvent;
+import com.buy01.audit.event.sales.SaleAuditEvent;
 
 @Configuration
 public class KafkaConfig {
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String kafkaServers;
+        @Value("${spring.kafka.bootstrap-servers}")
+        private String kafkaServers;
 
-    @Bean
-    ConsumerFactory<String, AuditEvent> consumerFactory() {
+        // AuditEvent
+        @Bean
+        ConsumerFactory<String, AuditEvent> auditConsumerFactory() {
+                return createConsumerFactory(AuditEvent.class, "audit-group");
+        }
 
-        Map<String, Object> props = new HashMap<>();
+        @Bean
+        ConcurrentKafkaListenerContainerFactory<String, AuditEvent> auditKafkaListenerContainerFactory(
+                        ConsumerFactory<String, AuditEvent> auditConsumerFactory) {
 
-        props.put(
-                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                kafkaServers);
+                return createListenerContainerFactory(auditConsumerFactory);
+        }
 
-        props.put(
-                ConsumerConfig.GROUP_ID_CONFIG,
-                "audit-group");
+        // SalesAuditEvent
+        @Bean
+        ConsumerFactory<String, SaleAuditEvent> saleConsumerFactory() {
+                return createConsumerFactory(
+                                SaleAuditEvent.class,
+                                "sale-audit-group");
+        }
 
-        props.put(
-                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
-                "earliest");
+        @Bean
+        ConcurrentKafkaListenerContainerFactory<String, SaleAuditEvent> saleKafkaListenerContainerFactory(
+                        ConsumerFactory<String, SaleAuditEvent> saleConsumerFactory) {
 
-        JacksonJsonDeserializer<AuditEvent> deserializer = new JacksonJsonDeserializer<>(
-                AuditEvent.class);
+                return createListenerContainerFactory(saleConsumerFactory);
+        }
 
-        deserializer.setUseTypeHeaders(false);
+        // Helpers
+        private <T> ConsumerFactory<String, T> createConsumerFactory(
+                        Class<T> eventType,
+                        String groupId) {
 
-        return new DefaultKafkaConsumerFactory<>(
-                props,
-                new StringDeserializer(),
-                deserializer);
-    }
+                Map<String, Object> props = new HashMap<>();
 
-    @Bean
-    ConcurrentKafkaListenerContainerFactory<String, AuditEvent> kafkaListenerContainerFactory(
-            ConsumerFactory<String, AuditEvent> consumerFactory) {
+                props.put(
+                                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                                kafkaServers);
 
-        var factory = new ConcurrentKafkaListenerContainerFactory<String, AuditEvent>();
+                props.put(
+                                ConsumerConfig.GROUP_ID_CONFIG,
+                                groupId);
 
-        factory.setConsumerFactory(consumerFactory);
+                props.put(
+                                ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
+                                "earliest");
 
-        return factory;
-    }
+                JacksonJsonDeserializer<T> deserializer = new JacksonJsonDeserializer<>(eventType);
+
+                deserializer.setUseTypeHeaders(false);
+
+                return new DefaultKafkaConsumerFactory<>(
+                                props,
+                                new StringDeserializer(),
+                                deserializer);
+        }
+
+        private <T> ConcurrentKafkaListenerContainerFactory<String, T> createListenerContainerFactory(
+                        ConsumerFactory<String, T> consumerFactory) {
+
+                var factory = new ConcurrentKafkaListenerContainerFactory<String, T>();
+
+                factory.setConsumerFactory(consumerFactory);
+
+                return factory;
+        }
 }

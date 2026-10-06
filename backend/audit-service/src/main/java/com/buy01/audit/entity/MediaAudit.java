@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.buy01.audit.event.AuditAction;
+import com.buy01.audit.event.audit.AuditAction;
 
 import lombok.Builder;
 import lombok.Data;

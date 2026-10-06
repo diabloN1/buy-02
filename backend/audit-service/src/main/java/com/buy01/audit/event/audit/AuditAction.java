@@ -1,4 +1,4 @@
-package com.buy01.audit.event;
+package com.buy01.audit.event.audit;
 
 public enum AuditAction {
     SELECTED,

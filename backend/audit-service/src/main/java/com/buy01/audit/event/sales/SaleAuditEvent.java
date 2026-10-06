@@ -16,5 +16,5 @@ public record SaleAuditEvent(
         Integer quantity,
 
         Instant timestamp
-    ) {
+    ) implements SalesAuditEvent {
 }

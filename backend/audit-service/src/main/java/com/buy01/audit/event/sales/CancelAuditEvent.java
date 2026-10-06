@@ -5,4 +5,4 @@ public record CancelAuditEvent (
     String subOrderId,
     String canceled
 
-){}
+) implements SalesAuditEvent {}

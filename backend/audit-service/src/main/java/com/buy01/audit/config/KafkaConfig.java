@@ -14,7 +14,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
 
 import com.buy01.audit.event.audit.AuditEvent;
-import com.buy01.audit.event.sales.SaleAuditEvent;
+import com.buy01.audit.event.sales.SalesAuditEvent;
 
 @Configuration
 public class KafkaConfig {
@@ -37,15 +37,15 @@ public class KafkaConfig {
 
         // SalesAuditEvent
         @Bean
-        ConsumerFactory<String, SaleAuditEvent> saleConsumerFactory() {
+        ConsumerFactory<String, SalesAuditEvent> saleConsumerFactory() {
                 return createConsumerFactory(
-                                SaleAuditEvent.class,
+                                SalesAuditEvent.class,
                                 "sale-audit-group");
         }
 
         @Bean
-        ConcurrentKafkaListenerContainerFactory<String, SaleAuditEvent> saleKafkaListenerContainerFactory(
-                        ConsumerFactory<String, SaleAuditEvent> saleConsumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, SalesAuditEvent> saleKafkaListenerContainerFactory(
+                        ConsumerFactory<String, SalesAuditEvent> saleConsumerFactory) {
 
                 return createListenerContainerFactory(saleConsumerFactory);
         }

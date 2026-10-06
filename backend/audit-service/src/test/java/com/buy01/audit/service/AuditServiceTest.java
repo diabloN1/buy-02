@@ -41,7 +41,7 @@ class AuditServiceTest {
     private AuditService auditService;
 
     @Test
-    void consume_WhenTypeIsUser_ShouldSaveUserAudit() {
+    void consumeAudit_WhenTypeIsUser_ShouldSaveUserAudit() {
         Instant now = Instant.now();
         AuditEvent event = new AuditEvent(
                 "user-100",
@@ -51,7 +51,7 @@ class AuditServiceTest {
                 true,
                 now);
 
-        auditService.consume(event);
+        auditService.consumeAudit(event);
 
         ArgumentCaptor<UserAudit> captor = ArgumentCaptor.forClass(UserAudit.class);
         verify(userRepo).save(captor.capture());
@@ -67,7 +67,7 @@ class AuditServiceTest {
     }
 
     @Test
-    void consume_WhenTypeIsProduct_ShouldSaveProductAudit() {
+    void consumeAudit_WhenTypeIsProduct_ShouldSaveProductAudit() {
         Instant now = Instant.now();
         AuditEvent event = new AuditEvent(
                 "prod-200",
@@ -77,7 +77,7 @@ class AuditServiceTest {
                 false,
                 now);
 
-        auditService.consume(event);
+        auditService.consumeAudit(event);
 
         ArgumentCaptor<ProductAudit> captor = ArgumentCaptor.forClass(ProductAudit.class);
         verify(productRepo).save(captor.capture());
@@ -93,7 +93,7 @@ class AuditServiceTest {
     }
 
     @Test
-    void consume_WhenTypeIsMedia_ShouldSaveMediaAudit() {
+    void consumeAudit_WhenTypeIsMedia_ShouldSaveMediaAudit() {
         Instant now = Instant.now();
         AuditEvent event = new AuditEvent(
                 "media-300",
@@ -103,7 +103,7 @@ class AuditServiceTest {
                 true,
                 now);
 
-        auditService.consume(event);
+        auditService.consumeAudit(event);
 
         ArgumentCaptor<MediaAudit> captor = ArgumentCaptor.forClass(MediaAudit.class);
         verify(mediaRepo).save(captor.capture());

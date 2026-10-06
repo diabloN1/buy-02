@@ -1,9 +1,9 @@
 package com.buy01.audit.service;
 
 import com.buy01.audit.BaseIntegrationTest;
-import com.buy01.audit.event.AuditAction;
-import com.buy01.audit.event.AuditEvent;
-import com.buy01.audit.event.EntityType;
+import com.buy01.audit.event.audit.AuditAction;
+import com.buy01.audit.event.audit.AuditEvent;
+import com.buy01.audit.event.audit.EntityType;
 import com.buy01.audit.repository.UserAuditRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

@@ -2,16 +2,47 @@ import { Injectable, inject } from "@angular/core";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { API } from "@core/config/api.config";
-import { Product, ProductUpsert } from "@core/models/product.model";
+import {
+  Product,
+  ProductUpsert,
+  ProductSearchFilter,
+} from "@core/models/product.model";
 import { Paginated } from "@core/models/paginated.model";
 
 @Injectable({ providedIn: "root" })
 export class ProductService {
   private readonly http = inject(HttpClient);
 
-  list(page = 1, pageSize = 12, q?: string): Observable<Paginated<Product>> {
+  search(
+    page = 1,
+    pageSize = 12,
+    filters: ProductSearchFilter = {},
+  ): Observable<Paginated<Product>> {
+    let params = new HttpParams()
+      .set("page", page - 1) 
+      .set("size", pageSize);
+
+    if (filters.keyword) params = params.set("keyword", filters.keyword);
+    if (filters.minPrice != null)
+      params = params.set("minPrice", filters.minPrice);
+    if (filters.maxPrice != null)
+      params = params.set("maxPrice", filters.maxPrice);
+    if (filters.categoryId)
+      params = params.set("categoryId", filters.categoryId);
+    if (filters.sellerId) params = params.set("sellerId", filters.sellerId);
+    if (filters.startDate) params = params.set("startDate", filters.startDate);
+    if (filters.endDate) params = params.set("endDate", filters.endDate);
+
+    return this.http.get<Paginated<Product>>(
+      API.base + API.products.root + "/search",
+      {
+        params,
+      },
+    );
+  }
+
+  list(page = 1, pageSize = 12): Observable<Paginated<Product>> {
     let params = new HttpParams().set("page", page - 1).set("size", pageSize);
-    if (q) params = params.set("q", q);
     return this.http.get<Paginated<Product>>(API.base + API.products.root, {
       params,
     });

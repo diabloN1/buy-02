@@ -1,25 +1,20 @@
-import {
-  Component,
-  inject,
-  signal,
-} from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  Validators,
-} from "@angular/forms";
+import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
+import { MatSelectModule } from "@angular/material/select";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
+
 import { ProductService } from "@core/services/product.service";
+import { CategoryService } from "@core/services/category.service";
 import { NotificationService } from "@core/services/notification.service";
 import { FieldErrorComponent } from "@shared/components/field-error.component";
 import { FileDropDirective } from "@shared/directives/file-drop.directive";
 import { LoadingSpinnerComponent } from "@shared/components/loading-spinner.component";
-import { ProductImage } from "@core/models/product.model";
+import { ProductImage, Category } from "@core/models/product.model";
 import { applyFormErrors } from "@shared/utils/form-error.util";
 
 const MAX_SIZE = 2 * 1024 * 1024;
@@ -33,6 +28,7 @@ const MAX_SIZE = 2 * 1024 * 1024;
     RouterLink,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatButtonModule,
     MatIconModule,
     FieldErrorComponent,
@@ -49,7 +45,9 @@ const MAX_SIZE = 2 * 1024 * 1024;
       <div class="glass-card panel">
         <div class="form-header">
           <h1>{{ id() ? "Edit Product" : "Create New Product" }}</h1>
-          <p class="muted">Fill in the product details and upload product media assets.</p>
+          <p class="muted">
+            Fill in the product details and upload product media assets.
+          </p>
         </div>
 
         @if (loading()) {
@@ -59,9 +57,28 @@ const MAX_SIZE = 2 * 1024 * 1024;
             <mat-form-field appearance="outline">
               <mat-label>Product Name</mat-label>
               <mat-icon matPrefix>label</mat-icon>
-              <input matInput formControlName="name" placeholder="e.g. Premium Wireless Headphones" />
+              <input
+                matInput
+                formControlName="name"
+                placeholder="e.g. Premium Wireless Headphones"
+              />
             </mat-form-field>
             <app-field-error [control]="form.controls.name" />
+
+      
+            <mat-form-field appearance="outline">
+              <mat-label>Category</mat-label>
+              <mat-icon matPrefix>category</mat-icon>
+              <mat-select
+                formControlName="categoryId"
+                placeholder="Select a category"
+              >
+                @for (cat of categories(); track cat.id) {
+                  <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <app-field-error [control]="form.controls.categoryId" />
 
             <mat-form-field appearance="outline">
               <mat-label>Description</mat-label>
@@ -79,7 +96,13 @@ const MAX_SIZE = 2 * 1024 * 1024;
                 <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Price ($ USD)</mat-label>
                   <mat-icon matPrefix>attach_money</mat-icon>
-                  <input matInput type="number" step="0.01" formControlName="price" placeholder="29.99" />
+                  <input
+                    matInput
+                    type="number"
+                    step="0.01"
+                    formControlName="price"
+                    placeholder="29.99"
+                  />
                 </mat-form-field>
                 <app-field-error [control]="form.controls.price" />
               </div>
@@ -88,7 +111,12 @@ const MAX_SIZE = 2 * 1024 * 1024;
                 <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Quantity in Stock</mat-label>
                   <mat-icon matPrefix>inventory_2</mat-icon>
-                  <input matInput type="number" formControlName="quantity" placeholder="10" />
+                  <input
+                    matInput
+                    type="number"
+                    formControlName="quantity"
+                    placeholder="10"
+                  />
                 </mat-form-field>
                 <app-field-error [control]="form.controls.quantity" />
               </div>
@@ -132,12 +160,16 @@ const MAX_SIZE = 2 * 1024 * 1024;
                 <div class="dropzone max-reached">
                   <mat-icon>block</mat-icon>
                   <div>Maximum of 5 images reached.</div>
-                  <small class="muted">Remove an existing image to upload another.</small>
+                  <small class="muted"
+                    >Remove an existing image to upload another.</small
+                  >
                 </div>
               }
 
               @if (uploading()) {
-                <div class="muted upload-progress">Uploading image assets… {{ progress() }}%</div>
+                <div class="muted upload-progress">
+                  Uploading image assets… {{ progress() }}%
+                </div>
               }
 
               @if (images().length) {
@@ -161,7 +193,12 @@ const MAX_SIZE = 2 * 1024 * 1024;
             </div>
 
             <div class="form-actions">
-              <a mat-outlined-button routerLink="/seller/products" class="cancel-btn">Cancel</a>
+              <a
+                mat-outlined-button
+                routerLink="/seller/products"
+                class="cancel-btn"
+                >Cancel</a
+              >
               <button
                 mat-flat-button
                 color="primary"
@@ -183,12 +220,10 @@ const MAX_SIZE = 2 * 1024 * 1024;
         padding-top: 24px;
         padding-bottom: 64px;
       }
-
       .back-btn {
         margin-bottom: 20px;
         color: var(--app-muted) !important;
       }
-
       .panel {
         padding: 36px;
         max-width: 760px;
@@ -196,7 +231,6 @@ const MAX_SIZE = 2 * 1024 * 1024;
         margin: 0 auto;
         box-shadow: var(--app-shadow-lg);
       }
-
       .form-header {
         margin-bottom: 28px;
       }
@@ -207,7 +241,6 @@ const MAX_SIZE = 2 * 1024 * 1024;
         margin: 0 0 4px;
         color: var(--app-fg-heading);
       }
-
       .row-inputs {
         display: flex;
         gap: 16px;
@@ -218,11 +251,9 @@ const MAX_SIZE = 2 * 1024 * 1024;
       .w-full {
         width: 100%;
       }
-
       .media-section {
         margin: 16px 0 24px;
       }
-
       .media-label {
         font-size: 13px;
         font-weight: 700;
@@ -230,7 +261,6 @@ const MAX_SIZE = 2 * 1024 * 1024;
         margin-bottom: 8px;
         display: block;
       }
-
       .dropzone {
         padding: 36px 24px;
         display: flex;
@@ -252,21 +282,18 @@ const MAX_SIZE = 2 * 1024 * 1024;
         cursor: not-allowed;
         opacity: 0.7;
       }
-
       .drop-icon mat-icon {
         font-size: 38px;
         width: 38px;
         height: 38px;
         color: var(--app-primary);
       }
-
       .thumbs-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         gap: 14px;
         margin-top: 16px;
       }
-
       .thumb-card {
         position: relative;
         aspect-ratio: 1 / 1;
@@ -280,7 +307,6 @@ const MAX_SIZE = 2 * 1024 * 1024;
         height: 100%;
         object-fit: cover;
       }
-
       .remove-img-btn {
         position: absolute;
         top: 4px;
@@ -297,7 +323,6 @@ const MAX_SIZE = 2 * 1024 * 1024;
       .remove-img-btn:hover {
         background: var(--app-danger);
       }
-
       .form-actions {
         display: flex;
         justify-content: flex-end;
@@ -306,13 +331,12 @@ const MAX_SIZE = 2 * 1024 * 1024;
         padding-top: 20px;
         border-top: 1px solid var(--app-border);
       }
-
-      .cancel-btn, .save-btn {
+      .cancel-btn,
+      .save-btn {
         height: 44px;
         border-radius: var(--app-radius-sm) !important;
         padding: 0 24px !important;
       }
-
       @media (max-width: 600px) {
         .panel {
           padding: 24px;
@@ -330,6 +354,7 @@ export class ProductFormPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly svc = inject(ProductService);
+  private readonly catSvc = inject(CategoryService); // <-- ADDED Injection
   private readonly notify = inject(NotificationService);
 
   readonly id = signal<string | null>(this.route.snapshot.paramMap.get("id"));
@@ -337,14 +362,18 @@ export class ProductFormPage {
   readonly saving = signal(false);
   readonly uploading = signal(false);
   readonly progress = signal(0);
+
   readonly images = signal<ProductImage[]>([]);
   readonly deletedImageIds = signal<string[]>([]);
+  readonly categories = signal<Category[]>([]); // <-- ADDED signal to hold categories
 
+  // ADDED categoryId to the form
   readonly form = this.fb.nonNullable.group({
     name: [
       "",
       [Validators.required, Validators.minLength(3), Validators.maxLength(100)],
     ],
+    categoryId: ["", [Validators.required]], // <-- FIXED! TypeScript error goes away now.
     description: [
       "",
       [
@@ -358,13 +387,20 @@ export class ProductFormPage {
   });
 
   constructor() {
+    this.catSvc.getAll().subscribe({
+      next: (cats) => this.categories.set(cats),
+      error: () => this.notify.error("Failed to load categories"),
+    });
+
     const id = this.id();
     if (id) {
       this.loading.set(true);
       this.svc.get(id).subscribe({
         next: (p) => {
+          // ADDED categoryId to patchValue so it populates when editing
           this.form.patchValue({
             name: p.name,
+            categoryId: p.categoryId,
             description: p.description,
             price: p.price,
             quantity: p.quantity,
@@ -374,7 +410,7 @@ export class ProductFormPage {
               id: image.id,
               url: image.url,
               existing: true,
-            }))
+            })),
           );
           this.loading.set(false);
         },

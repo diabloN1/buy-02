@@ -8,7 +8,7 @@ import com.buy01.audit.entity.MediaAudit;
 import com.buy01.audit.entity.OrderAudit;
 import com.buy01.audit.entity.ProductAudit;
 import com.buy01.audit.entity.UserAudit;
-import com.buy01.audit.event.AuditEvent;
+import com.buy01.audit.event.audit.AuditEvent;
 import com.buy01.audit.repository.CartAuditRepo;
 import com.buy01.audit.repository.MediaAuditRepo;
 import com.buy01.audit.repository.OrderAuditRepo;

@@ -18,17 +18,30 @@ describe("AdminProductsPage", () => {
 
   const mockPaginated: Paginated<Product> = {
     content: [
-      { id: "p1", name: "Prod 1", description: "Desc", price: 10, quantity: 5, userId: "s1", images: [] }
+      {
+        id: "p1",
+        categoryId: "c1",
+        name: "Product",
+        description: "Desc",
+        price: 10,
+        quantity: 5,
+        userId: "s1",
+        images: [],
+        createdAt: "2026-01-01",
+      },
     ],
     number: 0,
     size: 10,
     totalElements: 1,
-    totalPages: 1
+    totalPages: 1,
   };
 
   beforeEach(async () => {
     productSvcSpy = jasmine.createSpyObj("ProductService", ["list", "delete"]);
-    notifySpy = jasmine.createSpyObj("NotificationService", ["success", "error"]);
+    notifySpy = jasmine.createSpyObj("NotificationService", [
+      "success",
+      "error",
+    ]);
     mediaSvcSpy = jasmine.createSpyObj("MediaService", ["getImageUrl"]);
 
     productSvcSpy.list.and.returnValue(of(mockPaginated));
@@ -39,8 +52,8 @@ describe("AdminProductsPage", () => {
         provideRouter([]),
         { provide: ProductService, useValue: productSvcSpy },
         { provide: NotificationService, useValue: notifySpy },
-        { provide: MediaService, useValue: mediaSvcSpy }
-      ]
+        { provide: MediaService, useValue: mediaSvcSpy },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminProductsPage);

@@ -24,7 +24,7 @@ import { RouterModule } from "@angular/router";
         {{ addressForm.value.phone }}
       </p>
 
-      <button mat-stroked-button type="button" (click)="previous.emit()">
+      <button type="button" class="btn btn-outline" (click)="previous.emit()">
         <mat-icon>edit</mat-icon>
         Edit address
       </button>
@@ -67,20 +67,19 @@ import { RouterModule } from "@angular/router";
     </div>
 
     <div class="actions">
-      <button mat-button type="button" (click)="previous.emit()">
+      <button type="button" class="btn btn-outline" (click)="previous.emit()">
         <mat-icon>arrow_back</mat-icon>
         Back
       </button>
 
-      <button mat-button type="button" routerLink="/cart">
+      <a class="btn btn-outline" routerLink="/cart">
         <mat-icon>shopping_cart</mat-icon>
         Modify cart
-      </button>
+      </a>
 
       <button
-        mat-raised-button
-        color="primary"
         type="button"
+        class="btn btn-primary"
         (click)="placeOrder.emit()"
       >
         Place order

@@ -33,10 +33,6 @@ $dark-theme: mat.m2-define-dark-theme(
 
 @include mat.all-component-themes($light-theme);
 
-.dark-theme {
-  @include mat.all-component-colors($dark-theme);
-}
-
 :root {
   color-scheme: light;
 
@@ -58,67 +54,39 @@ $dark-theme: mat.m2-define-dark-theme(
   --app-muted: #71717a;
   --app-muted-light: #a1a1aa;
 
-  /* Primary Brand Colors (Sleek Indigo) */
-  --app-primary: #4f46e5;
-  --app-primary-hover: #4338ca;
+  /* Primary Brand Colors (Restrained Dark/Indigo) */
+  --app-primary: #18181b;
+  --app-primary-hover: #27272a;
   --app-primary-light: #e0e7ff;
-  --app-primary-lighter: #eef2ff;
+  --app-primary-lighter: #f4f4f5;
+  --app-primary-text: #ffffff;
 
   --app-accent: #ec4899;
   --app-accent-light: #fce7f3;
-  --app-success: #10b981;
-  --app-success-light: #d1fae5;
-  --app-warning: #f59e0b;
-  --app-warning-light: #fef3c7;
-  --app-danger: #ef4444;
-  --app-danger-light: #fee2e2;
-
-  /* Gradients (Pro Micro-gradients) */
-  --app-gradient-primary:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.12) 0%,
-      rgba(255, 255, 255, 0) 100%
-    ),
-    var(--app-primary);
-  --app-gradient-hover:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.12) 0%,
-      rgba(255, 255, 255, 0) 100%
-    ),
-    var(--app-primary-hover);
-  --app-gradient-hero: linear-gradient(
-    180deg,
-    #f4f4f5 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  --app-success: #16a34a;
+  --app-success-light: #f0fdf4;
+  --app-warning: #d97706;
+  --app-warning-light: #fffbeb;
+  --app-danger: #dc2626;
+  --app-danger-light: #fef2f2;
 
   /* Radius & Shadows (Shadcn Crisp Aesthetics) */
-  --app-radius-sm: 0.375rem; /* 6px */
-  --app-radius: 0.5rem; /* 8px */
-  --app-radius-lg: 0.75rem; /* 12px */
+  --app-radius-sm: 6px;
+  --app-radius: 8px;
+  --app-radius-lg: 12px;
   --app-radius-full: 9999px;
 
   --app-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --app-shadow:
     0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   --app-shadow-lg:
-    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --app-shadow-xl:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  --app-glow:
-    0 0 0 2px rgba(255, 255, 255, 1), 0 0 0 4px rgba(79, 70, 229, 0.4); /* Pro Focus Ring */
+    0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --app-glow: 0 0 0 2px var(--app-bg), 0 0 0 4px #18181b;
 
   /* Glassmorphism */
-  --app-glass-bg: rgba(255, 255, 255, 0.8);
-  --app-glass-border: rgba(228, 228, 231, 0.4);
-  --app-backdrop-blur: blur(12px);
-
-  /* PhoneNumber */
-  --mat-filled-tel-form-background: #f8fafc;
-  --mat-filled-tel-form-focus-background: #f8fafc;
-  --mat-filled-tel-form-hover-background: #f8fafc;
+  --app-glass-bg: rgba(255, 255, 255, 0.85);
+  --app-glass-border: rgba(228, 228, 231, 0.6);
+  --app-backdrop-blur: blur(8px);
 }
 
 .dark-theme {
@@ -142,58 +110,33 @@ $dark-theme: mat.m2-define-dark-theme(
   --app-muted: #a1a1aa;
   --app-muted-light: #71717a;
 
-  /* Primary Brand Colors */
-  --app-primary: #6366f1;
-  --app-primary-hover: #4f46e5;
-  --app-primary-light: rgba(99, 102, 241, 0.2);
-  --app-primary-lighter: rgba(99, 102, 241, 0.1);
+  /* Primary Brand Colors (Clean High Contrast) */
+  --app-primary: #fafafa;
+  --app-primary-hover: #e4e4e7;
+  --app-primary-light: rgba(250, 250, 250, 0.15);
+  --app-primary-lighter: rgba(250, 250, 250, 0.08);
+  --app-primary-text: #09090b;
 
   --app-accent: #f472b6;
   --app-accent-light: rgba(244, 114, 182, 0.15);
-  --app-success: #10b981;
-  --app-success-light: rgba(16, 185, 129, 0.15);
+  --app-success: #22c55e;
+  --app-success-light: rgba(34, 197, 94, 0.15);
   --app-warning: #f59e0b;
   --app-warning-light: rgba(245, 158, 11, 0.15);
   --app-danger: #ef4444;
   --app-danger-light: rgba(239, 68, 68, 0.15);
 
-  /* Gradients */
-  --app-gradient-primary:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0) 100%
-    ),
-    var(--app-primary);
-  --app-gradient-hover:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0) 100%
-    ),
-    var(--app-primary-hover);
-  --app-gradient-hero: linear-gradient(
-    180deg,
-    rgba(24, 24, 27, 0.8) 0%,
-    rgba(9, 9, 11, 0) 100%
-  );
-
   /* Shadows */
-  --app-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6);
-  --app-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
-  --app-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
-  --app-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
-  --app-glow: 0 0 0 2px rgba(9, 9, 11, 1), 0 0 0 4px rgba(99, 102, 241, 0.6);
+  --app-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --app-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --app-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --app-glow: 0 0 0 2px var(--app-bg), 0 0 0 4px #fafafa;
 
   /* Glassmorphism */
-  --app-glass-bg: rgba(9, 9, 11, 0.7);
-  --app-glass-border: rgba(39, 39, 42, 0.6);
+  --app-glass-bg: rgba(9, 9, 11, 0.85);
+  --app-glass-border: rgba(39, 39, 42, 0.8);
 
-  /* PhoneNumber */
-  --mat-filled-tel-form-background: #0b0f19;
-  --mat-filled-tel-form-focus-background: #0b0f19;
-  --mat-filled-tel-form-hover-background: #0b0f19;
+  @include mat.all-component-colors($dark-theme);
 }
 
 /* ==========================================================================
@@ -358,20 +301,22 @@ h3 {
 }
 
 .btn-primary {
-  background: var(--app-gradient-primary);
-  color: #ffffff !important;
+  background: var(--app-primary);
+  color: var(--app-primary-text) !important;
   box-shadow: var(--app-shadow-sm);
 }
 .btn-primary:hover {
-  background: var(--app-gradient-hover);
+  background: var(--app-primary-hover);
 }
 
 .btn-secondary {
   background: var(--app-bg-alt);
   color: var(--app-fg) !important;
+  border: 1px solid var(--app-border);
 }
 .btn-secondary:hover {
-  background: var(--app-border-hover);
+  background: var(--app-surface-hover);
+  border-color: var(--app-border-hover);
 }
 
 .btn-outline {
@@ -381,6 +326,7 @@ h3 {
 }
 .btn-outline:hover {
   background: var(--app-surface-hover);
+  border-color: var(--app-border-hover);
 }
 
 .btn-ghost {
@@ -389,6 +335,43 @@ h3 {
 }
 .btn-ghost:hover {
   background: var(--app-surface-hover);
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: var(--app-radius-full);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.status-badge-success {
+  background: var(--app-success-light);
+  color: var(--app-success);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-badge-warning {
+  background: var(--app-warning-light);
+  color: var(--app-warning);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.status-badge-danger {
+  background: var(--app-danger-light);
+  color: var(--app-danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.status-badge-outline {
+  background: transparent;
+  color: var(--app-fg);
+  border: 1px solid var(--app-border);
 }
 
 /* ==========================================================================
@@ -406,15 +389,15 @@ h3 {
   font-weight: 500 !important;
 }
 
-/* Tone down primary material button to match pro micro-gradient */
+/* Tone down primary material button */
 .mat-mdc-flat-button.mat-primary {
-  background: var(--app-gradient-primary) !important;
-  color: #ffffff !important;
+  background: var(--app-primary) !important;
+  color: var(--app-primary-text) !important;
   box-shadow: var(--app-shadow-sm) !important;
-  transition: background 0.2s ease !important;
+  transition: background-color 0.15s ease !important;
 }
 .mat-mdc-flat-button.mat-primary:hover {
-  background: var(--app-gradient-hover) !important;
+  background: var(--app-primary-hover) !important;
 }
 
 .mat-mdc-outlined-button {
@@ -484,7 +467,7 @@ h3 {
   border-color: var(--app-border-hover) !important;
 }
 
-/* Replace Material's 2px focus border with Shadcn's Ring Focus */
+/* Replace Material's blue focus color with theme primary/fg */
 .mdc-text-field--focused .mdc-notched-outline__leading,
 .mdc-text-field--focused .mdc-notched-outline__notch,
 .mdc-text-field--focused .mdc-notched-outline__trailing {
@@ -496,7 +479,137 @@ h3 {
   border-radius: var(--app-radius-sm);
 }
 
+/* Floating label styling - eliminate blue text on focus and under-border clipping */
+.mat-mdc-form-field .mdc-floating-label,
+.mat-mdc-form-field .mat-mdc-floating-label {
+  color: var(--app-muted) !important;
+}
+.mat-mdc-form-field.mat-focused .mdc-floating-label,
+.mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: var(--app-fg-heading) !important;
+}
+
+/* Ensure notched outline notch has transparent background so label renders cleanly above border */
+.mdc-text-field--outlined .mdc-notched-outline__notch {
+  border-left: none !important;
+  border-right: none !important;
+}
+
 .mat-mdc-form-field-icon-prefix mat-icon,
 .mat-mdc-form-field-icon-suffix mat-icon {
-  color: var(--app-muted);
+  color: var(--app-muted) !important;
+}
+.mat-mdc-form-field.mat-focused .mat-mdc-form-field-icon-prefix mat-icon,
+.mat-mdc-form-field.mat-focused .mat-mdc-form-field-icon-suffix mat-icon {
+  color: var(--app-primary) !important;
+}
+
+/* Material Dialog Container Overrides (Matching Vercel/Shadcn dialog theme) */
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  background-color: var(--app-surface) !important;
+  color: var(--app-fg) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: var(--app-radius) !important;
+  box-shadow: var(--app-shadow-lg) !important;
+}
+
+.mat-stepper-horizontal,
+.mat-stepper-vertical {
+  background-color: transparent !important;
+}
+
+.mat-step-header {
+  border-radius: var(--app-radius) !important;
+  padding: 8px 16px !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.mat-step-header:hover {
+  background-color: var(--app-surface-hover) !important;
+}
+
+.mat-step-header[aria-selected="true"] {
+  background-color: var(--app-bg-alt) !important;
+}
+
+.mat-step-header .mat-step-icon {
+  background-color: var(--app-bg-alt) !important;
+  color: var(--app-muted) !important;
+  border: 1px solid var(--app-border) !important;
+  font-weight: 600 !important;
+}
+
+.mat-step-header .mat-step-icon-selected,
+.mat-step-header .mat-step-icon-state-done {
+  background-color: var(--app-fg) !important;
+  color: var(--app-bg) !important;
+  border-color: var(--app-fg) !important;
+}
+
+.mat-step-header .mat-step-text-label {
+  color: var(--app-muted) !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+}
+
+.mat-step-header[aria-selected="true"] .mat-step-text-label {
+  color: var(--app-fg) !important;
+  font-weight: 700 !important;
+}
+
+.mat-stepper-horizontal-line {
+  border-top-color: var(--app-border) !important;
+}
+
+/* ngx-material-intl-tel-input theme integration */
+ngx-material-intl-tel-input {
+  width: 100%;
+}
+
+.ngx-mat-tel-input-container {
+  background-color: transparent !important;
+}
+
+.country-selector,
+.ngx-mat-tel-input-container .country-selector {
+  border-color: var(--app-border) !important;
+  color: var(--app-fg) !important;
+  background-color: transparent !important;
+}
+
+.country-dropdown,
+.ngx-mat-tel-input-mat-menu-panel,
+.country-selector-dropdown {
+  background-color: var(--app-surface) !important;
+  border: 1px solid var(--app-border) !important;
+  color: var(--app-fg) !important;
+  box-shadow: var(--app-shadow-lg) !important;
+}
+
+.country-dropdown .country-list-button:hover,
+.country-dropdown button:hover,
+.country-selector-dropdown .country-list-button:hover {
+  background-color: var(--app-surface-hover) !important;
+  color: var(--app-fg) !important;
+}
+
+.country-dropdown .search-box input,
+.country-selector-dropdown input {
+  background-color: var(--app-bg) !important;
+  color: var(--app-fg) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: var(--app-radius-sm) !important;
+}
+
+.phone-field .mat-mdc-form-field-flex {
+  background-color: transparent !important;
+}
+
+ngx-material-intl-tel-input input,
+.ngx-mat-tel-input-container input {
+  color: var(--app-fg) !important;
+}
+
+ngx-material-intl-tel-input .mat-mdc-form-field-input-control::placeholder {
+  color: var(--app-muted) !important;
 }

@@ -109,7 +109,7 @@ import { CartService } from "@core/services/cart.service";
         overflow-wrap: anywhere;
       }
 
-      /* Unified Shadcn-style Quantity Stepper */
+
       .qty-group {
         display: inline-flex;
         align-items: center;
@@ -178,7 +178,7 @@ import { CartService } from "@core/services/cart.service";
         font-variant-numeric: tabular-nums;
       }
 
-      /* Shadcn Ghost Remove Button */
+
       .remove-btn {
         width: 32px !important;
         height: 32px !important;

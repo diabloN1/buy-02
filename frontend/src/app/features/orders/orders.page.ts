@@ -67,7 +67,7 @@ import { Order, OrderStatus } from "@core/models/order.model";
             </p>
 
             @if (!isSeller) {
-              <a mat-raised-button color="primary" routerLink="/products">
+              <a class="btn btn-primary" routerLink="/products">
                 <mat-icon>shopping_bag</mat-icon>
                 Browse Products
               </a>

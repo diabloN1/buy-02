@@ -329,27 +329,36 @@ import { CurrentUserService } from "@core/services/current-user.service";
       }
 
       .actions {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         justify-content: flex-end;
+        width: 100%;
       }
 
       .action-btn {
-        width: 36px !important;
-        height: 36px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
         padding: 0 !important;
+        margin: 0 !important;
         color: var(--app-muted) !important;
-        border-radius: var(
-          --app-radius-sm
-        ) !important;
+        border-radius: var(--app-radius-sm) !important;
+        box-sizing: border-box !important;
+        vertical-align: middle !important;
       }
 
       .action-btn mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-        line-height: 18px;
+        font-size: 18px !important;
+        width: 18px !important;
+        height: 18px !important;
+        line-height: 18px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
       }
 
       .action-btn:hover {

@@ -16,6 +16,7 @@ import { FieldErrorComponent } from "@shared/components/field-error.component";
 import { LoadingSpinnerComponent } from "@shared/components/loading-spinner.component";
 import { MediaService } from "@core/services/media.service";
 import { CurrentUserService } from "@core/services/current-user.service";
+import { UserAvatarComponent } from "@shared/components/user-avatar.component";
 import { applyFormErrors } from "@shared/utils/form-error.util";
 import { AnalyticsService } from "@core/services/analytics.service";
 import { AnalyticsDisplayComponent } from "@shared/components/analytics/analytics-display.component";
@@ -35,6 +36,7 @@ import { UserAnalytics, SellerAnalytics } from "@core/models/analytics.model";
     FieldErrorComponent,
     LoadingSpinnerComponent,
     AnalyticsDisplayComponent,
+    UserAvatarComponent,
   ],
   template: `
     <div class="profile-page">
@@ -43,15 +45,12 @@ import { UserAnalytics, SellerAnalytics } from "@core/models/analytics.model";
         <div class="container banner-content">
           <div class="user-identity">
             <div class="banner-avatar">
-              @if (avatarUrl()) {
-                <img [src]="avatarUrl()!" alt="Profile Avatar" />
-              } @else {
-                <div class="avatar-fallback">
-                  {{
-                    (form.controls.name.value || "U").charAt(0).toUpperCase()
-                  }}
-                </div>
-              }
+              <app-user-avatar
+                [avatarUrl]="avatarUrl()"
+                [name]="form.controls.name.value"
+                [userId]="currentUser.user()?.id"
+                [size]="80"
+              />
             </div>
 
             <div class="identity-text">
@@ -83,17 +82,12 @@ import { UserAnalytics, SellerAnalytics } from "@core/models/analytics.model";
 
               <div class="avatar-upload-box">
                 <div class="preview-avatar">
-                  @if (avatarUrl()) {
-                    <img [src]="avatarUrl()!" alt="Avatar Preview" />
-                  } @else {
-                    <div class="avatar-fallback-lg">
-                      {{
-                        (form.controls.name.value || "U")
-                          .charAt(0)
-                          .toUpperCase()
-                      }}
-                    </div>
-                  }
+                  <app-user-avatar
+                    [avatarUrl]="avatarUrl()"
+                    [name]="form.controls.name.value"
+                    [userId]="currentUser.user()?.id"
+                    [size]="96"
+                  />
                 </div>
 
                 <div class="upload-controls">

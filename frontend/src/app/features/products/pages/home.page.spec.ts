@@ -17,18 +17,28 @@ describe("HomePage", () => {
 
   const mockPaginated: Paginated<Product> = {
     content: [
-      { id: "p1", name: "Keyboard", description: "Mechanical keyboard", price: 80, quantity: 10, userId: "s1", images: [], createdAt: "2026-01-01" }
+      {
+        id: "p1",
+        categoryId: "c1",
+        name: "Product",
+        description: "Desc",
+        price: 10,
+        quantity: 5,
+        userId: "s1",
+        images: [],
+        createdAt: "2026-01-01",
+      },
     ],
     number: 0,
     size: 8,
     totalElements: 1,
-    totalPages: 1
+    totalPages: 1,
   };
 
   beforeEach(async () => {
     productSvcSpy = jasmine.createSpyObj("ProductService", ["list"]);
     authSvcSpy = jasmine.createSpyObj("AuthService", [], {
-      isAuthenticated: signal(false)
+      isAuthenticated: signal(false),
     });
 
     productSvcSpy.list.and.returnValue(of(mockPaginated));
@@ -38,8 +48,8 @@ describe("HomePage", () => {
       providers: [
         provideRouter([]),
         { provide: ProductService, useValue: productSvcSpy },
-        { provide: AuthService, useValue: authSvcSpy }
-      ]
+        { provide: AuthService, useValue: authSvcSpy },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HomePage);

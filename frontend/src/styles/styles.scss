@@ -37,31 +37,28 @@ $dark-theme: mat.m2-define-dark-theme(
   @include mat.all-component-colors($dark-theme);
 }
 
-/* ==========================================================================
-   Design Tokens & CSS Variables (Shopify/Vercel Commerce Grade)
-   ========================================================================== */
 :root {
   color-scheme: light;
 
-  /* Palette & Surfaces */
-  --app-bg: #f8fafc;
-  --app-bg-alt: #f1f5f9;
-  --app-fg: #0f172a;
-  --app-fg-heading: #020617;
+  /* Palette & Surfaces (Zinc/Slate base) */
+  --app-bg: #ffffff;
+  --app-bg-alt: #f4f4f5;
+  --app-fg: #09090b;
+  --app-fg-heading: #09090b;
   --app-surface: #ffffff;
   --app-surface-elevated: #ffffff;
-  --app-surface-hover: #f1f5f9;
+  --app-surface-hover: #f4f4f5;
 
   /* Borders & Dividers */
-  --app-border: #e2e8f0;
-  --app-border-hover: #cbd5e1;
-  --app-border-focus: #4f46e5;
+  --app-border: #e4e4e7;
+  --app-border-hover: #d4d4d8;
+  --app-border-focus: #18181b;
 
   /* Muted Text & Accents */
-  --app-muted: #64748b;
-  --app-muted-light: #94a3b8;
+  --app-muted: #71717a;
+  --app-muted-light: #a1a1aa;
 
-  /* Primary Brand Colors */
+  /* Primary Brand Colors (Sleek Indigo) */
   --app-primary: #4f46e5;
   --app-primary-hover: #4338ca;
   --app-primary-light: #e0e7ff;
@@ -76,32 +73,46 @@ $dark-theme: mat.m2-define-dark-theme(
   --app-danger: #ef4444;
   --app-danger-light: #fee2e2;
 
-  /* Gradients */
-  --app-gradient-primary: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  --app-gradient-hover: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  /* Gradients (Pro Micro-gradients) */
+  --app-gradient-primary:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    var(--app-primary);
+  --app-gradient-hover:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    var(--app-primary-hover);
   --app-gradient-hero: linear-gradient(
     180deg,
-    rgba(238, 242, 255, 0.6) 0%,
-    rgba(248, 250, 252, 0) 100%
+    #f4f4f5 0%,
+    rgba(255, 255, 255, 0) 100%
   );
 
-  /* Radius & Shadows */
-  --app-radius-sm: 6px;
-  --app-radius: 12px;
-  --app-radius-lg: 20px;
+  /* Radius & Shadows (Shadcn Crisp Aesthetics) */
+  --app-radius-sm: 0.375rem; /* 6px */
+  --app-radius: 0.5rem; /* 8px */
+  --app-radius-lg: 0.75rem; /* 12px */
   --app-radius-full: 9999px;
 
   --app-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --app-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+    0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   --app-shadow-lg:
-    0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  --app-shadow-xl: 0 20px 30px -10px rgba(0, 0, 0, 0.1);
-  --app-glow: 0 0 20px rgba(79, 70, 229, 0.15);
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --app-shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --app-glow:
+    0 0 0 2px rgba(255, 255, 255, 1), 0 0 0 4px rgba(79, 70, 229, 0.4); /* Pro Focus Ring */
 
   /* Glassmorphism */
-  --app-glass-bg: rgba(255, 255, 255, 0.88);
-  --app-glass-border: rgba(226, 232, 240, 0.8);
+  --app-glass-bg: rgba(255, 255, 255, 0.8);
+  --app-glass-border: rgba(228, 228, 231, 0.4);
   --app-backdrop-blur: blur(12px);
 
   /* PhoneNumber */
@@ -113,58 +124,71 @@ $dark-theme: mat.m2-define-dark-theme(
 .dark-theme {
   color-scheme: dark;
 
-  /* Palette & Surfaces */
-  --app-bg: #090d16;
-  --app-bg-alt: #0e1422;
-  --app-fg: #f1f5f9;
+  /* Palette & Surfaces (Deep Zinc) */
+  --app-bg: #09090b;
+  --app-bg-alt: #18181b;
+  --app-fg: #fafafa;
   --app-fg-heading: #ffffff;
-  --app-surface: #141c2e;
-  --app-surface-elevated: #1a243a;
-  --app-surface-hover: #1e2a44;
+  --app-surface: #09090b;
+  --app-surface-elevated: #18181b;
+  --app-surface-hover: #27272a;
 
   /* Borders & Dividers */
-  --app-border: #232d42;
-  --app-border-hover: #334155;
-  --app-border-focus: #6366f1;
+  --app-border: #27272a;
+  --app-border-hover: #3f3f46;
+  --app-border-focus: #fafafa;
 
   /* Muted Text & Accents */
-  --app-muted: #94a3b8;
-  --app-muted-light: #64748b;
+  --app-muted: #a1a1aa;
+  --app-muted-light: #71717a;
 
   /* Primary Brand Colors */
   --app-primary: #6366f1;
   --app-primary-hover: #4f46e5;
-  --app-primary-light: rgba(99, 102, 241, 0.18);
+  --app-primary-light: rgba(99, 102, 241, 0.2);
   --app-primary-lighter: rgba(99, 102, 241, 0.1);
 
   --app-accent: #f472b6;
   --app-accent-light: rgba(244, 114, 182, 0.15);
-  --app-success: #34d399;
-  --app-success-light: rgba(52, 211, 153, 0.15);
-  --app-warning: #fbbf24;
-  --app-warning-light: rgba(251, 191, 36, 0.15);
-  --app-danger: #f87171;
-  --app-danger-light: rgba(248, 113, 113, 0.15);
+  --app-success: #10b981;
+  --app-success-light: rgba(16, 185, 129, 0.15);
+  --app-warning: #f59e0b;
+  --app-warning-light: rgba(245, 158, 11, 0.15);
+  --app-danger: #ef4444;
+  --app-danger-light: rgba(239, 68, 68, 0.15);
 
   /* Gradients */
-  --app-gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --app-gradient-hover: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  --app-gradient-primary:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    var(--app-primary);
+  --app-gradient-hover:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    var(--app-primary-hover);
   --app-gradient-hero: linear-gradient(
     180deg,
-    rgba(99, 102, 241, 0.08) 0%,
-    rgba(9, 13, 22, 0) 100%
+    rgba(24, 24, 27, 0.8) 0%,
+    rgba(9, 9, 11, 0) 100%
   );
 
   /* Shadows */
-  --app-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-  --app-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-  --app-shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.45);
-  --app-shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.55);
-  --app-glow: 0 0 25px rgba(99, 102, 241, 0.25);
+  --app-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6);
+  --app-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --app-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --app-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+  --app-glow: 0 0 0 2px rgba(9, 9, 11, 1), 0 0 0 4px rgba(99, 102, 241, 0.6);
 
   /* Glassmorphism */
-  --app-glass-bg: rgba(14, 20, 34, 0.85);
-  --app-glass-border: rgba(35, 45, 66, 0.9);
+  --app-glass-bg: rgba(9, 9, 11, 0.7);
+  --app-glass-border: rgba(39, 39, 42, 0.6);
 
   /* PhoneNumber */
   --mat-filled-tel-form-background: #0b0f19;
@@ -187,6 +211,8 @@ body {
     "Segoe UI",
     Roboto,
     sans-serif;
+  /* shadcn typography pro-tweaks */
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   background: var(--app-bg);
   color: var(--app-fg);
   transition:
@@ -196,7 +222,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Global Link Reset - NEVER show raw purple underlines on buttons or router links */
+/* Global focus state for modern accessibility (Shadcn style) */
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--app-glow);
+}
+
 a {
   color: inherit;
   text-decoration: none !important;
@@ -230,7 +261,7 @@ mat-icon,
 }
 ::-webkit-scrollbar-thumb {
   background: var(--app-border-hover);
-  border-radius: 4px;
+  border-radius: var(--app-radius-full);
 }
 
 /* Typography Defaults */
@@ -244,16 +275,16 @@ h6 {
   margin-top: 0;
 }
 h1 {
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  letter-spacing: -0.04em; /* Tighter for modern feel */
 }
 h2 {
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 h3 {
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 /* ==========================================================================
@@ -273,11 +304,11 @@ h3 {
 .stack {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 .row {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: center;
 }
 .grow {
@@ -296,9 +327,6 @@ h3 {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 }
-.app-card:hover {
-  border-color: var(--app-border-hover);
-}
 
 .glass-card {
   background: var(--app-glass-bg);
@@ -306,23 +334,25 @@ h3 {
   -webkit-backdrop-filter: var(--app-backdrop-blur);
   border: 1px solid var(--app-glass-border);
   border-radius: var(--app-radius);
-  box-shadow: var(--app-shadow);
+  box-shadow: var(--app-shadow-sm);
 }
 
-/* Button Component Utility Classes */
+/* Button Component Utility Classes (Shadcn Dimensions) */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 42px;
-  padding: 0 20px;
+  height: 40px; /* Standard Pro App Height */
+  padding: 0 16px;
   border-radius: var(--app-radius-sm);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   border: 1px solid transparent;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
   text-decoration: none !important;
   white-space: nowrap;
 }
@@ -334,20 +364,14 @@ h3 {
 }
 .btn-primary:hover {
   background: var(--app-gradient-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--app-glow);
 }
 
 .btn-secondary {
-  background: var(--app-surface);
+  background: var(--app-bg-alt);
   color: var(--app-fg) !important;
-  border-color: var(--app-border);
-  box-shadow: var(--app-shadow-sm);
 }
 .btn-secondary:hover {
-  background: var(--app-surface-hover);
-  border-color: var(--app-primary);
-  color: var(--app-primary) !important;
+  background: var(--app-border-hover);
 }
 
 .btn-outline {
@@ -356,22 +380,19 @@ h3 {
   border-color: var(--app-border);
 }
 .btn-outline:hover {
-  background: var(--app-primary-lighter);
-  border-color: var(--app-primary);
-  color: var(--app-primary) !important;
+  background: var(--app-surface-hover);
 }
 
 .btn-ghost {
   background: transparent;
-  color: var(--app-muted) !important;
+  color: var(--app-fg) !important;
 }
 .btn-ghost:hover {
   background: var(--app-surface-hover);
-  color: var(--app-fg) !important;
 }
 
 /* ==========================================================================
-   Material Component Overrides (Removing Broken MDC Defaults)
+   Material Component Overrides (Adapting to Shadcn UI)
    ========================================================================== */
 .mat-mdc-button,
 .mat-mdc-outlined-button,
@@ -379,75 +400,81 @@ h3 {
 .mat-mdc-stroked-button {
   text-decoration: none !important;
   letter-spacing: normal !important;
+  font-family: inherit !important;
+  height: 40px !important;
+  border-radius: var(--app-radius-sm) !important;
+  font-weight: 500 !important;
 }
 
+/* Tone down primary material button to match pro micro-gradient */
 .mat-mdc-flat-button.mat-primary {
   background: var(--app-gradient-primary) !important;
   color: #ffffff !important;
-  border-radius: var(--app-radius-sm) !important;
-  font-weight: 600 !important;
-  transition: all 0.2s ease !important;
   box-shadow: var(--app-shadow-sm) !important;
+  transition: background 0.2s ease !important;
 }
 .mat-mdc-flat-button.mat-primary:hover {
   background: var(--app-gradient-hover) !important;
-  transform: translateY(-1px);
-  box-shadow: var(--app-glow) !important;
 }
 
 .mat-mdc-outlined-button {
-  border-radius: var(--app-radius-sm) !important;
   border-color: var(--app-border) !important;
   color: var(--app-fg) !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
 }
 .mat-mdc-outlined-button:hover {
-  background: var(--app-primary-lighter) !important;
-  border-color: var(--app-primary) !important;
-  color: var(--app-primary) !important;
+  background: var(--app-surface-hover) !important;
 }
 
 .mat-mdc-button {
-  border-radius: var(--app-radius-sm) !important;
   color: var(--app-fg) !important;
-  font-weight: 500 !important;
 }
 .mat-mdc-button:hover {
   background: var(--app-surface-hover) !important;
 }
 
+/* Menus - Crisp Shadcn style */
 .mat-mdc-menu-panel {
   background-color: var(--app-surface) !important;
   border: 1px solid var(--app-border) !important;
-  border-radius: var(--app-radius) !important;
-  box-shadow: var(--app-shadow-lg) !important;
+  border-radius: var(--app-radius-sm) !important;
+  box-shadow: var(--app-shadow) !important;
+  padding: 4px !important; /* Tight internal padding */
 }
 .mat-mdc-menu-item {
   color: var(--app-fg) !important;
   font-size: 14px !important;
+  border-radius: 4px !important; /* Inner radius for hover effect */
+  min-height: 36px !important;
 }
 .mat-mdc-menu-item:hover {
   background: var(--app-surface-hover) !important;
 }
 .mat-mdc-menu-item mat-icon {
-  color: var(--app-primary) !important;
-  margin-right: 12px !important;
+  color: var(--app-muted) !important;
+  margin-right: 8px !important;
+  transform: scale(0.9);
 }
 
-/* Form Fields */
+/* Form Fields - Simulating simple Shadcn inputs */
 .mat-mdc-form-field {
   width: 100%;
 }
 .mat-mdc-text-field-wrapper {
-  background-color: var(--app-surface) !important;
+  background-color: transparent !important;
   border-radius: var(--app-radius-sm) !important;
 }
+
+/* Force 1px borders instead of Material's bulky defaults */
 .mdc-text-field--outlined .mdc-notched-outline__leading,
 .mdc-text-field--outlined .mdc-notched-outline__notch,
 .mdc-text-field--outlined .mdc-notched-outline__trailing {
   border-color: var(--app-border) !important;
+  border-width: 1px !important;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
+
 .mdc-text-field--outlined:not(.mdc-text-field--disabled):hover
   .mdc-notched-outline__leading,
 .mdc-text-field--outlined:not(.mdc-text-field--disabled):hover
@@ -456,12 +483,19 @@ h3 {
   .mdc-notched-outline__trailing {
   border-color: var(--app-border-hover) !important;
 }
+
+/* Replace Material's 2px focus border with Shadcn's Ring Focus */
 .mdc-text-field--focused .mdc-notched-outline__leading,
 .mdc-text-field--focused .mdc-notched-outline__notch,
 .mdc-text-field--focused .mdc-notched-outline__trailing {
   border-color: var(--app-primary) !important;
-  border-width: 2px !important;
+  border-width: 1px !important;
 }
+.mdc-text-field--focused .mdc-notched-outline {
+  box-shadow: 0 0 0 1px var(--app-primary);
+  border-radius: var(--app-radius-sm);
+}
+
 .mat-mdc-form-field-icon-prefix mat-icon,
 .mat-mdc-form-field-icon-suffix mat-icon {
   color: var(--app-muted);

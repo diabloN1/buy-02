@@ -24,7 +24,11 @@ describe("ShippingAddressStepComponent", () => {
 
     await TestBed.configureTestingModule({
       imports: [ShippingAddressStepComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ShippingAddressStepComponent);
@@ -54,9 +58,7 @@ describe("ShippingAddressStepComponent", () => {
       element.querySelector('input[formControlName="street"]'),
     ).toBeTruthy();
 
-    expect(
-      element.querySelector('input[formControlName="city"]'),
-    ).toBeTruthy();
+    expect(element.querySelector('input[formControlName="city"]')).toBeTruthy();
 
     expect(
       element.querySelector('input[formControlName="zipCode"]'),
@@ -137,22 +139,22 @@ describe("ShippingAddressStepComponent", () => {
     expect(component.next.emit).toHaveBeenCalled();
   });
 
-  it("should render the Back to cart button", () => {
-    const button = fixture.nativeElement.querySelector(
-      'button[routerlink="/cart"]',
-    );
+  it("should render the Back to cart link", () => {
+    const link = fixture.nativeElement.querySelector(
+      '.actions a[routerLink="/cart"]',
+    ) as HTMLAnchorElement;
 
-    expect(button).toBeTruthy();
-    expect(button.textContent).toContain("Back to cart");
+    expect(link).toBeTruthy();
+    expect(link.textContent).toContain("Back to cart");
+    expect(link.getAttribute("href")).toBe("/cart");
   });
 
   it("should render the Review order button", () => {
-    const buttons = fixture.nativeElement.querySelectorAll(
-      ".actions button",
-    );
+    const buttons = fixture.nativeElement.querySelectorAll(".actions button");
 
-    expect(buttons.length).toBe(2);
-    expect(buttons[1].textContent).toContain("Review order");
+    expect(buttons.length).toBe(1);
+    expect(buttons[0].type).toBe("submit");
+    expect(buttons[0].textContent).toContain("Review order");
   });
 
   it("should render the phone input", () => {

@@ -35,9 +35,7 @@ describe("ConfirmationStepComponent", () => {
   it("should display the order placed message", () => {
     const element: HTMLElement = fixture.nativeElement;
 
-    expect(element.querySelector("h2")?.textContent).toContain(
-      "Order placed!",
-    );
+    expect(element.querySelector("h2")?.textContent).toContain("Order placed!");
   });
 
   it("should display the payment information", () => {
@@ -52,8 +50,7 @@ describe("ConfirmationStepComponent", () => {
     component.orderId = "order-123";
     fixture.detectChanges();
 
-    const orderIdElement =
-      fixture.nativeElement.querySelector(".order-id");
+    const orderIdElement = fixture.nativeElement.querySelector(".order-id");
 
     expect(orderIdElement).toBeTruthy();
     expect(orderIdElement.textContent).toContain("Order #order-123");
@@ -63,39 +60,44 @@ describe("ConfirmationStepComponent", () => {
     component.orderId = null;
     fixture.detectChanges();
 
-    const orderIdElement =
-      fixture.nativeElement.querySelector(".order-id");
+    const orderIdElement = fixture.nativeElement.querySelector(".order-id");
 
     expect(orderIdElement).toBeNull();
   });
 
-  it("should render the view orders button", () => {
-    const buttons = fixture.nativeElement.querySelectorAll("button");
+  it("should render the view orders link", () => {
+    const links = fixture.nativeElement.querySelectorAll(".actions a");
 
-    expect(buttons.length).toBe(2);
-    expect(buttons[0].textContent).toContain("View my orders");
+    expect(links.length).toBe(2);
+    expect(links[0].textContent).toContain("View my orders");
   });
 
-  it("should render the continue shopping button", () => {
-    const buttons = fixture.nativeElement.querySelectorAll("button");
+  it("should render the continue shopping link", () => {
+    const links = fixture.nativeElement.querySelectorAll(".actions a");
 
-    expect(buttons[1].textContent).toContain("Continue shopping");
+    expect(links[1].textContent).toContain("Continue shopping");
   });
 
-  it("should link the view orders button to the orders page", () => {
-    const button = fixture.nativeElement.querySelector(
-      'button[routerlink="/orders"]',
-    );
+  it("should link the view orders link to the orders page", () => {
+    const link = fixture.nativeElement.querySelector(
+      'a[routerLink="/orders"]',
+    ) as HTMLAnchorElement;
 
-    expect(button).toBeTruthy();
+    expect(link).toBeTruthy();
+    expect(link.getAttribute("href")).toBe("/orders");
   });
 
-  it("should link the continue shopping button to the products page", () => {
-    const button = fixture.nativeElement.querySelector(
-      'button[routerlink="/products"]',
-    );
+  it("should link the continue shopping link to the products page", () => {
+    const link = fixture.nativeElement.querySelector(
+      'a[routerLink="/products"]',
+    ) as HTMLAnchorElement;
 
-    expect(button).toBeTruthy();
+    expect(link).toBeTruthy();
+    expect(link.getAttribute("href")).toBe("/products");
+  });
+
+  it("should not render any action buttons", () => {
+    expect(fixture.nativeElement.querySelectorAll("button").length).toBe(0);
   });
 
   it("should render the confirmation icon", () => {

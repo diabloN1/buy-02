@@ -86,12 +86,22 @@ import { CartService } from "@core/services/cart.service";
           <!-- Product Details Column -->
           <div class="info-card app-card stack">
             <div class="header-area">
-              <span class="stock-pill" [class.out-of-stock]="p.quantity <= 0">
-                <mat-icon>inventory_2</mat-icon>
-                <span>{{
-                  p.quantity > 0 ? "In Stock: " + p.quantity : "Out of Stock"
-                }}</span>
-              </span>
+              <!-- ADDED: Pill Group for Stock and Category -->
+              <div class="pill-group">
+                <span class="stock-pill" [class.out-of-stock]="p.quantity <= 0">
+                  <mat-icon>inventory_2</mat-icon>
+                  <span>{{
+                    p.quantity > 0 ? "In Stock: " + p.quantity : "Out of Stock"
+                  }}</span>
+                </span>
+
+                @if (p.categoryName) {
+                  <span class="category-pill">
+                    <mat-icon>category</mat-icon>
+                    <span>{{ p.categoryName }}</span>
+                  </span>
+                }
+              </div>
 
               <h1 class="title">{{ p.name }}</h1>
 
@@ -404,6 +414,14 @@ import { CartService } from "@core/services/cart.service";
           0 0 0 4px var(--app-primary);
       }
 
+      /* ADDED: Styles for the pill group and category pill */
+      .pill-group {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+
       /* Typography & Badges */
       .stock-pill {
         display: inline-flex;
@@ -427,6 +445,26 @@ import { CartService } from "@core/services/cart.service";
         font-size: 14px;
         width: 14px;
         height: 14px;
+      }
+
+      /* ADDED: Category pill styles */
+      .category-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: var(--app-radius-full);
+        background: var(--app-bg-alt); /* using an existing variable */
+        border: 1px solid var(--app-border);
+        color: var(--app-fg);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .category-pill mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: var(--app-primary);
       }
 
       .title {
@@ -563,6 +601,13 @@ import { CartService } from "@core/services/cart.service";
         border: 1px solid var(--app-border);
         font-size: 14px;
       }
+
+      .minifab {
+        box-shadow: none;
+        color: var(--app-fg);
+        background-color: transparent;
+      }
+      
       .connect-btn {
         height: 32px !important;
         padding: 0 12px !important;
@@ -711,6 +756,8 @@ export class ProductDetailsPage {
     effect(() => {
       const product = this.product();
       const user = this.currentUser.user();
+
+      console.log(this.product());
 
       if (!product || !user) {
         this.quantity.set(1);

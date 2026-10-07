@@ -27,6 +27,10 @@ public class ProductResponse {
 
     private String userId;
 
+    private String categoryId;
+
+    private String categoryName;
+
     private Integer quantity;
 
     private LocalDateTime createdAt;

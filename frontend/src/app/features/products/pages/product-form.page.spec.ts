@@ -7,6 +7,9 @@ import { NotificationService } from "@core/services/notification.service";
 import { MediaService } from "@core/services/media.service";
 import { CurrentUserService } from "@core/services/current-user.service";
 
+import { of } from "rxjs";
+import { CategoryService } from "@core/services/category.service";
+
 describe("ProductFormPage", () => {
   let component: ProductFormPage;
   let fixture: ComponentFixture<ProductFormPage>;
@@ -14,14 +17,30 @@ describe("ProductFormPage", () => {
   let notifySpy: jasmine.SpyObj<NotificationService>;
   let mediaSvcSpy: jasmine.SpyObj<MediaService>;
   let currentUserSpy: jasmine.SpyObj<CurrentUserService>;
+  let categorySeriveSpy: jasmine.SpyObj<CategoryService>;
 
   beforeEach(async () => {
-    productSvcSpy = jasmine.createSpyObj("ProductService", ["get", "create", "update"]);
-    notifySpy = jasmine.createSpyObj("NotificationService", ["success", "error"]);
+    productSvcSpy = jasmine.createSpyObj("ProductService", [
+      "get",
+      "create",
+      "update",
+    ]);
+    notifySpy = jasmine.createSpyObj("NotificationService", [
+      "success",
+      "error",
+    ]);
     mediaSvcSpy = jasmine.createSpyObj("MediaService", ["getImageUrl"]);
-    currentUserSpy = jasmine.createSpyObj("CurrentUserService", ["clear", "load"]);
+    currentUserSpy = jasmine.createSpyObj("CurrentUserService", [
+      "clear",
+      "load",
+    ]);
+    categorySeriveSpy = jasmine.createSpyObj("CategoryService", ["getAll"]);
 
-    mediaSvcSpy.getImageUrl.and.callFake((id: string) => `http://example.com/${id}`);
+    categorySeriveSpy.getAll.and.returnValue(of([]));
+
+    mediaSvcSpy.getImageUrl.and.callFake(
+      (id: string) => `http://example.com/${id}`,
+    );
 
     await TestBed.configureTestingModule({
       imports: [ProductFormPage],
@@ -34,10 +53,11 @@ describe("ProductFormPage", () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            snapshot: { paramMap: { get: () => null } }
-          }
-        }
-      ]
+            snapshot: { paramMap: { get: () => null } },
+          },
+        },
+        { provide: CategoryService, useValue: categorySeriveSpy },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProductFormPage);

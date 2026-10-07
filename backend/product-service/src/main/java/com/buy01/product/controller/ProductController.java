@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.buy01.product.DTOs.CreateRequest;
 import com.buy01.product.DTOs.ProductResponse;
+import com.buy01.product.DTOs.ProductSearchFilter;
 import com.buy01.product.DTOs.UpdateRequest;
 import com.buy01.product.service.ProductService;
 
@@ -92,5 +93,14 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
     public long countProducts() {
         return productService.countProducts();
+    }
+
+    @PermitAll
+    @GetMapping("/search")
+    public Page<ProductResponse> searchProducts(
+            @ModelAttribute ProductSearchFilter filter,
+            Pageable pageable) {
+
+        return productService.searchProducts(filter, pageable);
     }
 }

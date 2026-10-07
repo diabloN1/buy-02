@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.buy01.product.entity.Product;
 
-public interface ProductRepository extends MongoRepository<Product, String> {
+public interface ProductRepository extends MongoRepository<Product, String>, ProductCustomRepository {
     Page<Product> findByUserId(String userId, Pageable pageable);
+
+    Page<Product> findByCategoryId(String categoryId, Pageable pageable);
 }

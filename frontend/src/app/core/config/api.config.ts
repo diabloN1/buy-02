@@ -24,6 +24,10 @@ export const API = {
     count: "/products/count",
   },
 
+  categories: {
+    root: "/categories",
+  },
+
   media: {
     images: "/media/images",
     byId: (id: string) => `/media/images/${id}`,

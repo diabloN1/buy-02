@@ -14,13 +14,14 @@ describe("ProductCardComponent", () => {
     price: 199.99,
     quantity: 15,
     userId: "seller-1",
-    images: [{ id: "i1", url: "http://example.com/h.jpg", existing: true }]
+    categoryId: "x1",
+    images: [{ id: "i1", url: "http://example.com/h.jpg", existing: true }],
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ProductCardComponent],
-      providers: [provideRouter([])]
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProductCardComponent);

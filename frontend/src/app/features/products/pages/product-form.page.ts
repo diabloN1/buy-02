@@ -194,15 +194,13 @@ const MAX_SIZE = 2 * 1024 * 1024;
 
             <div class="form-actions">
               <a
-                mat-outlined-button
                 routerLink="/seller/products"
-                class="cancel-btn"
+                class="btn btn-outline cancel-btn"
                 >Cancel</a
               >
               <button
-                mat-flat-button
-                color="primary"
-                class="save-btn"
+                type="submit"
+                class="btn btn-primary save-btn"
                 [disabled]="form.invalid || saving()"
               >
                 <span *ngIf="!saving()">Save Product</span>
@@ -325,6 +323,7 @@ const MAX_SIZE = 2 * 1024 * 1024;
       }
       .form-actions {
         display: flex;
+        align-items: center;
         justify-content: flex-end;
         gap: 12px;
         margin-top: 16px;
@@ -333,9 +332,15 @@ const MAX_SIZE = 2 * 1024 * 1024;
       }
       .cancel-btn,
       .save-btn {
-        height: 44px;
-        border-radius: var(--app-radius-sm) !important;
-        padding: 0 24px !important;
+        height: 40px;
+        padding: 0 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        box-sizing: border-border-box;
       }
       @media (max-width: 600px) {
         .panel {

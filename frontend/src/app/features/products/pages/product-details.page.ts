@@ -22,6 +22,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
 import { ImagePreviewComponent } from "@shared/components/image-preview.component";
 import { NotificationService } from "@core/services/notification.service";
 import { CartService } from "@core/services/cart.service";
+import { UserAvatarComponent } from "@shared/components/user-avatar.component";
 
 @Component({
   selector: "app-product-details",
@@ -35,6 +36,7 @@ import { CartService } from "@core/services/cart.service";
     LoadingSpinnerComponent,
     SafeUrlPipe,
     ImagePreviewComponent,
+    UserAvatarComponent,
   ],
   template: `
     <section class="container details-section">
@@ -101,6 +103,16 @@ import { CartService } from "@core/services/cart.service";
                     <span>{{ p.categoryName }}</span>
                   </span>
                 }
+
+                @if (ownedByMe()) {
+                  <a
+                    class="btn btn-outline edit-pill-btn"
+                    [routerLink]="['/seller/products', p.id, 'edit']"
+                  >
+                    <mat-icon>edit</mat-icon>
+                    <span>Edit Product</span>
+                  </a>
+                }
               </div>
 
               <h1 class="title">{{ p.name }}</h1>
@@ -114,19 +126,10 @@ import { CartService } from "@core/services/cart.service";
             <!-- Seller Information Badge -->
             @if (seller(); as seller) {
               <div class="seller-card">
-                @if (seller.avatar) {
-                  <img
-                    class="seller-avatar"
-                    [src]="seller.avatar.url | safeUrl"
-                    [alt]="seller.name"
-                  />
-                } @else {
-                  <div class="seller-avatar-placeholder">
-                    <span>{{
-                      (seller.name || "S").charAt(0).toUpperCase()
-                    }}</span>
-                  </div>
-                }
+                <app-user-avatar
+                  [user]="seller"
+                  [size]="40"
+                />
 
                 <div class="seller-details">
                   <span class="seller-role">Verified Seller</span>
@@ -197,36 +200,27 @@ import { CartService } from "@core/services/cart.service";
 
             <!-- Action Controls -->
             <div class="actions-group">
-              @if (ownedByMe()) {
-                <a
-                  mat-flat-button
-                  color="primary"
-                  class="edit-btn"
-                  [routerLink]="['/seller/products', p.id, 'edit']"
-                >
-                  <mat-icon>edit</mat-icon>
-                  <span>Edit Product Details</span>
-                </a>
-              } @else {
+              @if (!ownedByMe()) {
                 <button
-                  mat-flat-button
-                  color="primary"
-                  class="buy-btn"
+                  type="button"
+                  class="btn btn-primary buy-btn"
                   [disabled]="p.quantity <= 0"
+                  (click)="addToCart()"
                 >
                   <mat-icon>shopping_bag</mat-icon>
                   <span>{{ p.quantity > 0 ? "Buy Now" : "Out of Stock" }}</span>
                 </button>
               }
               @if (!currentUser.user()) {
-                <span>Want to buy ?</span>
-                <a
-                  mat-stroked-button
-                  routerLink="/auth/register"
-                  class="connect-btn"
-                >
-                  <mat-icon>login</mat-icon> Create account!
-                </a>
+                <div class="auth-prompt">
+                  <span class="muted">Want to buy?</span>
+                  <a
+                    routerLink="/auth/register"
+                    class="btn btn-outline connect-btn"
+                  >
+                    <mat-icon>login</mat-icon> Create account!
+                  </a>
+                </div>
               }
 
               @if (cartQuantity() > 0) {
@@ -235,8 +229,8 @@ import { CartService } from "@core/services/cart.service";
                     <span>Update quantity:</span>
                     <div class="quantity-stepper">
                       <button
-                        mat-mini-fab
-                        class="minifab"
+                        type="button"
+                        class="btn btn-outline stepper-btn"
                         (click)="quantity.set(quantity() - 1)"
                         [disabled]="quantity() <= 1"
                         aria-label="Decrease quantity"
@@ -245,8 +239,8 @@ import { CartService } from "@core/services/cart.service";
                       </button>
                       <span class="quantity-value">{{ quantity() }}</span>
                       <button
-                        mat-mini-fab
-                        class="minifab"
+                        type="button"
+                        class="btn btn-outline stepper-btn"
                         (click)="quantity.set(quantity() + 1)"
                         [disabled]="quantity() >= (p.quantity || 1)"
                         aria-label="Increase quantity"
@@ -261,14 +255,14 @@ import { CartService } from "@core/services/cart.service";
                   </div>
                   <div class="in-cart-actions">
                     <button
-                      mat-stroked-button
-                      color="primary"
+                      type="button"
+                      class="btn btn-outline"
                       (click)="updateCart()"
                       [disabled]="quantity() == cartQuantity()"
                     >
                       <mat-icon>cached</mat-icon> Update quantity
                     </button>
-                    <a mat-flat-button color="primary" routerLink="/cart">
+                    <a class="btn btn-primary" routerLink="/cart">
                       <mat-icon>shopping_cart</mat-icon> View Cart
                     </a>
                   </div>
@@ -296,6 +290,7 @@ import { CartService } from "@core/services/cart.service";
         padding-bottom: 64px;
       }
 
+  
       .back-btn {
         margin-bottom: 24px;
         font-weight: 500;
@@ -378,6 +373,7 @@ import { CartService } from "@core/services/cart.service";
         height: 48px;
       }
 
+
       .thumbs {
         display: flex;
         gap: 12px;
@@ -411,7 +407,7 @@ import { CartService } from "@core/services/cart.service";
         background: var(--app-surface);
       }
 
-      /* ADDED: Styles for the pill group and category pill */
+
       .pill-group {
         display: flex;
         gap: 8px;
@@ -419,6 +415,7 @@ import { CartService } from "@core/services/cart.service";
         flex-wrap: wrap;
       }
 
+      /* Typography & Badges */
       .stock-pill {
         display: inline-flex;
         align-items: center;
@@ -440,14 +437,14 @@ import { CartService } from "@core/services/cart.service";
         height: 16px;
       }
 
-      /* ADDED: Category pill styles */
+
       .category-pill {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         padding: 4px 12px;
         border-radius: var(--app-radius-full);
-        background: var(--app-bg-alt); /* using an existing variable */
+        background: var(--app-bg-alt); 
         border: 1px solid var(--app-border);
         color: var(--app-fg);
         font-size: 12px;
@@ -458,6 +455,32 @@ import { CartService } from "@core/services/cart.service";
         width: 16px;
         height: 16px;
         color: var(--app-primary);
+      }
+
+      .edit-pill-btn {
+        height: 28px !important;
+        padding: 0 10px !important;
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        border-radius: var(--app-radius-full) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        color: var(--app-fg) !important;
+        border: 1px solid var(--app-border) !important;
+        text-decoration: none !important;
+        transition: all 0.15s ease !important;
+      }
+      .edit-pill-btn mat-icon {
+        font-size: 14px !important;
+        width: 14px !important;
+        height: 14px !important;
+        line-height: 14px !important;
+      }
+      .edit-pill-btn:hover {
+        background: var(--app-surface-hover) !important;
+        border-color: var(--app-border-hover) !important;
+        color: var(--app-fg-heading) !important;
       }
 
       .title {
@@ -543,6 +566,7 @@ import { CartService } from "@core/services/cart.service";
         letter-spacing: -0.02em;
       }
 
+
       .seller-card {
         display: flex;
         align-items: center;
@@ -585,6 +609,24 @@ import { CartService } from "@core/services/cart.service";
         color: var(--app-fg-heading);
       }
 
+      .description {
+        font-size: 14px;
+        color: var(--app-muted);
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+
+      .stock-tag {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: var(--app-fg);
+        font-weight: 500;
+      }
+      .out-of-stock {
+        color: var(--app-muted);
+      }
+
       .divider {
         height: 1px;
         background: var(--app-border);
@@ -604,15 +646,27 @@ import { CartService } from "@core/services/cart.service";
         margin: 0;
       }
 
+
       .actions-group {
-        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 24px;
       }
       .edit-btn,
       .buy-btn {
         width: 100%;
-        height: 48px;
-        font-size: 15px !important;
-        border-radius: var(--app-radius-sm) !important;
+        max-width: 100%;
+        height: 44px;
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 16px;
+      }
+
+      .auth-prompt {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -624,7 +678,59 @@ import { CartService } from "@core/services/cart.service";
         color: var(--app-fg);
         background-color: transparent;
       }
+      
+      .connect-btn {
+        height: 32px !important;
+        padding: 0 12px !important;
+      }
 
+      .quantity-selector,
+      .quantity-display {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--app-fg-heading);
+        margin-bottom: 12px;
+      }
+
+      .quantity-stepper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--app-surface);
+        border: 1px solid var(--app-border);
+        padding: 4px;
+        border-radius: var(--app-radius-sm);
+      }
+      .quantity-value {
+        min-width: 24px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .minifab {
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 4px !important;
+        background: transparent !important;
+        color: var(--app-fg) !important;
+        box-shadow: none !important;
+        border: 1px solid transparent !important;
+        transition: background 0.15s ease !important;
+      }
+      .minifab mat-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+        line-height: 16px !important;
+      }
+      .minifab:hover:not(:disabled) {
+        background: var(--app-surface-hover) !important;
+        border-color: var(--app-border) !important;
+      }
       .minifab:disabled {
         visibility: hidden;
       }
@@ -634,18 +740,12 @@ import { CartService } from "@core/services/cart.service";
         flex-direction: column;
         gap: 12px;
         padding: 16px;
-        background: var(--app-surface);
-        border: 2px solid var(--app-primary);
-        border-radius: var(--app-radius);
-        margin-top: 16px;
+        background: var(--app-primary-lighter);
+        border: 1px solid var(--app-primary-light);
+        border-radius: var(--app-radius-sm);
       }
-
-      .quantity-display {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-weight: 600;
-        color: var(--app-fg);
+      .dark-theme .in-cart-card {
+        background: rgba(99, 102, 241, 0.05); 
       }
 
       .in-cart-message {

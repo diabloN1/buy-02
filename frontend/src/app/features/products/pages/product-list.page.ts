@@ -210,7 +210,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 24px; /* Reduced to accommodate panel */
+        margin-bottom: 24px; 
         flex-wrap: wrap;
         gap: 20px;
       }
@@ -225,11 +225,11 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
       .search-field {
         width: 340px;
         max-width: 100%;
-        margin-bottom: -1.34375em; /* Counteract mat-form-field bottom padding */
+        margin-bottom: -1.34375em; 
       }
 
       .filter-toggle-btn {
-        height: 56px; /* Match form field height */
+        height: 56px; 
         border-radius: var(--app-radius-sm);
         position: relative;
       }
@@ -244,7 +244,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         top: -6px;
         right: -6px;
         background: var(--app-primary);
-        color: white;
+        color: var(--app-primary-text);
         font-size: 11px;
         font-weight: 700;
         width: 20px;

@@ -219,14 +219,16 @@ import { CartService } from "@core/services/cart.service";
                 </button>
               }
               @if (!currentUser.user()) {
-                <span>Want to buy ?</span>
-                <a
-                  mat-stroked-button
-                  routerLink="/auth/register"
-                  class="connect-btn"
-                >
-                  <mat-icon>login</mat-icon> Create account!
-                </a>
+                <div class="auth-prompt">
+                  <span class="muted">Want to buy?</span>
+                  <a
+                    mat-stroked-button
+                    routerLink="/auth/register"
+                    class="connect-btn"
+                  >
+                    <mat-icon>login</mat-icon> Create account!
+                  </a>
+                </div>
               }
 
               @if (cartQuantity() > 0) {
@@ -266,7 +268,7 @@ import { CartService } from "@core/services/cart.service";
                       (click)="updateCart()"
                       [disabled]="quantity() == cartQuantity()"
                     >
-                      <mat-icon>cached</mat-icon> Update quantity
+                      <mat-icon>cached</mat-icon> Update
                     </button>
                     <a mat-flat-button color="primary" routerLink="/cart">
                       <mat-icon>shopping_cart</mat-icon> View Cart
@@ -296,21 +298,20 @@ import { CartService } from "@core/services/cart.service";
         padding-bottom: 64px;
       }
 
+      /* Clean Ghost Button (Shadcn style) */
       .back-btn {
         margin-bottom: 24px;
         font-weight: 500;
         color: var(--app-muted) !important;
-        border-radius: var(--app-radius-sm);
       }
-      .back-btn:hover {
-        color: var(--app-primary) !important;
-        background: var(--app-primary-lighter) !important;
+      .back-btn mat-icon {
+        margin-right: 4px;
       }
 
       .grid {
         display: grid;
         grid-template-columns: 1.1fr 1fr;
-        gap: 32px;
+        gap: 24px; /* Tighter gap for pro look */
         align-items: start;
       }
       @media (max-width: 860px) {
@@ -320,11 +321,15 @@ import { CartService } from "@core/services/cart.service";
         }
       }
 
+      /* Base Cards */
       .gallery {
-        padding: 20px;
-        background: var(--app-surface);
+        padding: 16px;
+      }
+      .info-card {
+        padding: 24px;
       }
 
+      /* Images */
       .main-image-wrap {
         position: relative;
         border-radius: var(--app-radius-sm);
@@ -332,15 +337,16 @@ import { CartService } from "@core/services/cart.service";
         aspect-ratio: 4 / 3;
         background: var(--app-bg-alt);
         cursor: pointer;
+        border: 1px solid var(--app-border);
       }
       .main-image-wrap img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.4s ease;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       }
       .main-image-wrap:hover img {
-        transform: scale(1.03);
+        transform: scale(1.02);
       }
 
       .expand-overlay {
@@ -349,7 +355,7 @@ import { CartService } from "@core/services/cart.service";
         left: 0;
         right: 0;
         padding: 12px;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
         color: #ffffff;
         display: flex;
         align-items: center;
@@ -357,7 +363,7 @@ import { CartService } from "@core/services/cart.service";
         font-size: 13px;
         font-weight: 500;
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transition: opacity 0.2s ease;
       }
       .main-image-wrap:hover .expand-overlay {
         opacity: 1;
@@ -373,11 +379,12 @@ import { CartService } from "@core/services/cart.service";
         color: var(--app-muted);
       }
       .ph mat-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
+        font-size: 40px;
+        width: 40px;
+        height: 40px;
       }
 
+      /* Shadcn style Thumbnails */
       .thumbs {
         display: flex;
         gap: 12px;
@@ -385,30 +392,26 @@ import { CartService } from "@core/services/cart.service";
         flex-wrap: wrap;
       }
       .thumb {
-        border: 2px solid transparent;
         padding: 0;
-        background: none;
+        background: var(--app-bg-alt);
         border-radius: var(--app-radius-sm);
+        border: 1px solid var(--app-border);
         overflow: hidden;
         cursor: pointer;
         transition: all 0.2s ease;
-        box-shadow: var(--app-shadow-sm);
-      }
-      .thumb.on {
-        border-color: var(--app-primary);
-        transform: translateY(-2px);
-        box-shadow: var(--app-glow);
       }
       .thumb img {
-        width: 72px;
-        height: 72px;
+        width: 64px;
+        height: 64px;
         object-fit: cover;
         display: block;
       }
-
-      .info-card {
-        padding: 28px;
-        background: var(--app-surface);
+      /* Pro Focus Ring effect */
+      .thumb.on {
+        border-color: var(--app-surface);
+        box-shadow:
+          0 0 0 2px var(--app-surface),
+          0 0 0 4px var(--app-primary);
       }
 
       /* ADDED: Styles for the pill group and category pill */
@@ -419,25 +422,29 @@ import { CartService } from "@core/services/cart.service";
         flex-wrap: wrap;
       }
 
+      /* Typography & Badges */
       .stock-pill {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 4px 12px;
+        gap: 4px;
+        padding: 2px 10px;
         border-radius: var(--app-radius-full);
         background: var(--app-success-light);
         color: var(--app-success);
+        border: 1px solid rgba(16, 185, 129, 0.2);
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 600;
+        margin-bottom: 16px;
       }
       .stock-pill.out-of-stock {
         background: var(--app-danger-light);
         color: var(--app-danger);
+        border-color: rgba(239, 68, 68, 0.2);
       }
       .stock-pill mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
       }
 
       /* ADDED: Category pill styles */
@@ -461,139 +468,105 @@ import { CartService } from "@core/services/cart.service";
       }
 
       .title {
-        font-size: clamp(1.8rem, 3.5vw, 2.4rem);
-        font-weight: 800;
-        letter-spacing: -0.025em;
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+        letter-spacing: -0.04em;
         line-height: 1.2;
         overflow-wrap: anywhere;
-        letter-spacing: -0.03em;
-        line-height: 1.25;
-        margin: 0 0 16px;
+        margin: 0 0 12px;
         color: var(--app-fg-heading);
       }
 
       .price-box {
         display: flex;
-        align-items: baseline;
+        align-items: flex-start;
         gap: 2px;
-        color: var(--app-primary);
-        font-weight: 800;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
       }
       .price-box .currency {
-        font-size: 1.2rem;
-      }
-      .actions {
-        margin-top: 24px;
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-      .actions a {
-        margin: 0;
-      }
-
-      .quantity-stepper {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        color: var(--app-fg);
-      }
-
-      .quantity-stepper mat-icon {
-        width: 20px;
-        height: 20px;
+        font-size: 1rem;
+        font-weight: 600;
         color: var(--app-muted);
-      }
-
-      .quantity-value {
-        min-width: 24px;
-        text-align: center;
-        font-size: 16px;
-      }
-
-      .quantity-selector {
-        margin: 16px 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        color: var(--app-fg);
-      }
-
-      .connect-btn {
-        border-color: var(--app-primary);
-        color: var(--app-primary);
-      }
-      .connect-btn:hover {
-        background-color: var(--app-primary);
-        color: var(--app-primary-contrast, #fff);
-      }
-      .out-of-stock {
-        color: var(--app-muted);
-        font-size: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
+        margin-top: 4px;
       }
       .price-box .amount {
-        font-size: 2.2rem;
-        letter-spacing: -0.02em;
+        font-size: 2.25rem;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        color: var(--app-fg-heading);
       }
 
+      /* Seller Card - Cleaned up to Vercel standard */
       .seller-card {
         display: flex;
         align-items: center;
-        gap: 14px;
-        padding: 12px 16px;
-        background: var(--app-bg-alt);
+        gap: 12px;
+        padding: 12px;
+        background: var(--app-surface);
         border: 1px solid var(--app-border);
         border-radius: var(--app-radius-sm);
+        margin-bottom: 16px;
       }
-      .seller-avatar {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
+      .seller-avatar,
+      .seller-avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--app-radius-full);
         object-fit: cover;
       }
       .seller-avatar-placeholder {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background: var(--app-gradient-primary);
-        color: #ffffff;
+        background: var(--app-bg-alt);
+        border: 1px solid var(--app-border);
+        color: var(--app-muted);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
+        font-weight: 600;
       }
       .seller-details {
         display: flex;
         flex-direction: column;
+        line-height: 1.4;
       }
       .seller-role {
         font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: var(--app-primary);
-        letter-spacing: 0.05em;
+        font-weight: 600;
+        color: var(--app-muted);
       }
       .seller-name {
         font-size: 14px;
+        font-weight: 600;
         color: var(--app-fg-heading);
       }
 
+      .description {
+        font-size: 14px;
+        color: var(--app-muted);
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+
+      .stock-tag {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: var(--app-fg);
+        font-weight: 500;
+      }
+      .out-of-stock {
+        color: var(--app-muted);
+      }
+
+      /* Dividers & Blocks */
       .divider {
         height: 1px;
         background: var(--app-border);
-        margin: 16px 0;
+        margin: 20px 0;
       }
 
       .description-block h3 {
-        font-size: 15px;
-        font-weight: 700;
+        font-size: 14px;
+        font-weight: 600;
         margin: 0 0 8px;
         color: var(--app-fg-heading);
       }
@@ -604,19 +577,29 @@ import { CartService } from "@core/services/cart.service";
         margin: 0;
       }
 
+      /* Controls & Buttons */
       .actions-group {
-        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 24px;
       }
+
       .edit-btn,
       .buy-btn {
         width: 100%;
-        height: 48px;
-        font-size: 15px !important;
-        border-radius: var(--app-radius-sm) !important;
+        height: 44px !important;
+      }
+
+      .auth-prompt {
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 8px;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: var(--app-bg-alt);
+        border-radius: var(--app-radius-sm);
+        border: 1px solid var(--app-border);
+        font-size: 14px;
       }
 
       .minifab {
@@ -624,51 +607,99 @@ import { CartService } from "@core/services/cart.service";
         color: var(--app-fg);
         background-color: transparent;
       }
-
-      .minifab:disabled {
-        visibility: hidden;
+      
+      .connect-btn {
+        height: 32px !important;
+        padding: 0 12px !important;
       }
 
+      /* Modern Quantity Stepper (Overriding Mat-Mini-Fab) */
+      .quantity-selector,
+      .quantity-display {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--app-fg-heading);
+        margin-bottom: 12px;
+      }
+
+      .quantity-stepper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--app-surface);
+        border: 1px solid var(--app-border);
+        padding: 4px;
+        border-radius: var(--app-radius-sm);
+      }
+      .quantity-value {
+        min-width: 24px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      /* Square clean icon buttons instead of material circles */
+      .minifab {
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 4px !important;
+        background: transparent !important;
+        color: var(--app-fg) !important;
+        box-shadow: none !important;
+        border: 1px solid transparent !important;
+        transition: background 0.15s ease !important;
+      }
+      .minifab mat-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+        line-height: 16px !important;
+      }
+      .minifab:hover:not(:disabled) {
+        background: var(--app-surface-hover) !important;
+        border-color: var(--app-border) !important;
+      }
+      .minifab:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      /* In-Cart Callout (Vercel Style Callout) */
       .in-cart-card {
         display: flex;
         flex-direction: column;
         gap: 12px;
         padding: 16px;
-        background: var(--app-surface);
-        border: 2px solid var(--app-primary);
-        border-radius: var(--app-radius);
-        margin-top: 16px;
+        background: var(--app-primary-lighter);
+        border: 1px solid var(--app-primary-light);
+        border-radius: var(--app-radius-sm);
       }
-
-      .quantity-display {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-weight: 600;
-        color: var(--app-fg);
+      .dark-theme .in-cart-card {
+        background: rgba(99, 102, 241, 0.05); /* Very subtle in dark mode */
       }
 
       .in-cart-message {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         color: var(--app-primary);
         font-weight: 600;
-        font-size: 14px;
+        font-size: 13px;
       }
-
       .check-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-        color: var(--app-primary);
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
       }
 
       .in-cart-actions {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 4px;
       }
     `,
   ],

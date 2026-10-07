@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -34,10 +35,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.buy01.product.DTOs.CreateRequest;
 import com.buy01.product.DTOs.ProductResponse;
 import com.buy01.product.DTOs.UpdateRequest;
+import com.buy01.product.entity.Category;
 import com.buy01.product.entity.Product;
 import com.buy01.product.exception.custom.BadRequestException;
 import com.buy01.product.exception.custom.ForbiddenException;
 import com.buy01.product.exception.custom.NotFoundException;
+import com.buy01.product.repository.CategoryRepository;
 import com.buy01.product.repository.ProductRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,6 +52,9 @@ class ProductServiceImplTest {
 
         @Mock
         private ProductRepository productRepo;
+
+        @Mock
+        private CategoryRepository categoryRepository;
 
         @InjectMocks
         private ProductServiceImpl productService;
@@ -232,6 +238,9 @@ class ProductServiceImplTest {
                                         CATEGORY);
 
                         setAuthenticatedUser(USER_ID);
+
+                        lenient().when(categoryRepository.findById(any()))
+                                        .thenReturn(Optional.of(mock(Category.class)));
                 }
 
                 @Test
@@ -294,6 +303,9 @@ class ProductServiceImplTest {
                                         "category 1");
 
                         setAuthenticatedUser(USER_ID);
+
+                        lenient().when(categoryRepository.findById(any()))
+                                        .thenReturn(Optional.of(mock(Category.class)));
                 }
 
                 @Test
@@ -590,19 +602,20 @@ class ProductServiceImplTest {
                 }
 
                 @Test
-                @DisplayName("should do nothing when product does not exist")
-                void removeImageFromProduct_productNotFound_saveNeverCalled() {
+                @DisplayName("should throw NotFoundException when product does not exist")
+                void removeImageFromProduct_productNotFound_throwsNotFoundException() {
 
                         // given
                         when(productRepo.findById(PRODUCT_ID))
                                         .thenReturn(Optional.empty());
 
-                        // when
-                        productService.removeImageFromProduct(
-                                        PRODUCT_ID,
-                                        IMAGE_ID_1);
+                        // when / then
+                        assertThatThrownBy(
+                                        () -> productService.removeImageFromProduct(
+                                                        PRODUCT_ID,
+                                                        IMAGE_ID_1))
+                                        .isInstanceOf(NotFoundException.class);
 
-                        // then
                         verify(productRepo, never()).save(any());
                 }
 

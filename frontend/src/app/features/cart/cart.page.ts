@@ -34,7 +34,7 @@ import { RouterModule } from "@angular/router";
           <div class="empty-state">
             <mat-icon>shopping_cart</mat-icon>
             <p>Your cart is empty</p>
-            <a mat-raised-button color="primary" routerLink="/products">
+            <a class="btn btn-primary" routerLink="/products">
               Continue Shopping
             </a>
           </div>
@@ -64,13 +64,13 @@ import { RouterModule } from "@angular/router";
               </div>
 
               <div class="actions">
-                <button mat-stroked-button type="button" (click)="clearCart()">
+                <button type="button" class="btn btn-outline" (click)="clearCart()">
                   <mat-icon>delete</mat-icon> Clear cart
                 </button>
 
-                <button mat-raised-button type="button" color="primary" routerLink="/checkout">
+                <a class="btn btn-primary" routerLink="/checkout">
                   Proceed to checkout
-                </button>
+                </a>
               </div>
             </div>
           </div>

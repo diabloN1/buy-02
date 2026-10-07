@@ -23,24 +23,43 @@ describe("SellerProductsPage", () => {
 
   const mockPaginated: Paginated<Product> = {
     content: [
-      { id: "p1", name: "Prod 1", description: "Desc", price: 10, quantity: 5, userId: "s1", images: [] }
+      {
+        id: "p1",
+        categoryId: "c1",
+        name: "Product",
+        description: "Desc",
+        price: 10,
+        quantity: 5,
+        userId: "s1",
+        images: [],
+        createdAt: "2026-01-01",
+      },
     ],
     number: 0,
     size: 10,
     totalElements: 1,
-    totalPages: 1
+    totalPages: 1,
   };
 
   beforeEach(async () => {
-    productSvcSpy = jasmine.createSpyObj("ProductService", ["listBySeller", "delete"]);
-    notifySpy = jasmine.createSpyObj("NotificationService", ["success", "error"]);
+    productSvcSpy = jasmine.createSpyObj("ProductService", [
+      "listBySeller",
+      "delete",
+    ]);
+    notifySpy = jasmine.createSpyObj("NotificationService", [
+      "success",
+      "error",
+    ]);
     mediaSvcSpy = jasmine.createSpyObj("MediaService", ["getImageUrl"]);
-    currentUserSpy = jasmine.createSpyObj("CurrentUserService", ["clear", "load"]);
+    currentUserSpy = jasmine.createSpyObj("CurrentUserService", [
+      "clear",
+      "load",
+    ]);
     (currentUserSpy as any).user = signal({
       id: "s1",
       email: "seller@test.com",
       name: "Seller",
-      role: "SELLER"
+      role: "SELLER",
     });
 
     productSvcSpy.listBySeller.and.returnValue(of(mockPaginated));
@@ -54,8 +73,8 @@ describe("SellerProductsPage", () => {
         { provide: ProductService, useValue: productSvcSpy },
         { provide: NotificationService, useValue: notifySpy },
         { provide: MediaService, useValue: mediaSvcSpy },
-        { provide: CurrentUserService, useValue: currentUserSpy }
-      ]
+        { provide: CurrentUserService, useValue: currentUserSpy },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SellerProductsPage);

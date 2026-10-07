@@ -40,16 +40,27 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
           <div class="header-tag">Marketplace</div>
           <h1 class="header-title">
             All Products
-            <span class="count-badge" *ngIf="!loading()">{{ total() }}</span>
+            @if (!loading()) {
+              <span class="count-badge">{{ total() }}</span>
+            }
           </h1>
         </div>
 
         <mat-form-field appearance="outline" class="search-field">
           <mat-icon matPrefix class="search-icon">search</mat-icon>
           <mat-label>Search catalog…</mat-label>
-          <input matInput [formControl]="q" placeholder="Type product name or keywords…" />
+          <input
+            matInput
+            [formControl]="q"
+            placeholder="Type product name or keywords…"
+          />
           @if (q.value) {
-            <button matSuffix mat-icon-button (click)="q.setValue('')" aria-label="Clear search">
+            <button
+              matSuffix
+              mat-icon-button
+              (click)="q.setValue('')"
+              aria-label="Clear search"
+            >
               <mat-icon>close</mat-icon>
             </button>
           }
@@ -79,6 +90,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
             [pageSizeOptions]="[12, 24, 48]"
             (page)="onPage($event)"
             aria-label="Select page"
+            class="pro-paginator"
           />
         </div>
       }
@@ -87,32 +99,44 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
   styles: [
     `
       .catalog-section {
-        padding-top: 32px;
+        padding-top: 40px;
         padding-bottom: 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
       }
 
       .catalog-header {
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         justify-content: space-between;
-        margin-bottom: 36px;
         flex-wrap: wrap;
-        gap: 20px;
+        gap: 24px;
+      }
+
+      .header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
       }
 
       .header-tag {
+        display: inline-flex;
+        align-items: center;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.05em;
         color: var(--app-primary);
+        background: var(--app-primary-lighter);
+        padding: 4px 10px;
+        border-radius: var(--app-radius-full);
+        align-self: flex-start;
         margin-bottom: 4px;
       }
 
       .header-title {
-        font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-        font-weight: 800;
-        letter-spacing: -0.03em;
+        font-size: clamp(1.5rem, 3vw, 2rem);
         margin: 0;
         display: flex;
         align-items: center;
@@ -121,38 +145,47 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
 
       .count-badge {
         font-size: 13px;
-        font-weight: 700;
-        padding: 4px 12px;
+        font-weight: 600;
+        padding: 2px 10px;
         border-radius: var(--app-radius-full);
-        background: var(--app-primary-light);
-        color: var(--app-primary);
+        background: var(--app-bg-alt);
+        color: var(--app-muted);
+        border: 1px solid var(--app-border);
       }
 
       .search-field {
-        width: 380px;
-        max-width: 100%;
+        width: 100%;
+        max-width: 380px;
       }
 
+      /* Subtle adjustment for search icon to match muted tokens */
       .search-icon {
         margin-right: 8px;
-        color: var(--app-muted);
+        color: var(--app-muted) !important;
       }
 
       .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 24px;
-        margin-bottom: 40px;
+        margin-bottom: 16px;
       }
 
       .paginator-card {
         background: var(--app-surface);
         border: 1px solid var(--app-border);
         border-radius: var(--app-radius);
-        padding: 8px 16px;
+        padding: 4px 16px;
         box-shadow: var(--app-shadow-sm);
         display: flex;
         justify-content: flex-end;
+        overflow: hidden;
+      }
+
+      /* Forces the material paginator to blend into our custom card */
+      .pro-paginator {
+        background: transparent !important;
+        color: var(--app-fg) !important;
       }
     `,
   ],

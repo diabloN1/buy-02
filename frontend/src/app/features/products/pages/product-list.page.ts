@@ -52,7 +52,9 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
           <div class="header-tag">Marketplace</div>
           <h1 class="header-title">
             All Products
-            <span class="count-badge" *ngIf="!loading()">{{ total() }}</span>
+            @if (!loading()) {
+              <span class="count-badge">{{ total() }}</span>
+            }
           </h1>
         </div>
 
@@ -194,6 +196,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
             [pageSizeOptions]="[12, 24, 48]"
             (page)="onPage($event)"
             aria-label="Select page"
+            class="pro-paginator"
           />
         </div>
       }
@@ -202,17 +205,26 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
   styles: [
     `
       .catalog-section {
-        padding-top: 32px;
+        padding-top: 40px;
         padding-bottom: 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
       }
 
       .catalog-header {
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         justify-content: space-between;
         margin-bottom: 24px; /* Reduced to accommodate panel */
         flex-wrap: wrap;
-        gap: 20px;
+        gap: 24px;
+      }
+
+      .header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
       }
 
       .header-actions {
@@ -292,17 +304,24 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 24px;
-        margin-bottom: 40px;
+        margin-bottom: 16px;
       }
 
       .paginator-card {
         background: var(--app-surface);
         border: 1px solid var(--app-border);
         border-radius: var(--app-radius);
-        padding: 8px 16px;
+        padding: 4px 16px;
         box-shadow: var(--app-shadow-sm);
         display: flex;
         justify-content: flex-end;
+        overflow: hidden;
+      }
+
+      /* Forces the material paginator to blend into our custom card */
+      .pro-paginator {
+        background: transparent !important;
+        color: var(--app-fg) !important;
       }
 
       @keyframes slideDown {

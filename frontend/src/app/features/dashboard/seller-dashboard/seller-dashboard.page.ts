@@ -32,13 +32,17 @@ import { CurrentUserService } from "@core/services/current-user.service";
   template: `
     <section class="container dashboard-section">
       <div class="welcome-header">
-        <div>
+        <div class="welcome-text">
           <div class="welcome-tag">Seller Portal</div>
-          <h1 class="welcome-title">Welcome back, {{ currentUser.user()?.name }} 👋</h1>
-          <p class="muted">Manage your store products, media assets, and inventory performance.</p>
+          <h1 class="welcome-title">
+            Welcome back, {{ currentUser.user()?.name }} 👋
+          </h1>
+          <p class="muted">
+            Manage your store products, media assets, and inventory performance.
+          </p>
         </div>
 
-        <a routerLink="/seller/products/new" class="btn btn-primary create-btn">
+        <a routerLink="/seller/products/new" class="btn btn-primary">
           <mat-icon>add</mat-icon>
           <span>Create New Product</span>
         </a>
@@ -66,19 +70,21 @@ import { CurrentUserService } from "@core/services/current-user.service";
           <div class="stat-icon l-icon"><mat-icon>schedule</mat-icon></div>
           <div class="stat-content">
             <div class="stat-label">Latest Item</div>
-            <div class="stat-value text-truncate">{{ items().length ? latest().name : '—' }}</div>
+            <div class="stat-value text-truncate">
+              {{ items().length ? latest().name : "—" }}
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Secondary Navigation Shortcuts -->
       <div class="shortcuts-bar">
-        <a routerLink="/seller/products" class="btn btn-secondary shortcut-btn">
+        <a routerLink="/seller/products" class="btn btn-secondary">
           <mat-icon>list_alt</mat-icon>
           <span>Manage All Products</span>
         </a>
 
-        <a routerLink="/seller/media" class="btn btn-secondary shortcut-btn">
+        <a routerLink="/seller/media" class="btn btn-secondary">
           <mat-icon>perm_media</mat-icon>
           <span>Media Gallery</span>
         </a>
@@ -109,47 +115,57 @@ import { CurrentUserService } from "@core/services/current-user.service";
   styles: [
     `
       .dashboard-section {
-        padding-top: 32px;
+        padding-top: 40px;
         padding-bottom: 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
       }
 
       .welcome-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
+        align-items: flex-start;
         gap: 20px;
-        margin-bottom: 32px;
         flex-wrap: wrap;
       }
 
+      .welcome-text {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
       .welcome-tag {
+        display: inline-flex;
+        align-items: center;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.05em;
         color: var(--app-primary);
+        background: var(--app-primary-lighter);
+        padding: 4px 10px;
+        border-radius: var(--app-radius-full);
+        align-self: flex-start;
         margin-bottom: 4px;
       }
 
       .welcome-title {
-        font-size: clamp(1.8rem, 3.5vw, 2.4rem);
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        margin: 0 0 4px;
-        color: var(--app-fg-heading);
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        /* Font weights and letter spacing inherit beautifully from global heading settings */
+        margin: 0;
       }
 
-      .create-btn {
-        height: 44px;
-        padding: 0 22px;
+      .welcome-text .muted {
+        margin: 0;
         font-size: 15px;
       }
 
       .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        margin-bottom: 28px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
       }
 
       .stat-card {
@@ -162,85 +178,98 @@ import { CurrentUserService } from "@core/services/current-user.service";
       .stat-icon {
         width: 48px;
         height: 48px;
-        border-radius: 12px;
+        border-radius: var(--app-radius);
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
       }
+
       .stat-icon mat-icon {
         font-size: 24px;
         width: 24px;
         height: 24px;
       }
 
+      /* Using mapped theme variables instead of hardcoded colors */
       .p-icon {
         background: var(--app-primary-lighter);
         color: var(--app-primary);
       }
       .m-icon {
-        background: rgba(168, 85, 247, 0.12);
-        color: #a855f7;
+        background: var(--app-accent-light);
+        color: var(--app-accent);
       }
       .l-icon {
-        background: rgba(16, 185, 129, 0.12);
-        color: #10b981;
+        background: var(--app-success-light);
+        color: var(--app-success);
+      }
+
+      .stat-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0; /* Ensures truncation works */
       }
 
       .stat-label {
-        font-size: 12px;
-        font-weight: 700;
+        font-size: 13px;
+        font-weight: 500;
         color: var(--app-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
       }
 
       .stat-value {
-        font-size: 1.8rem;
-        font-weight: 800;
-        color: var(--app-fg-heading);
-        margin-top: 2px;
-        letter-spacing: -0.02em;
-      }
-      .stat-value.text-truncate {
-        font-size: 1.05rem;
+        font-size: 1.5rem;
         font-weight: 700;
+        color: var(--app-fg-heading);
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+      }
+
+      .stat-value.text-truncate {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 170px;
       }
 
       .shortcuts-bar {
         display: flex;
         gap: 12px;
-        margin-bottom: 40px;
         flex-wrap: wrap;
+        padding-top: 8px;
       }
 
       .recent-section {
-        margin-top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding-top: 16px;
       }
+
       .section-title-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 24px;
       }
+
       .section-title-row h2 {
-        font-size: 1.5rem;
-        font-weight: 800;
         margin: 0;
       }
 
       .link-btn {
         color: var(--app-primary) !important;
         font-weight: 600;
+        padding: 0 8px; /* Tighter padding for text-heavy ghost links */
+      }
+      .link-btn mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
       }
 
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 24px;
       }
     `,
@@ -254,7 +283,7 @@ export class SellerDashboardPage {
   readonly items = signal<Product[]>([]);
   readonly loading = signal(true);
   readonly totalImages = computed(() =>
-    this.items().reduce((n, p) => n + p.images.length, 0)
+    this.items().reduce((n, p) => n + p.images.length, 0),
   );
   readonly latest = computed(() => this.items()[0]);
 

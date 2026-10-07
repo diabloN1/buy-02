@@ -377,7 +377,6 @@ import { CurrentUserService } from "@core/services/current-user.service";
 })
 export class SellerProductsPage {
   private readonly svc = inject(ProductService);
-  private readonly auth = inject(AuthService);
   private readonly dialog = inject(MatDialog);
   private readonly notify = inject(NotificationService);
   readonly currentUser = inject(CurrentUserService);

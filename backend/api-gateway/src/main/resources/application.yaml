@@ -37,7 +37,7 @@ spring:
                 - Path=/api/media/**
               filters:
                 - StripPrefix=1
-              
+
             - id: cart-service
               uri: lb://CART-SERVICE
               predicates:
@@ -45,11 +45,17 @@ spring:
               filters:
                 - StripPrefix=1
 
+            - id: order-service
+              uri: lb://ORDER-SERVICE
+              predicates:
+                - Path=/api/orders/**,/api/suborders/**
+              filters:
+                - StripPrefix=1
+
 eureka:
   client:
     service-url:
       defaultZone: http://eureka:8761/eureka
-
 
 jwt:
   secret: ${JWT_SECRET:WUTsutO3lC3LuEI2g78FI6Gvxm5ZkmltirMrq099JfhPvJlRVNobuloPiyLHgSrx}

@@ -32,6 +32,17 @@ services:
     volumes:
       - kafka-data:/var/lib/kafka/data
 
+  # kafka-ui:
+  #   image: provectuslabs/kafka-ui:latest
+  #   ports:
+  #     - "8085:8080"
+  #   environment:
+  #     KAFKA_CLUSTERS_0_NAME: local
+  #     KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+  #   depends_on:
+  #     kafka:
+  #       condition: service_healthy
+
   eureka:
     build: ./backend/eureka
 
@@ -201,6 +212,36 @@ services:
       timeout: 3s
       retries: 20
 
+  order:
+    build: ./backend/order-service
+
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "-",
+          "http://localhost:8086/actuator/health",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
   api-gateway:
     build: ./backend/api-gateway
 
@@ -252,15 +293,20 @@ services:
       - mongo-data:/data/db
 
   minio:
-    build:
-      context: ./deps-setup/minio
-    image: anlazaar/minio:latest
+    image: minio/minio
+
+    # ports:
+    #   - "9001:9001"
+
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+
     command: server /data --console-address ":9001"
+
     volumes:
       - minio-data:/data
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 5s

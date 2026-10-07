@@ -37,9 +37,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
           <div class="brand-icon">
             <mat-icon>storefront</mat-icon>
           </div>
-          <span class="title"
-            >Market<span class="title-accent">place</span></span
-          >
+          <span class="title">Market<span class="title-accent">place</span></span>
         </a>
 
         <!-- Main Navigation Links -->
@@ -50,58 +48,34 @@ import { CurrentUserService } from "@core/services/current-user.service";
           </a>
 
           @if (auth.isSeller()) {
-            <a
-              routerLink="/dashboard"
-              routerLinkActive="active"
-              class="nav-link"
-            >
+            <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
               <mat-icon>dashboard</mat-icon>
               <span>Dashboard</span>
             </a>
 
-            <a
-              routerLink="/seller/products"
-              routerLinkActive="active"
-              class="nav-link"
-            >
+            <a routerLink="/seller/products" routerLinkActive="active" class="nav-link">
               <mat-icon>inventory_2</mat-icon>
               <span>My Products</span>
             </a>
 
-            <a
-              routerLink="/seller/media"
-              routerLinkActive="active"
-              class="nav-link"
-            >
+            <a routerLink="/seller/media" routerLinkActive="active" class="nav-link">
               <mat-icon>perm_media</mat-icon>
               <span>Media</span>
             </a>
           }
 
           @if (auth.isAdmin()) {
-            <a
-              routerLink="/admin/dashboard"
-              routerLinkActive="active"
-              class="nav-link"
-            >
+            <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">
               <mat-icon>admin_panel_settings</mat-icon>
               <span>Dashboard</span>
             </a>
 
-            <a
-              routerLink="/admin/products"
-              routerLinkActive="active"
-              class="nav-link"
-            >
+            <a routerLink="/admin/products" routerLinkActive="active" class="nav-link">
               <mat-icon>inventory</mat-icon>
               <span>Products</span>
             </a>
 
-            <a
-              routerLink="/admin/users"
-              routerLinkActive="active"
-              class="nav-link"
-            >
+            <a routerLink="/admin/users" routerLinkActive="active" class="nav-link">
               <mat-icon>group</mat-icon>
               <span>Users</span>
             </a>
@@ -118,11 +92,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
             class="icon-btn hide-on-mobile"
             (click)="theme.toggle()"
             [attr.aria-label]="'Toggle theme mode'"
-            [title]="
-              theme.mode() === 'dark'
-                ? 'Switch to Light Mode'
-                : 'Switch to Dark Mode'
-            "
+            [title]="theme.mode() === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
           >
             <mat-icon>
               {{ theme.mode() === "dark" ? "light_mode" : "dark_mode" }}
@@ -145,7 +115,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
               aria-label="User menu"
             >
               <div class="avatar-circle">
-                {{ (currentUser.user()?.name || "U").charAt(0).toUpperCase() }}
+                {{ (currentUser.user()?.name || 'U').charAt(0).toUpperCase() }}
               </div>
               <span class="user-name">
                 {{ currentUser.user()?.name }}
@@ -300,9 +270,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
         backdrop-filter: var(--app-backdrop-blur);
         -webkit-backdrop-filter: var(--app-backdrop-blur);
         border-bottom: 1px solid var(--app-border);
-        transition:
-          background-color 0.25s ease,
-          border-color 0.25s ease;
+        transition: background-color 0.25s ease, border-color 0.25s ease;
       }
 
       .header-container {
@@ -506,6 +474,8 @@ import { CurrentUserService } from "@core/services/current-user.service";
       .app-footer {
         padding: 40px 0;
         border-top: 1px solid var(--app-border);
+        background: var(--app-surface);
+        transition: background-color 0.25s ease, border-color 0.25s ease;
         background: var(--app-bg);
         transition:
           background-color 0.25s ease,

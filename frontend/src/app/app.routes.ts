@@ -13,14 +13,14 @@ export const APP_ROUTES: Routes = [
     path: "products",
     loadComponent: () =>
       import("./features/products/pages/product-list.page").then(
-        (m) => m.ProductListPage
+        (m) => m.ProductListPage,
       ),
   },
   {
     path: "products/:id",
     loadComponent: () =>
       import("./features/products/pages/product-details.page").then(
-        (m) => m.ProductDetailsPage
+        (m) => m.ProductDetailsPage,
       ),
   },
   {
@@ -32,7 +32,7 @@ export const APP_ROUTES: Routes = [
     path: "auth/register",
     loadComponent: () =>
       import("./features/auth/register/register.page").then(
-        (m) => m.RegisterPage
+        (m) => m.RegisterPage,
       ),
   },
 
@@ -40,16 +40,16 @@ export const APP_ROUTES: Routes = [
     path: "dashboard",
     canActivate: [authGuard, roleGuard(["SELLER"])],
     loadComponent: () =>
-      import(
-        "./features/dashboard/seller-dashboard/seller-dashboard.page"
-      ).then((m) => m.SellerDashboardPage),
+      import("./features/dashboard/seller-dashboard/seller-dashboard.page").then(
+        (m) => m.SellerDashboardPage,
+      ),
   },
   {
     path: "admin/dashboard",
     canActivate: [authGuard, roleGuard(["ADMIN"])],
     loadComponent: () =>
       import("./features/dashboard/admin-dashboard/admin-dashboard.page").then(
-        (m) => m.AdminDashboardPage
+        (m) => m.AdminDashboardPage,
       ),
   },
   {
@@ -57,7 +57,7 @@ export const APP_ROUTES: Routes = [
     canActivate: [authGuard, roleGuard(["ADMIN"])],
     loadComponent: () =>
       import("./features/admin/admin-products.page").then(
-        (m) => m.AdminProductsPage
+        (m) => m.AdminProductsPage,
       ),
   },
   {
@@ -65,7 +65,7 @@ export const APP_ROUTES: Routes = [
     canActivate: [authGuard, roleGuard(["ADMIN"])],
     loadComponent: () =>
       import("./features/products/pages/product-form.page").then(
-        (m) => m.ProductFormPage
+        (m) => m.ProductFormPage,
       ),
   },
   {
@@ -79,7 +79,7 @@ export const APP_ROUTES: Routes = [
     canActivate: [authGuard, roleGuard(["SELLER"])],
     loadComponent: () =>
       import("./features/products/pages/seller-products.page").then(
-        (m) => m.SellerProductsPage
+        (m) => m.SellerProductsPage,
       ),
   },
   {
@@ -87,7 +87,7 @@ export const APP_ROUTES: Routes = [
     canActivate: [authGuard, roleGuard(["SELLER"])],
     loadComponent: () =>
       import("./features/products/pages/product-form.page").then(
-        (m) => m.ProductFormPage
+        (m) => m.ProductFormPage,
       ),
   },
   {
@@ -95,7 +95,7 @@ export const APP_ROUTES: Routes = [
     canActivate: [authGuard, roleGuard(["SELLER", "ADMIN"])],
     loadComponent: () =>
       import("./features/products/pages/product-form.page").then(
-        (m) => m.ProductFormPage
+        (m) => m.ProductFormPage,
       ),
   },
   {
@@ -103,7 +103,7 @@ export const APP_ROUTES: Routes = [
     canActivate: [authGuard, roleGuard(["SELLER", "ADMIN"])],
     loadComponent: () =>
       import("./features/media/media-management.page").then(
-        (m) => m.MediaManagementPage
+        (m) => m.MediaManagementPage,
       ),
   },
   {
@@ -118,6 +118,54 @@ export const APP_ROUTES: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import("./features/cart/cart.page").then((m) => m.CartPage),
+  },
+
+  {
+    path: "checkout",
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import("./features/checkout/checkout.page").then(
+        (m) => m.CheckoutWizardComponent,
+      ),
+  },
+
+  {
+    path: "orders",
+    canActivate: [authGuard],
+    data: {
+      type: "orders",
+    },
+
+    loadComponent: () =>
+      import("./features/orders/orders.page").then((m) => m.OrdersPage),
+  },
+
+  {
+    path: "orders/:orderId",
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import("./features/orders/order-details/order-details.page").then(
+        (m) => m.OrderDetailsPage,
+      ),
+  },
+
+  {
+    path: "suborders",
+    canActivate: [authGuard],
+    data: {
+      type: "suborders",
+    },
+    loadComponent: () =>
+      import("./features/orders/orders.page").then((m) => m.OrdersPage),
+  },
+
+  {
+    path: "suborders/:subOrderId",
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import("./features/orders/order-details/order-details.page").then(
+        (m) => m.OrderDetailsPage,
+      ),
   },
 
   {

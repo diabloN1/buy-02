@@ -2,7 +2,7 @@ package com.buy01.media.aop;
 
 import com.buy01.media.event.AuditEvent;
 import com.buy01.media.event.EntityType;
-import com.buy01.media.service.AuditEventProducer;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

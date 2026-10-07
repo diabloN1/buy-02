@@ -37,9 +37,6 @@ $dark-theme: mat.m2-define-dark-theme(
   @include mat.all-component-colors($dark-theme);
 }
 
-/* ==========================================================================
-   Design Tokens & CSS Variables (Shadcn / Vercel Pro Grade)
-   ========================================================================== */
 :root {
   color-scheme: light;
 
@@ -117,6 +114,11 @@ $dark-theme: mat.m2-define-dark-theme(
   --app-glass-bg: rgba(255, 255, 255, 0.8);
   --app-glass-border: rgba(228, 228, 231, 0.4);
   --app-backdrop-blur: blur(12px);
+
+  /* PhoneNumber */
+  --mat-filled-tel-form-background: #f8fafc;
+  --mat-filled-tel-form-focus-background: #f8fafc;
+  --mat-filled-tel-form-hover-background: #f8fafc;
 }
 
 .dark-theme {
@@ -187,6 +189,11 @@ $dark-theme: mat.m2-define-dark-theme(
   /* Glassmorphism */
   --app-glass-bg: rgba(9, 9, 11, 0.7);
   --app-glass-border: rgba(39, 39, 42, 0.6);
+
+  /* PhoneNumber */
+  --mat-filled-tel-form-background: #0b0f19;
+  --mat-filled-tel-form-focus-background: #0b0f19;
+  --mat-filled-tel-form-hover-background: #0b0f19;
 }
 
 /* ==========================================================================
@@ -257,7 +264,7 @@ mat-icon,
   border-radius: var(--app-radius-full);
 }
 
-/* Typography Defaults (Tighter tracking for Pro look) */
+/* Typography Defaults */
 h1,
 h2,
 h3,

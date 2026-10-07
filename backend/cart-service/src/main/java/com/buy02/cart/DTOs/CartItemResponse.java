@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 public class CartItemResponse {
 
     private String productId;
+    private String ownerId;
     private String productName;
     private BigDecimal price;
     private Integer quantity;
@@ -33,6 +34,7 @@ public class CartItemResponse {
 
         return CartItemResponse.builder()
                 .productId(item.getProductId())
+                .ownerId(product.getUserId())
                 .productName(product.getName())
                 .price(product.getPrice())
                 .quantity(item.getQuantity())

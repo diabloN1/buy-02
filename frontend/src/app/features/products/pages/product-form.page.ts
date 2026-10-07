@@ -354,7 +354,7 @@ export class ProductFormPage {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly svc = inject(ProductService);
-  private readonly catSvc = inject(CategoryService); // <-- ADDED Injection
+  private readonly catSvc = inject(CategoryService);
   private readonly notify = inject(NotificationService);
 
   readonly id = signal<string | null>(this.route.snapshot.paramMap.get("id"));
@@ -365,15 +365,15 @@ export class ProductFormPage {
 
   readonly images = signal<ProductImage[]>([]);
   readonly deletedImageIds = signal<string[]>([]);
-  readonly categories = signal<Category[]>([]); // <-- ADDED signal to hold categories
+  readonly categories = signal<Category[]>([]); 
 
-  // ADDED categoryId to the form
+
   readonly form = this.fb.nonNullable.group({
     name: [
       "",
       [Validators.required, Validators.minLength(3), Validators.maxLength(100)],
     ],
-    categoryId: ["", [Validators.required]], // <-- FIXED! TypeScript error goes away now.
+    categoryId: ["", [Validators.required]], 
     description: [
       "",
       [
@@ -397,7 +397,7 @@ export class ProductFormPage {
       this.loading.set(true);
       this.svc.get(id).subscribe({
         next: (p) => {
-          // ADDED categoryId to patchValue so it populates when editing
+        
           this.form.patchValue({
             name: p.name,
             categoryId: p.categoryId,

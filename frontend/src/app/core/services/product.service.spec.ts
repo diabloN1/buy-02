@@ -1,5 +1,8 @@
 import { TestBed } from "@angular/core/testing";
-import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from "@angular/common/http/testing";
 import { provideHttpClient } from "@angular/common/http";
 
 import { ProductService } from "./product.service";
@@ -18,8 +21,10 @@ describe("ProductService", () => {
     price: 29.99,
     quantity: 10,
     userId: "seller-1",
+    categoryId: "1",
+    categoryName: "Test Category",
     images: [],
-    createdAt: "2026-01-01"
+    createdAt: "2026-01-01",
   };
 
   beforeEach(() => {
@@ -27,8 +32,8 @@ describe("ProductService", () => {
       providers: [
         ProductService,
         provideHttpClient(),
-        provideHttpClientTesting()
-      ]
+        provideHttpClientTesting(),
+      ],
     });
 
     service = TestBed.inject(ProductService);
@@ -45,19 +50,20 @@ describe("ProductService", () => {
       totalElements: 1,
       totalPages: 1,
       number: 0,
-      size: 10
+      size: 10,
     };
 
-    service.list(1, 10, "mouse").subscribe((res) => {
+    service.list(1, 10).subscribe((res) => {
       expect(res).toEqual(mockResponse);
     });
 
-    const req = httpMock.expectOne((request) =>
-      request.url === API.base + API.products.root &&
-      request.params.get("page") === "0" &&
-      request.params.get("size") === "10" &&
-      request.params.get("q") === "mouse"
+    const req = httpMock.expectOne(
+      (request) =>
+        request.url === API.base + API.products.root &&
+        request.params.get("page") === "0" &&
+        request.params.get("size") === "10",
     );
+
     expect(req.request.method).toBe("GET");
     req.flush(mockResponse);
   });

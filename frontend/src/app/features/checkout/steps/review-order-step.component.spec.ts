@@ -166,25 +166,30 @@ describe("ReviewOrderStepComponent", () => {
 
     const buttons = fixture.nativeElement.querySelectorAll(".actions button");
 
-    (buttons[2] as HTMLButtonElement).click();
+    (buttons[1] as HTMLButtonElement).click();
 
     expect(component.placeOrder.emit).toHaveBeenCalled();
   });
 
   it("should have a link to the cart", () => {
-    const button = fixture.nativeElement.querySelector(
-      'button[routerlink="/cart"]',
-    );
+    const link = fixture.nativeElement.querySelector(
+      '.actions a[routerLink="/cart"]',
+    ) as HTMLAnchorElement;
 
-    expect(button).toBeTruthy();
+    expect(link).toBeTruthy();
+    expect(link.textContent).toContain("Modify cart");
+    expect(link.getAttribute("href")).toBe("/cart");
   });
 
   it("should render the correct action buttons", () => {
     const buttons = fixture.nativeElement.querySelectorAll(".actions button");
+    const links = fixture.nativeElement.querySelectorAll(".actions a");
 
-    expect(buttons.length).toBe(3);
+    expect(buttons.length).toBe(2);
     expect(buttons[0].textContent).toContain("Back");
-    expect(buttons[1].textContent).toContain("Modify cart");
-    expect(buttons[2].textContent).toContain("Place order");
+    expect(buttons[1].textContent).toContain("Place order");
+
+    expect(links.length).toBe(1);
+    expect(links[0].textContent).toContain("Modify cart");
   });
 });

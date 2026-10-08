@@ -320,7 +320,7 @@ import { ImagePreviewComponent } from "@shared/components/image-preview.componen
         background: var(--app-surface, #ffffff);
         overflow: hidden;
       }
-      /* Lightbox Modal */
+
       .lightbox-backdrop {
         position: fixed;
         inset: 0;

@@ -153,7 +153,6 @@ import { CurrentUserService } from "@core/services/current-user.service";
 
       .welcome-title {
         font-size: clamp(1.5rem, 3vw, 2rem);
-        /* Font weights and letter spacing inherit beautifully from global heading settings */
         margin: 0;
       }
 
@@ -191,7 +190,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
         height: 24px;
       }
 
-      /* Using mapped theme variables instead of hardcoded colors */
+  
       .p-icon {
         background: var(--app-primary-lighter);
         color: var(--app-primary);
@@ -209,7 +208,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
         display: flex;
         flex-direction: column;
         gap: 2px;
-        min-width: 0; /* Ensures truncation works */
+        min-width: 0; 
       }
 
       .stat-label {
@@ -259,7 +258,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
       .link-btn {
         color: var(--app-primary) !important;
         font-weight: 600;
-        padding: 0 8px; /* Tighter padding for text-heavy ghost links */
+        padding: 0 8px;
       }
       .link-btn mat-icon {
         font-size: 18px;

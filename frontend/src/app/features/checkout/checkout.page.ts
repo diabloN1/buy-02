@@ -51,7 +51,7 @@ import { ConfirmationStepComponent } from "./steps/confirmation-step.component";
             <mat-icon>shopping_cart</mat-icon>
             <p>Your cart is empty</p>
 
-            <a mat-raised-button color="primary" routerLink="/products">
+            <a class="btn btn-primary" routerLink="/products">
               Browse products
             </a>
           </div>

@@ -24,15 +24,15 @@ import { RouterModule } from "@angular/router";
       }
 
       <div class="actions">
-        <button mat-raised-button color="primary" routerLink="/orders">
+        <a class="btn btn-primary" routerLink="/orders">
           <mat-icon>receipt</mat-icon>
           View my orders
-        </button>
+        </a>
 
-        <button mat-stroked-button routerLink="/products">
-          <mat-icon>continue_shopping</mat-icon>
+        <a class="btn btn-outline" routerLink="/products">
+          <mat-icon>shopping_bag</mat-icon>
           Continue shopping
-        </button>
+        </a>
       </div>
     </div>
   `,

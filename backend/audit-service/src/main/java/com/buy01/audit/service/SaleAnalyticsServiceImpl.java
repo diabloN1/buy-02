@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.buy01.audit.dto.ProductOrCategoryCount;
 import com.buy01.audit.dto.SellerAnalytics;
-import com.buy01.audit.dto.BestSellingProductBar;
+import com.buy01.audit.dto.BestSellingProductData;
 import com.buy01.audit.dto.TimeSeriesPoint;
 import com.buy01.audit.dto.UserAnalytics;
 import com.buy01.audit.entity.SaleAudit;
@@ -132,7 +132,7 @@ public class SaleAnalyticsServiceImpl implements SaleAnalyticsService {
                                 .getMappedResults();
         }
 
-        private List<BestSellingProductBar> aggregateBestSellingProducts(
+        private List<BestSellingProductData> aggregateBestSellingProducts(
                         String sellerId) {
 
                 Aggregation aggregation = Aggregation.newAggregation(
@@ -142,8 +142,13 @@ public class SaleAnalyticsServiceImpl implements SaleAnalyticsService {
                                                                 .is(sellerId)
                                                                 .and("canceled").is(false)),
 
+                                Aggregation.project()
+                                                .and("_id").as("id")
+                                                .and("productId").as("productId")
+                                                .andExpression("itemPrice * quantity").as("lineRevenue"),
+
                                 Aggregation.group("productId")
-                                                .sum("itemPrice * quantity").as("revenue")
+                                                .sum("lineRevenue").as("revenue")
                                                 .count().as("ordersCount"),
 
                                 Aggregation.sort(
@@ -161,7 +166,7 @@ public class SaleAnalyticsServiceImpl implements SaleAnalyticsService {
                                 .aggregate(
                                                 aggregation,
                                                 SaleAudit.class,
-                                                BestSellingProductBar.class)
+                                                BestSellingProductData.class)
                                 .getMappedResults();
         }
 
@@ -173,7 +178,7 @@ public class SaleAnalyticsServiceImpl implements SaleAnalyticsService {
                                 Aggregation.match(
                                                 new Criteria("sellerId")
                                                                 .is(sellerId)
-                                                        .and("canceled").is(false)),
+                                                                .and("canceled").is(false)),
 
                                 Aggregation.group("productId")
                                                 .sum("quantity").as("totalUnits"),

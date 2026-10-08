@@ -1,0 +1,178 @@
+@if (userAnalytics) {
+  <h2>User Analytics</h2>
+
+  <!-- Spending -->
+  <mat-card class="analytics-card analytics-card--wide">
+    <mat-card-header>
+      <mat-card-title> Spending over time </mat-card-title>
+
+      <mat-card-subtitle>
+        Customer spending trend across the selected period.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="chart-container chart-container--large">
+        <apx-chart
+          [series]="spendingChart.series"
+          [chart]="spendingChart.chart"
+          [colors]="spendingChart.colors"
+          [stroke]="spendingChart.stroke"
+          [xaxis]="spendingChart.xaxis"
+          [yaxis]="spendingChart.yaxis"
+          [grid]="spendingChart.grid"
+          [tooltip]="spendingChart.tooltip"
+          [dataLabels]="spendingChart.dataLabels"
+        >
+        </apx-chart>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="chart-grid">
+    <!-- Products -->
+    <mat-card class="analytics-card">
+      <mat-card-header>
+        <mat-card-title> Most bought products </mat-card-title>
+
+        <mat-card-subtitle>
+          Products ranked by quantity purchased.
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="chart-container">
+          <apx-chart
+            [series]="topProductsChart.series"
+            [chart]="topProductsChart.chart"
+            [colors]="topProductsChart.colors"
+            [plotOptions]="topProductsChart.plotOptions"
+            [xaxis]="topProductsChart.xaxis"
+            [yaxis]="topProductsChart.yaxis"
+            [grid]="topProductsChart.grid"
+            [tooltip]="topProductsChart.tooltip"
+            [dataLabels]="topProductsChart.dataLabels"
+          >
+          </apx-chart>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Categories -->
+    <mat-card class="analytics-card">
+      <mat-card-header>
+        <mat-card-title> Most bought categories </mat-card-title>
+
+        <mat-card-subtitle>
+          Distribution of purchased items by category.
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="chart-container chart-container--medium">
+          <apx-chart
+            [series]="userCategoriesChart.series"
+            [chart]="userCategoriesChart.chart"
+            [colors]="userCategoriesChart.colors"
+            [labels]="userCategoriesChart.labels"
+            [legend]="userCategoriesChart.legend"
+            [dataLabels]="userCategoriesChart.dataLabels"
+            [plotOptions]="userCategoriesChart.plotOptions"
+            [tooltip]="userCategoriesChart.tooltip"
+            [responsive]="userCategoriesChart.responsive"
+          >
+          </apx-chart>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+}
+
+@if (sellerAnalytics) {
+  <h2>Sales Analytics</h2>
+
+  <!-- Revenue -->
+  <mat-card class="analytics-card analytics-card--wide">
+    <mat-card-header>
+      <mat-card-title> Revenue over time </mat-card-title>
+
+      <mat-card-subtitle>
+        Seller revenue trend across the selected period.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="chart-container chart-container--large">
+        <apx-chart
+          [series]="sellerRevenueChart.series"
+          [chart]="sellerRevenueChart.chart"
+          [colors]="sellerRevenueChart.colors"
+          [stroke]="sellerRevenueChart.stroke"
+          [fill]="sellerRevenueChart.fill"
+          [xaxis]="sellerRevenueChart.xaxis"
+          [yaxis]="sellerRevenueChart.yaxis"
+          [grid]="sellerRevenueChart.grid"
+          [tooltip]="sellerRevenueChart.tooltip"
+          [dataLabels]="sellerRevenueChart.dataLabels"
+        >
+        </apx-chart>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Best selling -->
+  <mat-card class="analytics-card">
+    <mat-card-header>
+      <mat-card-title> Best selling products </mat-card-title>
+
+      <mat-card-subtitle>
+        Products ranked by sales and orders.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="chart-container">
+        <apx-chart
+          [series]="sellerBestProductsChart.series"
+          [chart]="sellerBestProductsChart.chart"
+          [colors]="sellerBestProductsChart.colors"
+          [plotOptions]="sellerBestProductsChart.plotOptions"
+          [xaxis]="sellerBestProductsChart.xaxis"
+          [yaxis]="sellerBestProductsChart.yaxis"
+          [grid]="sellerBestProductsChart.grid"
+          [tooltip]="sellerBestProductsChart.tooltip"
+          [dataLabels]="sellerBestProductsChart.dataLabels"
+        >
+        </apx-chart>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Units -->
+  <mat-card class="analytics-card">
+    <mat-card-header>
+      <mat-card-title> Units sold by product </mat-card-title>
+
+      <mat-card-subtitle>
+        Total quantity sold for each product.
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="chart-container">
+        <apx-chart
+          [series]="sellerUnitsChart.series"
+          [chart]="sellerUnitsChart.chart"
+          [colors]="sellerUnitsChart.colors"
+          [plotOptions]="sellerUnitsChart.plotOptions"
+          [xaxis]="sellerUnitsChart.xaxis"
+          [yaxis]="sellerUnitsChart.yaxis"
+          [grid]="sellerUnitsChart.grid"
+          [tooltip]="sellerUnitsChart.tooltip"
+          [dataLabels]="sellerUnitsChart.dataLabels"
+        >
+        </apx-chart>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}

@@ -1,5 +1,7 @@
 package com.buy01.audit.dto;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,11 +13,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BestSellingProductBar {
+public class BestSellingProductData {
 
     private String productId;
 
-    private Integer revenue;
+    private BigDecimal revenue;
 
     private Integer ordersCount;
 }

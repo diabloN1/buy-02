@@ -17,7 +17,7 @@ public class SellerAnalytics {
 
     private List<TimeSeriesPoint> revenueByDay;
 
-    private List<BestSellingProductBar> bestSellingProducts;
+    private List<BestSellingProductData> bestSellingProducts;
 
     private List<ProductOrCategoryCount> unitsSoldByProduct;
 }

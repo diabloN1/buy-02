@@ -37,6 +37,7 @@ import { UserAnalytics, SellerAnalytics } from "@core/models/analytics.model";
     LoadingSpinnerComponent,
     AnalyticsDisplayComponent,
     UserAvatarComponent,
+    AnalyticsDisplayComponent,
   ],
   template: `
     <div class="profile-page">

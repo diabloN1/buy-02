@@ -45,6 +45,13 @@ spring:
               filters:
                 - StripPrefix=1
 
+            - id: audit-service
+              uri: lb://AUDIT-SERVICE
+              predicates:
+                - Path=/api/analytics/**
+              filters:
+                - StripPrefix=1
+
             - id: order-service
               uri: lb://ORDER-SERVICE
               predicates:

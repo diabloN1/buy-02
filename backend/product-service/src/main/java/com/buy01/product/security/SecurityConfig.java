@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
@@ -45,16 +46,20 @@ public class SecurityConfig {
                 .authenticationEntryPoint((req, res, authEx) -> {
                     res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     res.setContentType("application/json");
-                    res.getWriter().write("""
-                                {"code":"UNAUTHORIZED","message":"Token expired or invalid","details":null,"timestamp":"%s"}
-                            """.formatted(java.time.LocalDateTime.now()));
+                    res.getWriter()
+                            .write("""
+                                        {"code":"UNAUTHORIZED","message":"Token expired or invalid","details":null,"timestamp":"%s"}
+                                    """
+                                    .formatted(java.time.LocalDateTime.now()));
                 })
                 .accessDeniedHandler((req, res, accessDeniedEx) -> {
                     res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     res.setContentType("application/json");
-                    res.getWriter().write("""
-                                {"code":"FORBIDDEN","message":"You do not have permission to access this resource","details":null,"timestamp":"%s"}
-                            """.formatted(java.time.LocalDateTime.now()));
+                    res.getWriter()
+                            .write("""
+                                        {"code":"FORBIDDEN","message":"You do not have permission to access this resource","details":null,"timestamp":"%s"}
+                                    """
+                                    .formatted(java.time.LocalDateTime.now()));
                 }));
         return http.build();
     }

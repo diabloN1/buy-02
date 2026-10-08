@@ -87,6 +87,11 @@ $dark-theme: mat.m2-define-dark-theme(
   --app-glass-bg: rgba(255, 255, 255, 0.85);
   --app-glass-border: rgba(228, 228, 231, 0.6);
   --app-backdrop-blur: blur(8px);
+
+  /* PhoneNumber */
+  --mat-filled-tel-form-background: #f8fafc;
+  --mat-filled-tel-form-focus-background: #f8fafc;
+  --mat-filled-tel-form-hover-background: #f8fafc;
 }
 
 .dark-theme {
@@ -135,6 +140,11 @@ $dark-theme: mat.m2-define-dark-theme(
   /* Glassmorphism */
   --app-glass-bg: rgba(9, 9, 11, 0.85);
   --app-glass-border: rgba(39, 39, 42, 0.8);
+  /* PhoneNumber */
+  --mat-filled-tel-form-background: var(--app-bg);
+  --mat-filled-tel-form-focus-background: var(--app-bg);
+  --mat-filled-tel-form-hover-background: var(--app-bg);
+  // --mat-filled-tel-form-focus-border-color: var(--app-bg);
 
   @include mat.all-component-colors($dark-theme);
 }

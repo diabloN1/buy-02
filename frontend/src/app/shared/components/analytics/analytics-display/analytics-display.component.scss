@@ -1,0 +1,160 @@
+.analytics-card {
+  margin-bottom: 24px;
+  overflow: hidden;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius);
+  box-shadow: var(--app-shadow-sm);
+}
+
+.analytics-card mat-card-header {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.analytics-card mat-card-title {
+  color: var(--app-fg-heading);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.analytics-card mat-card-subtitle {
+  margin-top: 4px;
+  color: var(--app-muted);
+  font-size: 13px;
+}
+
+.chart-container {
+  width: 100%;
+  min-height: 320px;
+}
+
+.chart-container--large {
+  height: 360px;
+}
+
+.chart-container--medium {
+  height: 320px;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+h2 {
+  margin: 0 0 24px;
+  color: var(--app-fg-heading);
+}
+
+.muted {
+  color: var(--app-muted);
+}
+
+/* ApexCharts toolbar */
+:host ::ng-deep .apexcharts-toolbar {
+  gap: 2px;
+}
+
+:host ::ng-deep .apexcharts-toolbar button,
+:host ::ng-deep .apexcharts-toolbar > div {
+  color: var(--app-muted);
+}
+
+:host ::ng-deep .apexcharts-toolbar button:hover,
+:host ::ng-deep .apexcharts-toolbar > div:hover {
+  color: var(--app-primary);
+}
+
+:host ::ng-deep .apexcharts-menu {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow-lg);
+}
+
+:host ::ng-deep .apexcharts-menu-item {
+  color: var(--app-fg);
+}
+
+:host ::ng-deep .apexcharts-menu-item:hover {
+  background: var(--app-surface-hover);
+}
+
+/* Custom 1M / 6M / 1Y / ALL buttons */
+:host ::ng-deep .apex-range-button-wrapper {
+  width: auto;
+  min-width: 30px;
+  height: 28px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+:host ::ng-deep .apex-range-button {
+  color: var(--app-muted);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+:host ::ng-deep .apex-range-button-wrapper:hover .apex-range-button {
+  color: var(--app-primary);
+}
+
+/* Chart text */
+:host ::ng-deep .apexcharts-text {
+  fill: var(--app-muted);
+}
+
+:host ::ng-deep .apexcharts-title-text {
+  fill: var(--app-fg-heading);
+}
+
+:host ::ng-deep .apexcharts-legend-text {
+  color: var(--app-fg) !important;
+}
+
+/* Tooltip */
+:host ::ng-deep .apexcharts-tooltip {
+  background: var(--app-surface-elevated) !important;
+  border: 1px solid var(--app-border) !important;
+  box-shadow: var(--app-shadow-lg);
+  color: var(--app-fg);
+}
+
+:host ::ng-deep .apexcharts-tooltip-title {
+  background: var(--app-surface-hover) !important;
+  border-bottom: 1px solid var(--app-border) !important;
+  color: var(--app-fg);
+}
+
+/* Grid */
+:host ::ng-deep .apexcharts-gridline {
+  stroke: var(--app-border);
+}
+
+/* Donut center text */
+:host ::ng-deep .apexcharts-datalabel-label,
+:host ::ng-deep .apexcharts-datalabel-value {
+  fill: var(--app-fg) !important;
+}
+
+@media (max-width: 900px) {
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .chart-container--large {
+    height: 300px;
+  }
+
+  .chart-container {
+    min-height: 280px;
+  }
+}

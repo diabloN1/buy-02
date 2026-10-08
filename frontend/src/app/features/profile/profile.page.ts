@@ -17,6 +17,9 @@ import { LoadingSpinnerComponent } from "@shared/components/loading-spinner.comp
 import { MediaService } from "@core/services/media.service";
 import { CurrentUserService } from "@core/services/current-user.service";
 import { applyFormErrors } from "@shared/utils/form-error.util";
+import { AnalyticsService } from "@core/services/analytics.service";
+import { AnalyticsDisplayComponent } from "@shared/components/analytics/analytics-display/analytics-display.component";
+import { UserAnalytics, SellerAnalytics } from "@core/models/analytics.model";
 
 @Component({
   selector: "app-profile",
@@ -31,6 +34,7 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
     MatIconModule,
     FieldErrorComponent,
     LoadingSpinnerComponent,
+    AnalyticsDisplayComponent,
   ],
   template: `
     <div class="profile-page">
@@ -43,7 +47,9 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
                 <img [src]="avatarUrl()!" alt="Profile Avatar" />
               } @else {
                 <div class="avatar-fallback">
-                  {{ (form.controls.name.value || 'U').charAt(0).toUpperCase() }}
+                  {{
+                    (form.controls.name.value || "U").charAt(0).toUpperCase()
+                  }}
                 </div>
               }
             </div>
@@ -51,9 +57,11 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
             <div class="identity-text">
               <div class="role-pill">
                 <mat-icon>shield</mat-icon>
-                <span>{{ currentUser.user()?.role || 'User Account' }}</span>
+                <span>{{ currentUser.user()?.role || "User Account" }}</span>
               </div>
-              <h1 class="user-display-name">{{ form.controls.name.value || 'Account User' }}</h1>
+              <h1 class="user-display-name">
+                {{ form.controls.name.value || "Account User" }}
+              </h1>
               <p class="user-display-email">{{ form.controls.email.value }}</p>
             </div>
           </div>
@@ -79,7 +87,11 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
                     <img [src]="avatarUrl()!" alt="Avatar Preview" />
                   } @else {
                     <div class="avatar-fallback-lg">
-                      {{ (form.controls.name.value || 'U').charAt(0).toUpperCase() }}
+                      {{
+                        (form.controls.name.value || "U")
+                          .charAt(0)
+                          .toUpperCase()
+                      }}
                     </div>
                   }
                 </div>
@@ -99,7 +111,9 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
                     [disabled]="uploading()"
                   >
                     <mat-icon>cloud_upload</mat-icon>
-                    <span>{{ uploading() ? "Uploading…" : "Upload new photo" }}</span>
+                    <span>{{
+                      uploading() ? "Uploading…" : "Upload new photo"
+                    }}</span>
                   </button>
 
                   @if (avatarUrl()) {
@@ -124,7 +138,9 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
               <div class="account-summary-list">
                 <div class="summary-item">
                   <span class="summary-label">Account Type</span>
-                  <span class="summary-val">{{ currentUser.user()?.role || 'Standard' }}</span>
+                  <span class="summary-val">{{
+                    currentUser.user()?.role || "Standard"
+                  }}</span>
                 </div>
                 <div class="summary-item">
                   <span class="summary-label">Status</span>
@@ -139,7 +155,9 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
             <main class="app-card main-form-card">
               <div class="card-header">
                 <h2>Personal Details</h2>
-                <p class="muted">Update your display name and registered email address.</p>
+                <p class="muted">
+                  Update your display name and registered email address.
+                </p>
               </div>
 
               <form [formGroup]="form" (ngSubmit)="save()" class="form-stack">
@@ -147,7 +165,11 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
                   <label class="input-label">Full Name</label>
                   <mat-form-field appearance="outline" class="w-full">
                     <mat-icon matPrefix>person</mat-icon>
-                    <input matInput formControlName="name" placeholder="John Doe" />
+                    <input
+                      matInput
+                      formControlName="name"
+                      placeholder="John Doe"
+                    />
                   </mat-form-field>
                   <app-field-error [control]="form.controls.name" />
                 </div>
@@ -175,7 +197,9 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
                     [disabled]="form.invalid || saving()"
                   >
                     <mat-icon>check</mat-icon>
-                    <span>{{ saving() ? "Saving Changes…" : "Save Changes" }}</span>
+                    <span>{{
+                      saving() ? "Saving Changes…" : "Save Changes"
+                    }}</span>
                   </button>
                 </div>
               </form>
@@ -183,6 +207,31 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
           </div>
         }
       </div>
+
+      <!-- Analytics Toggle -->
+      @if (!showAnalytics()) {
+        <div class="analytics-toggle">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="loadAnalytics()"
+          >
+            <mat-icon>bar_chart</mat-icon>
+            <span>Show Analytics</span>
+          </button>
+        </div>
+      } @else {
+        @if (analyticsData()) {
+          <div class="container">
+            <app-analytics-display
+              [userAnalytics]="userAnalytics()"
+              [sellerAnalytics]="sellerAnalytics()"
+            />
+          </div>
+        } @else {
+          <app-loading-spinner label="Loading analytics…" />
+        }
+      }
     </div>
   `,
   styles: [
@@ -445,6 +494,21 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
           grid-template-columns: 1fr;
         }
       }
+
+      .analytics-toggle {
+        padding: 20px 0;
+        text-align: center;
+        border-bottom: 1px solid var(--app-border);
+      }
+      .analytics-toggle .btn {
+        background: var(--app-primary-lighter);
+        color: var(--app-primary) !important;
+        border: 1px solid var(--app-border);
+      }
+      .analytics-toggle .btn:hover {
+        background: var(--app-primary);
+        color: #ffffff !important;
+      }
     `,
   ],
 })
@@ -453,6 +517,7 @@ export class ProfilePage {
   private readonly profile = inject(ProfileService);
   private readonly notify = inject(NotificationService);
   private readonly media = inject(MediaService);
+  private readonly analytics = inject(AnalyticsService);
   readonly currentUser = inject(CurrentUserService);
 
   readonly loading = signal(true);
@@ -460,6 +525,11 @@ export class ProfilePage {
   readonly uploading = signal(false);
   readonly avatarId = signal<string | undefined>(undefined);
   readonly avatarUrl = signal<string | undefined>(undefined);
+  readonly showAnalytics = signal(false);
+  readonly analyticsData = signal<{
+    user?: UserAnalytics;
+    seller?: SellerAnalytics;
+  } | null>(null);
 
   readonly form = this.fb.nonNullable.group({
     name: ["", [Validators.required, Validators.maxLength(25)]],
@@ -478,6 +548,46 @@ export class ProfilePage {
       error: () => this.loading.set(false),
     });
   }
+
+  loadAnalytics(): void {
+    const role = this.currentUser.user()?.role;
+    this.showAnalytics.set(true);
+    if (role === "SELLER") {
+      this.analytics.getSellerAnalytics().subscribe({
+        next: (data) => {
+          this.analyticsData.update((old) => {
+            return { ...old, seller: data };
+          });
+        },
+        error: (err) => {
+          this.notify.error(
+            err.error?.message || "Failed to load seller analytics",
+          );
+        },
+      });
+    }
+    this.analytics.getUserAnalytics().subscribe({
+      next: (data) => {
+        this.analyticsData.update((old) => {
+          return { ...old, user: data };
+        });
+      },
+      error: (err) => {
+        this.notify.error(
+          err.error?.message || "Failed to load user analytics",
+        );
+      },
+    });
+  }
+
+  // Helper getters for type narrowing
+  readonly userAnalytics = (): UserAnalytics | null => {
+    return this.analyticsData()?.user ?? null;
+  };
+
+  readonly sellerAnalytics = (): SellerAnalytics | null => {
+    return this.analyticsData()?.seller ?? null;
+  };
 
   uploadAvatar(input: HTMLInputElement) {
     const file = input.files?.[0];

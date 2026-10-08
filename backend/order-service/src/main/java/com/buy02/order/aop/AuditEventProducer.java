@@ -1,8 +1,8 @@
 package com.buy02.order.aop;
 
-import com.buy02.order.event.AuditEvent;
-import com.buy02.order.event.CancelAuditEvent;
-import com.buy02.order.event.SaleAuditEvent;
+import com.buy02.order.event.audit.AuditEvent;
+import com.buy02.order.event.sales.CancelAuditEvent;
+import com.buy02.order.event.sales.SaleAuditEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

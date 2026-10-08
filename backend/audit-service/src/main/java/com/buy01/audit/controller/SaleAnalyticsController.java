@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.buy01.audit.dto.SellerAnalytics;
 import com.buy01.audit.dto.UserAnalytics;
-import com.buy01.audit.service.SaleAnalyticsService;
+import com.buy01.audit.service.SaleAnalyticsServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SaleAnalyticsController {
 
-        private final SaleAnalyticsService saleAnalyticsService;
+        private final SaleAnalyticsServiceImpl saleAnalyticsService;
 
         @GetMapping("/user")
         @PreAuthorize("isAuthenticated()")

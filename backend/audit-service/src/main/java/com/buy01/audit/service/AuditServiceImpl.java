@@ -127,11 +127,13 @@ public class AuditServiceImpl {
             }
 
             case CancelAuditEvent cancel -> {
-                saleRepo.findBySubOrderId(cancel.subOrderId()).ifPresent(existingSale -> {
-                    existingSale.setCanceled(true);
-                    existingSale.setUpdatedAt(Instant.now());
-                    saleRepo.save(existingSale);
-                });
+                var sales = saleRepo.findBySubOrderId(cancel.subOrderId()).stream().map(sale -> {
+                    sale.setCanceled(true);
+                    sale.setUpdatedAt(Instant.now());
+                    return sale;
+                }).toList();
+
+                saleRepo.saveAll(sales);
             }
         }
     }

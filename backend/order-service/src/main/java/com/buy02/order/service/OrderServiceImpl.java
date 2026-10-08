@@ -350,6 +350,7 @@ public class OrderServiceImpl implements OrderService {
                                                 .forEach((item) -> {
                                                         eventProducer.send(CancelAuditEvent.builder()
                                                                         .subOrderId(sub.getId())
+                                                                        .canceled(true)
                                                                         .build());
 
                                                 }));

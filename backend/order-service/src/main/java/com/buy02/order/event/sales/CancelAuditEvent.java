@@ -4,7 +4,6 @@ import lombok.Builder;
 
 @Builder
 public record CancelAuditEvent(
-        String subOrderId
-
-) {
+                String subOrderId,
+                boolean canceled) {
 }

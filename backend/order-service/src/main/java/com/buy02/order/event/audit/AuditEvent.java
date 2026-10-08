@@ -1,4 +1,4 @@
-package com.buy02.order.event;
+package com.buy02.order.event.audit;
 
 import java.time.Instant;
 

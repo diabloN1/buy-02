@@ -1,6 +1,7 @@
 package com.buy02.order.service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.buy02.order.aop.AuditEventProducer;
 import com.buy02.order.aop.Auditable;
 import com.buy02.order.client.CartClient;
 import com.buy02.order.client.ProductClient;
@@ -24,7 +26,9 @@ import com.buy02.order.dto.ProductResponse;
 import com.buy02.order.entity.Order;
 import com.buy02.order.entity.Order.OrderStatus;
 import com.buy02.order.entity.SubOrder;
-import com.buy02.order.event.AuditAction;
+import com.buy02.order.event.audit.AuditAction;
+import com.buy02.order.event.sales.CancelAuditEvent;
+import com.buy02.order.event.sales.SaleAuditEvent;
 import com.buy02.order.exception.custom.BadRequestException;
 import com.buy02.order.exception.custom.ForbiddenException;
 import com.buy02.order.exception.custom.NotFoundException;
@@ -42,6 +46,7 @@ public class OrderServiceImpl implements OrderService {
         private final CartClient cartClient;
         private final ProductClient productClient;
         private final OrderMapper orderMapper;
+        private final AuditEventProducer eventProducer;
 
         private static final List<OrderStatus> STATUS_FLOW = List.of(
                         OrderStatus.PENDING,
@@ -93,6 +98,7 @@ public class OrderServiceImpl implements OrderService {
 
                 List<SubOrder> savedSubOrders = subOrderRepository.saveAll(subOrders);
 
+                produceSaleEvent(savedSubOrders, userId);
                 cartClient.clearCart();
 
                 OrderResponse response = orderMapper.toResponse(savedOrder);
@@ -191,6 +197,8 @@ public class OrderServiceImpl implements OrderService {
                                 .toList();
 
                 subOrderRepository.saveAll(canceledSubOrders);
+
+                produceCancelationEvent(canceledSubOrders);
         };
 
         @Override
@@ -218,6 +226,8 @@ public class OrderServiceImpl implements OrderService {
                                 .peek(sub -> sub.setOrderId(savedOrder.getId()))
                                 .toList();
                 subOrderRepository.saveAll(newSubOrders);
+
+                produceSaleEvent(newSubOrders, userId);
         }
 
         @Override
@@ -314,6 +324,35 @@ public class OrderServiceImpl implements OrderService {
                 }
 
                 return subOrders;
+        }
+
+        private void produceSaleEvent(List<SubOrder> suborders, String buyerId) {
+                suborders.stream()
+                                .forEach((sub) -> sub.getItems()
+                                                .forEach((item) -> {
+                                                        eventProducer.send(SaleAuditEvent.builder()
+                                                                        .buyerId(buyerId)
+                                                                        .sellerId(sub.getSellerId())
+                                                                        .subOrderId(sub.getId())
+                                                                        .productId(item.getProductId())
+                                                                        .category("CATEGORIE")
+                                                                        .itemPrice(item.getPrice())
+                                                                        .quantity(item.getQuantity())
+                                                                        .timestamp(Instant.now())
+                                                                        .build());
+
+                                                }));
+        }
+
+        private void produceCancelationEvent(List<SubOrder> subOrders) {
+                subOrders.stream()
+                                .forEach((sub) -> sub.getItems()
+                                                .forEach((item) -> {
+                                                        eventProducer.send(CancelAuditEvent.builder()
+                                                                        .subOrderId(sub.getId())
+                                                                        .build());
+
+                                                }));
         }
 
         private OrderStatus resolveOrderStatus(List<SubOrder> subOrders) {

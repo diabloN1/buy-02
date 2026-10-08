@@ -1,8 +1,11 @@
-package com.buy02.order.event;
+package com.buy02.order.event.sales;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
+import lombok.Builder;
+
+@Builder
 public record SaleAuditEvent(
 
         String buyerId,
@@ -16,5 +19,6 @@ public record SaleAuditEvent(
         Integer quantity,
 
         Instant timestamp
-    ) {
+
+) {
 }

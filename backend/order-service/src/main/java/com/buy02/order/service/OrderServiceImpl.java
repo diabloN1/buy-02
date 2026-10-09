@@ -100,7 +100,6 @@ public class OrderServiceImpl implements OrderService {
                 List<SubOrder> savedSubOrders = subOrderRepository.saveAll(subOrders);
 
                 produceSaleEvent(savedSubOrders, userId);
-                cartClient.clearCart();
 
                 OrderResponse response = orderMapper.toResponse(savedOrder);
 

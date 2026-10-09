@@ -1,7 +1,6 @@
 package com.buy01.product.event.audit;
 
 import java.time.Instant;
-
 import lombok.Builder;
 
 @Builder

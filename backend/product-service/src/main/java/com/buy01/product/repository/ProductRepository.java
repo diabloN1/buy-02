@@ -11,7 +11,9 @@ import com.buy01.product.entity.Product;
 
 public interface ProductRepository extends MongoRepository<Product, String>, ProductCustomRepository {
     Page<Product> findByUserId(String userId, Pageable pageable);
+
     List<Product> findByIdIn(Set<String> productIds);
 
     Page<Product> findByCategoryId(String categoryId, Pageable pageable);
+
 }

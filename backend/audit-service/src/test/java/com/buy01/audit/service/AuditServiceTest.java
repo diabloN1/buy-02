@@ -1,8 +1,6 @@
 package com.buy01.audit.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -11,6 +9,9 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -37,6 +38,7 @@ import com.buy01.audit.repository.SaleAuditRepo;
 import com.buy01.audit.repository.UserAuditRepo;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("AuditServiceImpl Unit Tests")
 class AuditServiceImplTest {
 
     @Mock
@@ -60,333 +62,357 @@ class AuditServiceImplTest {
     @InjectMocks
     private AuditServiceImpl auditService;
 
-    // --------------------------------------------------
-    // USER AUDIT
-    // --------------------------------------------------
+    private static final String EXECUTOR_ID = "executor-999";
+    private static final String BUYER_ID = "buyer-100";
+    private static final String SELLER_ID = "seller-200";
+    private static final String SUB_ORDER_ID = "suborder-300";
+    private static final String PRODUCT_ID_1 = "product-400";
+    private static final String PRODUCT_ID_2 = "product-500";
 
-    @Test
-    void consumeAudit_WhenTypeIsUser_ShouldSaveUserAudit() {
-        Instant now = Instant.now();
+    private Instant now;
 
-        AuditEvent event = new AuditEvent(
-                "user-100",
-                EntityType.USER,
-                AuditAction.CREATED,
-                "executor-999",
-                true,
-                now);
-
-        auditService.consumeAudit(event);
-
-        ArgumentCaptor<UserAudit> captor =
-                ArgumentCaptor.forClass(UserAudit.class);
-
-        verify(userRepo).save(captor.capture());
-
-        verifyNoInteractions(
-                productRepo,
-                mediaRepo,
-                cartRepo,
-                orderRepo,
-                saleRepo);
-
-        UserAudit savedAudit = captor.getValue();
-
-        assertEquals("user-100", savedAudit.getUserId());
-        assertEquals("executor-999", savedAudit.getExecutorId());
-        assertEquals(AuditAction.CREATED, savedAudit.getAction());
-        assertTrue(savedAudit.isAdmin());
-        assertEquals(now, savedAudit.getTimestamp());
+    @BeforeEach
+    void setUp() {
+        now = Instant.now();
     }
 
-    // --------------------------------------------------
-    // PRODUCT AUDIT
-    // --------------------------------------------------
+    @Nested
+    @DisplayName("consumeAudit()")
+    class ConsumeAudit {
 
-    @Test
-    void consumeAudit_WhenTypeIsProduct_ShouldSaveProductAudit() {
-        Instant now = Instant.now();
+        @Nested
+        @DisplayName("USER")
+        class UserAuditTests {
 
-        AuditEvent event = new AuditEvent(
-                "prod-200",
-                EntityType.PRODUCT,
-                AuditAction.MODIFIED,
-                "executor-888",
-                false,
-                now);
+            @Test
+            @DisplayName("Should save user audit")
+            void shouldSaveUserAudit() {
+                // given
+                AuditEvent event = new AuditEvent(
+                        "user-100",
+                        EntityType.USER,
+                        AuditAction.CREATED,
+                        EXECUTOR_ID,
+                        true,
+                        now);
 
-        auditService.consumeAudit(event);
+                // when
+                auditService.consumeAudit(event);
 
-        ArgumentCaptor<ProductAudit> captor =
-                ArgumentCaptor.forClass(ProductAudit.class);
+                // then
+                ArgumentCaptor<UserAudit> captor =
+                        ArgumentCaptor.forClass(UserAudit.class);
 
-        verify(productRepo).save(captor.capture());
+                verify(userRepo).save(captor.capture());
 
-        verifyNoInteractions(
-                userRepo,
-                mediaRepo,
-                cartRepo,
-                orderRepo,
-                saleRepo);
+                verifyNoInteractions(
+                        productRepo, mediaRepo, cartRepo, orderRepo, saleRepo);
 
-        ProductAudit savedAudit = captor.getValue();
+                UserAudit savedAudit = captor.getValue();
 
-        assertEquals("prod-200", savedAudit.getProductId());
-        assertEquals("executor-888", savedAudit.getExecutorId());
-        assertEquals(AuditAction.MODIFIED, savedAudit.getAction());
-        assertEquals(now, savedAudit.getTimestamp());
-    }
-
-    // --------------------------------------------------
-    // MEDIA AUDIT
-    // --------------------------------------------------
-
-    @Test
-    void consumeAudit_WhenTypeIsMedia_ShouldSaveMediaAudit() {
-        Instant now = Instant.now();
-
-        AuditEvent event = new AuditEvent(
-                "media-300",
-                EntityType.MEDIA,
-                AuditAction.DELETED,
-                "executor-777",
-                true,
-                now);
-
-        auditService.consumeAudit(event);
-
-        ArgumentCaptor<MediaAudit> captor =
-                ArgumentCaptor.forClass(MediaAudit.class);
-
-        verify(mediaRepo).save(captor.capture());
-
-        verifyNoInteractions(
-                userRepo,
-                productRepo,
-                cartRepo,
-                orderRepo,
-                saleRepo);
-
-        MediaAudit savedAudit = captor.getValue();
-
-        assertEquals("media-300", savedAudit.getMediaId());
-        assertEquals("executor-777", savedAudit.getExecutorId());
-        assertEquals(AuditAction.DELETED, savedAudit.getAction());
-        assertTrue(savedAudit.isAdmin());
-        assertEquals(now, savedAudit.getTimestamp());
-    }
-
-    // --------------------------------------------------
-    // CART AUDIT
-    // --------------------------------------------------
-
-    @Test
-    void consumeAudit_WhenTypeIsCart_ShouldSaveCartAudit() {
-        Instant now = Instant.now();
-
-        AuditEvent event = new AuditEvent(
-                "cart-400",
-                EntityType.CART,
-                AuditAction.CREATED,
-                "executor-666",
-                true,
-                now);
-
-        auditService.consumeAudit(event);
-
-        ArgumentCaptor<CartAudit> captor =
-                ArgumentCaptor.forClass(CartAudit.class);
-
-        verify(cartRepo).save(captor.capture());
-
-        verifyNoInteractions(
-                userRepo,
-                productRepo,
-                mediaRepo,
-                orderRepo,
-                saleRepo);
-
-        CartAudit savedAudit = captor.getValue();
-
-        assertEquals("cart-400", savedAudit.getCartId());
-        assertEquals("executor-666", savedAudit.getExecutorId());
-        assertEquals(AuditAction.CREATED, savedAudit.getAction());
-        assertTrue(savedAudit.isAdmin());
-        assertEquals(now, savedAudit.getTimestamp());
-    }
-
-    // --------------------------------------------------
-    // ORDER AUDIT
-    // --------------------------------------------------
-
-    @Test
-    void consumeAudit_WhenTypeIsOrder_ShouldSaveOrderAudit() {
-        Instant now = Instant.now();
-
-        AuditEvent event = new AuditEvent(
-                "order-500",
-                EntityType.ORDER,
-                AuditAction.MODIFIED,
-                "executor-555",
-                false,
-                now);
-
-        auditService.consumeAudit(event);
-
-        ArgumentCaptor<OrderAudit> captor =
-                ArgumentCaptor.forClass(OrderAudit.class);
-
-        verify(orderRepo).save(captor.capture());
-
-        verifyNoInteractions(
-                userRepo,
-                productRepo,
-                mediaRepo,
-                cartRepo,
-                saleRepo);
-
-        OrderAudit savedAudit = captor.getValue();
-
-        assertEquals("order-500", savedAudit.getOrderId());
-        assertEquals("executor-555", savedAudit.getExecutorId());
-        assertEquals(AuditAction.MODIFIED, savedAudit.getAction());
-        assertEquals(now, savedAudit.getTimestamp());
-    }
-
-    // --------------------------------------------------
-    // SALE AUDIT
-    // --------------------------------------------------
-
-    @Test
-    void consumeSale_WhenEventIsSale_ShouldSaveSaleAudit() {
-        Instant now = Instant.now();
-        BigDecimal itemPrice = new BigDecimal("199.99");
-
-        SaleAuditEvent event = new SaleAuditEvent(
-                "buyer-100",
-                "seller-200",
-                "suborder-300",
-                "product-400",
-                "ELECTRONICS",
-                itemPrice,
-                2,
-                now);
-
-        auditService.consumeSale(event);
-
-        ArgumentCaptor<SaleAudit> captor =
-                ArgumentCaptor.forClass(SaleAudit.class);
-
-        verify(saleRepo).save(captor.capture());
-
-        verifyNoInteractions(
-                userRepo,
-                productRepo,
-                mediaRepo,
-                cartRepo,
-                orderRepo);
-
-        SaleAudit savedAudit = captor.getValue();
-
-        assertEquals("buyer-100", savedAudit.getBuyerId());
-        assertEquals("seller-200", savedAudit.getSellerId());
-        assertEquals("suborder-300", savedAudit.getSubOrderId());
-        assertEquals("product-400", savedAudit.getProductId());
-        assertEquals("ELECTRONICS", savedAudit.getCategory());
-        assertEquals(itemPrice, savedAudit.getItemPrice());
-        assertEquals(2, savedAudit.getQuantity());
-        assertEquals(now, savedAudit.getCreatedAt());
-    }
-
-    // --------------------------------------------------
-    // SALE CANCELLATION
-    // --------------------------------------------------
-
-    @Test
-    void consumeSale_WhenEventIsCancellation_ShouldMarkSalesAsCanceled() {
-        Instant now = Instant.now();
-
-        SaleAudit sale1 = SaleAudit.builder()
-                .buyerId("buyer-100")
-                .sellerId("seller-200")
-                .subOrderId("suborder-300")
-                .productId("product-400")
-                .category("ELECTRONICS")
-                .itemPrice(new BigDecimal("199.99"))
-                .quantity(2)
-                .createdAt(now)
-                .build();
-
-        SaleAudit sale2 = SaleAudit.builder()
-                .buyerId("buyer-100")
-                .sellerId("seller-200")
-                .subOrderId("suborder-300")
-                .productId("product-500")
-                .category("ACCESSORIES")
-                .itemPrice(new BigDecimal("49.99"))
-                .quantity(1)
-                .createdAt(now)
-                .build();
-
-        when(saleRepo.findBySubOrderId("suborder-300"))
-                .thenReturn(List.of(sale1, sale2));
-
-        CancelAuditEvent event =
-                new CancelAuditEvent("suborder-300", true);
-
-        auditService.consumeSale(event);
-
-        verify(saleRepo).findBySubOrderId("suborder-300");
-
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<SaleAudit>> captor =
-                (ArgumentCaptor<List<SaleAudit>>) (ArgumentCaptor<?>)
-                        ArgumentCaptor.forClass(List.class);
-
-        verify(saleRepo).saveAll(captor.capture());
-
-        List<SaleAudit> savedSales = captor.getValue();
-
-        assertEquals(2, savedSales.size());
-
-        for (SaleAudit sale : savedSales) {
-            assertTrue(sale.isCanceled());
-            assertNotNull(sale.getUpdatedAt());
+                assertThat(savedAudit.getUserId()).isEqualTo("user-100");
+                assertThat(savedAudit.getExecutorId()).isEqualTo(EXECUTOR_ID);
+                assertThat(savedAudit.getAction()).isEqualTo(AuditAction.CREATED);
+                assertThat(savedAudit.isAdmin()).isTrue();
+                assertThat(savedAudit.getTimestamp()).isEqualTo(now);
+            }
         }
 
-        assertEquals("product-400", savedSales.get(0).getProductId());
-        assertEquals("product-500", savedSales.get(1).getProductId());
+        @Nested
+        @DisplayName("PRODUCT")
+        class ProductAuditTests {
 
-        verifyNoInteractions(
-                userRepo,
-                productRepo,
-                mediaRepo,
-                cartRepo,
-                orderRepo);
+            @Test
+            @DisplayName("Should save product audit")
+            void shouldSaveProductAudit() {
+                // given
+                AuditEvent event = new AuditEvent(
+                        "prod-200",
+                        EntityType.PRODUCT,
+                        AuditAction.MODIFIED,
+                        EXECUTOR_ID,
+                        false,
+                        now);
+
+                // when
+                auditService.consumeAudit(event);
+
+                // then
+                ArgumentCaptor<ProductAudit> captor =
+                        ArgumentCaptor.forClass(ProductAudit.class);
+
+                verify(productRepo).save(captor.capture());
+
+                verifyNoInteractions(
+                        userRepo, mediaRepo, cartRepo, orderRepo, saleRepo);
+
+                ProductAudit savedAudit = captor.getValue();
+
+                assertThat(savedAudit.getProductId()).isEqualTo("prod-200");
+                assertThat(savedAudit.getExecutorId()).isEqualTo(EXECUTOR_ID);
+                assertThat(savedAudit.getAction()).isEqualTo(AuditAction.MODIFIED);
+                assertThat(savedAudit.isAdmin()).isFalse();
+                assertThat(savedAudit.getTimestamp()).isEqualTo(now);
+            }
+        }
+
+        @Nested
+        @DisplayName("MEDIA")
+        class MediaAuditTests {
+
+            @Test
+            @DisplayName("Should save media audit")
+            void shouldSaveMediaAudit() {
+                // given
+                AuditEvent event = new AuditEvent(
+                        "media-300",
+                        EntityType.MEDIA,
+                        AuditAction.DELETED,
+                        EXECUTOR_ID,
+                        true,
+                        now);
+
+                // when
+                auditService.consumeAudit(event);
+
+                // then
+                ArgumentCaptor<MediaAudit> captor =
+                        ArgumentCaptor.forClass(MediaAudit.class);
+
+                verify(mediaRepo).save(captor.capture());
+
+                verifyNoInteractions(
+                        userRepo, productRepo, cartRepo, orderRepo, saleRepo);
+
+                MediaAudit savedAudit = captor.getValue();
+
+                assertThat(savedAudit.getMediaId()).isEqualTo("media-300");
+                assertThat(savedAudit.getExecutorId()).isEqualTo(EXECUTOR_ID);
+                assertThat(savedAudit.getAction()).isEqualTo(AuditAction.DELETED);
+                assertThat(savedAudit.isAdmin()).isTrue();
+                assertThat(savedAudit.getTimestamp()).isEqualTo(now);
+            }
+        }
+
+        @Nested
+        @DisplayName("CART")
+        class CartAuditTests {
+
+            @Test
+            @DisplayName("Should save cart audit")
+            void shouldSaveCartAudit() {
+                // given
+                AuditEvent event = new AuditEvent(
+                        "cart-400",
+                        EntityType.CART,
+                        AuditAction.CREATED,
+                        EXECUTOR_ID,
+                        true,
+                        now);
+
+                // when
+                auditService.consumeAudit(event);
+
+                // then
+                ArgumentCaptor<CartAudit> captor =
+                        ArgumentCaptor.forClass(CartAudit.class);
+
+                verify(cartRepo).save(captor.capture());
+
+                verifyNoInteractions(
+                        userRepo, productRepo, mediaRepo, orderRepo, saleRepo);
+
+                CartAudit savedAudit = captor.getValue();
+
+                assertThat(savedAudit.getCartId()).isEqualTo("cart-400");
+                assertThat(savedAudit.getExecutorId()).isEqualTo(EXECUTOR_ID);
+                assertThat(savedAudit.getAction()).isEqualTo(AuditAction.CREATED);
+                assertThat(savedAudit.isAdmin()).isTrue();
+                assertThat(savedAudit.getTimestamp()).isEqualTo(now);
+            }
+        }
+
+        @Nested
+        @DisplayName("ORDER")
+        class OrderAuditTests {
+
+            @Test
+            @DisplayName("Should save order audit")
+            void shouldSaveOrderAudit() {
+                // given
+                AuditEvent event = new AuditEvent(
+                        "order-500",
+                        EntityType.ORDER,
+                        AuditAction.MODIFIED,
+                        EXECUTOR_ID,
+                        false,
+                        now);
+
+                // when
+                auditService.consumeAudit(event);
+
+                // then
+                ArgumentCaptor<OrderAudit> captor =
+                        ArgumentCaptor.forClass(OrderAudit.class);
+
+                verify(orderRepo).save(captor.capture());
+
+                verifyNoInteractions(
+                        userRepo, productRepo, mediaRepo, cartRepo, saleRepo);
+
+                OrderAudit savedAudit = captor.getValue();
+
+                assertThat(savedAudit.getOrderId()).isEqualTo("order-500");
+                assertThat(savedAudit.getExecutorId()).isEqualTo(EXECUTOR_ID);
+                assertThat(savedAudit.getAction()).isEqualTo(AuditAction.MODIFIED);
+                assertThat(savedAudit.isAdmin()).isFalse();
+                assertThat(savedAudit.getTimestamp()).isEqualTo(now);
+            }
+        }
     }
 
-    // --------------------------------------------------
-    // CANCELLATION WITHOUT MATCHING SALES
-    // --------------------------------------------------
+    @Nested
+    @DisplayName("consumeSale()")
+    class ConsumeSale {
 
-    @Test
-    void consumeSale_WhenCancellationHasNoSales_ShouldSaveEmptyList() {
-        when(saleRepo.findBySubOrderId("suborder-999"))
-                .thenReturn(List.of());
+        @Nested
+        @DisplayName("SaleAuditEvent")
+        class SaleAuditTests {
 
-        CancelAuditEvent event =
-                new CancelAuditEvent("suborder-999", true);
+            @Test
+            @DisplayName("Should save sale audit")
+            void shouldSaveSaleAudit() {
+                // given
+                BigDecimal itemPrice = new BigDecimal("199.99");
 
-        auditService.consumeSale(event);
+                SaleAuditEvent event = new SaleAuditEvent(
+                        BUYER_ID,
+                        SELLER_ID,
+                        SUB_ORDER_ID,
+                        PRODUCT_ID_1,
+                        "ELECTRONICS",
+                        itemPrice,
+                        2,
+                        now);
 
-        verify(saleRepo).findBySubOrderId("suborder-999");
-        verify(saleRepo).saveAll(List.of());
+                // when
+                auditService.consumeSale(event);
 
-        verifyNoInteractions(
-                userRepo,
-                productRepo,
-                mediaRepo,
-                cartRepo,
-                orderRepo);
+                // then
+                ArgumentCaptor<SaleAudit> captor =
+                        ArgumentCaptor.forClass(SaleAudit.class);
+
+                verify(saleRepo).save(captor.capture());
+
+                verifyNoInteractions(
+                        userRepo, productRepo, mediaRepo, cartRepo, orderRepo);
+
+                SaleAudit savedAudit = captor.getValue();
+
+                assertThat(savedAudit.getBuyerId()).isEqualTo(BUYER_ID);
+                assertThat(savedAudit.getSellerId()).isEqualTo(SELLER_ID);
+                assertThat(savedAudit.getSubOrderId()).isEqualTo(SUB_ORDER_ID);
+                assertThat(savedAudit.getProductId()).isEqualTo(PRODUCT_ID_1);
+                assertThat(savedAudit.getCategory()).isEqualTo("ELECTRONICS");
+                assertThat(savedAudit.getItemPrice()).isEqualByComparingTo(itemPrice);
+                assertThat(savedAudit.getQuantity()).isEqualTo(2);
+                assertThat(savedAudit.getCreatedAt()).isEqualTo(now);
+            }
+        }
+
+        @Nested
+        @DisplayName("CancelAuditEvent")
+        class CancelAuditTests {
+
+            @Test
+            @DisplayName("Should mark all sales for the suborder as canceled")
+            void shouldMarkSalesAsCanceled() {
+                // given
+                SaleAudit sale1 = createSale(
+                        PRODUCT_ID_1,
+                        "ELECTRONICS",
+                        "199.99",
+                        2);
+
+                SaleAudit sale2 = createSale(
+                        PRODUCT_ID_2,
+                        "ACCESSORIES",
+                        "49.99",
+                        1);
+
+                when(saleRepo.findBySubOrderId(SUB_ORDER_ID))
+                        .thenReturn(List.of(sale1, sale2));
+
+                CancelAuditEvent event =
+                        new CancelAuditEvent(SUB_ORDER_ID, true);
+
+                // when
+                auditService.consumeSale(event);
+
+                // then
+                @SuppressWarnings("unchecked")
+                ArgumentCaptor<List<SaleAudit>> captor =
+                        (ArgumentCaptor<List<SaleAudit>>) (ArgumentCaptor<?>)
+                                ArgumentCaptor.forClass(List.class);
+
+                verify(saleRepo).findBySubOrderId(SUB_ORDER_ID);
+                verify(saleRepo).saveAll(captor.capture());
+
+                List<SaleAudit> savedSales = captor.getValue();
+
+                assertThat(savedSales)
+                        .hasSize(2)
+                        .allSatisfy(sale -> {
+                            assertThat(sale.isCanceled()).isTrue();
+                            assertThat(sale.getUpdatedAt()).isNotNull();
+                        });
+
+                assertThat(savedSales)
+                        .extracting(SaleAudit::getProductId)
+                        .containsExactly(PRODUCT_ID_1, PRODUCT_ID_2);
+
+                verifyNoInteractions(
+                        userRepo, productRepo, mediaRepo, cartRepo, orderRepo);
+            }
+
+            @Test
+            @DisplayName("Should save an empty list when no sales match the suborder")
+            void shouldSaveEmptyListWhenNoSalesMatch() {
+                // given
+                when(saleRepo.findBySubOrderId(SUB_ORDER_ID))
+                        .thenReturn(List.of());
+
+                CancelAuditEvent event =
+                        new CancelAuditEvent(SUB_ORDER_ID, true);
+
+                // when
+                auditService.consumeSale(event);
+
+                // then
+                verify(saleRepo).findBySubOrderId(SUB_ORDER_ID);
+                verify(saleRepo).saveAll(List.of());
+
+                verifyNoInteractions(
+                        userRepo, productRepo, mediaRepo, cartRepo, orderRepo);
+            }
+        }
+    }
+
+    private SaleAudit createSale(
+            String productId,
+            String category,
+            String itemPrice,
+            int quantity) {
+
+        return SaleAudit.builder()
+                .buyerId(BUYER_ID)
+                .sellerId(SELLER_ID)
+                .subOrderId(SUB_ORDER_ID)
+                .productId(productId)
+                .category(category)
+                .itemPrice(new BigDecimal(itemPrice))
+                .quantity(quantity)
+                .createdAt(now)
+                .build();
     }
 }

@@ -20,7 +20,7 @@ import com.buy02.cart.aop.Auditable;
 import com.buy02.cart.client.ProductClient;
 import com.buy02.cart.entity.Cart;
 import com.buy02.cart.entity.Cart.Item;
-import com.buy02.cart.event.AuditAction;
+import com.buy02.cart.event.audit.AuditAction;
 import com.buy02.cart.exception.custom.BadRequestException;
 import com.buy02.cart.exception.custom.NotFoundException;
 import com.buy02.cart.repository.CartRepository;

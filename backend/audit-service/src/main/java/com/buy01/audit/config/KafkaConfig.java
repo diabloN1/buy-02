@@ -40,7 +40,7 @@ public class KafkaConfig {
         ConsumerFactory<String, SalesAuditEvent> saleConsumerFactory() {
                 return createConsumerFactory(
                                 SalesAuditEvent.class,
-                                "sale-audit-group");
+                                "audit-group");
         }
 
         @Bean

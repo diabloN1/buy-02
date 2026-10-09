@@ -35,7 +35,7 @@ public class AuditServiceImpl {
     private final OrderAuditRepo orderRepo;
     private final SaleAuditRepo saleRepo;
 
-    @KafkaListener(topics = "audit-events", groupId = "audit-service", containerFactory = "auditContainer")
+    @KafkaListener(topics = "audit-events", groupId = "audit-group", containerFactory = "auditContainer")
     public void consumeAudit(AuditEvent event) {
 
         switch (event.entityType()) {
@@ -106,7 +106,7 @@ public class AuditServiceImpl {
         }
     }
 
-    @KafkaListener(topics = "sales-events", groupId = "sale-audit-group", containerFactory = "salesContainer")
+    @KafkaListener(topics = "sales-events", groupId = "audit-group", containerFactory = "salesContainer")
     public void consumeSale(SalesAuditEvent event) {
 
         switch (event) {
@@ -115,7 +115,6 @@ public class AuditServiceImpl {
                         .builder()
                         .buyerId(sale.buyerId())
                         .sellerId(sale.sellerId())
-                        .subOrderId(sale.subOrderId())
                         .productId(sale.productId())
                         .category(sale.category())
                         .itemPrice(sale.itemPrice())
@@ -127,7 +126,7 @@ public class AuditServiceImpl {
             }
 
             case CancelAuditEvent cancel -> {
-                var sales = saleRepo.findBySubOrderId(cancel.subOrderId()).stream().map(sale -> {
+                var sales = saleRepo.findByproductIdIn(cancel.productByQuantity().keySet()).stream().map(sale -> {
                     sale.setCanceled(true);
                     sale.setUpdatedAt(Instant.now());
                     return sale;

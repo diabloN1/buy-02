@@ -21,7 +21,7 @@ import com.buy01.product.DTOs.UpdateRequest;
 import com.buy01.product.aop.Auditable;
 import com.buy01.product.DTOs.ProductResponse;
 import com.buy01.product.entity.Product;
-import com.buy01.product.event.AuditAction;
+import com.buy01.product.event.audit.AuditAction;
 import com.buy01.product.exception.custom.BadRequestException;
 import com.buy01.product.exception.custom.ForbiddenException;
 import com.buy01.product.exception.custom.NotFoundException;

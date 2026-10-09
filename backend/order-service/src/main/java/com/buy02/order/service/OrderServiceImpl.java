@@ -25,6 +25,7 @@ import com.buy02.order.dto.OrderResponse;
 import com.buy02.order.dto.ProductResponse;
 import com.buy02.order.entity.Order;
 import com.buy02.order.entity.Order.OrderStatus;
+import com.buy02.order.entity.SubOrder.Item;
 import com.buy02.order.entity.SubOrder;
 import com.buy02.order.event.audit.AuditAction;
 import com.buy02.order.event.sales.CancelAuditEvent;
@@ -346,14 +347,19 @@ public class OrderServiceImpl implements OrderService {
 
         private void produceCancelationEvent(List<SubOrder> subOrders) {
                 subOrders.stream()
-                                .forEach((sub) -> sub.getItems()
-                                                .forEach((item) -> {
-                                                        eventProducer.send(CancelAuditEvent.builder()
-                                                                        .subOrderId(sub.getId())
-                                                                        .canceled(true)
-                                                                        .build());
+                                .forEach((sub) -> {
+                                        Map<String, Integer> productByQuantity = sub.getItems()
+                                                        .stream()
+                                                        .collect(Collectors.toMap(
+                                                                        Item::getProductId,
+                                                                        Item::getQuantity));
 
-                                                }));
+                                        eventProducer.send(CancelAuditEvent.builder()
+                                                        .subOrderId(sub.getId())
+                                                        .productByQuantity(productByQuantity)
+                                                        .build());
+                                });
+
         }
 
         private OrderStatus resolveOrderStatus(List<SubOrder> subOrders) {

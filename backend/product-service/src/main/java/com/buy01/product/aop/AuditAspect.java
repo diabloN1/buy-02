@@ -1,8 +1,5 @@
 package com.buy01.product.aop;
 
-import com.buy01.product.event.AuditEvent;
-import com.buy01.product.event.EntityType;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +14,9 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
+
+import com.buy01.product.event.audit.AuditEvent;
+import com.buy01.product.event.audit.EntityType;
 
 import java.time.Instant;
 

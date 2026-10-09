@@ -1,8 +1,11 @@
 package com.buy01.audit.event.sales;
 
-public record CancelAuditEvent (
+import java.util.Map;
 
-    String subOrderId,
-    boolean canceled
+public record CancelAuditEvent(
 
-) implements SalesAuditEvent {}
+        String subOrderId,
+        Map<String, Integer> productByQuantity
+
+) implements SalesAuditEvent {
+}

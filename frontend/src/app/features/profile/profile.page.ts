@@ -18,7 +18,7 @@ import { MediaService } from "@core/services/media.service";
 import { CurrentUserService } from "@core/services/current-user.service";
 import { applyFormErrors } from "@shared/utils/form-error.util";
 import { AnalyticsService } from "@core/services/analytics.service";
-import { AnalyticsDisplayComponent } from "@shared/components/analytics/analytics-display/analytics-display.component";
+import { AnalyticsDisplayComponent } from "@shared/components/analytics/analytics-display.component";
 import { UserAnalytics, SellerAnalytics } from "@core/models/analytics.model";
 
 @Component({

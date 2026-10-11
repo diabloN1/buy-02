@@ -15,5 +15,7 @@ public class ProductOrCategoryCount {
 
     private String id;
 
+    private String productName;
+
     private Integer count;
 }

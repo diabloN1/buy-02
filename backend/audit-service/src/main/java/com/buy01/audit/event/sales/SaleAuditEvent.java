@@ -10,6 +10,7 @@ public record SaleAuditEvent(
 
         String subOrderId,
         String productId,
+        String productName,
         String category,
 
         BigDecimal itemPrice,

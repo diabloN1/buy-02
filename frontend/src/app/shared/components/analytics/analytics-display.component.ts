@@ -111,6 +111,7 @@ export class AnalyticsDisplayComponent {
     return this.rankingChart(
       this.userAnalytics?.mostBoughtProducts ?? [],
       "Units bought",
+      true,
     );
   }
 
@@ -240,11 +241,10 @@ export class AnalyticsDisplayComponent {
 
       dataLabels: {
         enabled: false,
-
       },
 
       xaxis: {
-        categories: products.map((product) => product.productId),
+        categories: products.map((product) => product.productName || product.productId),
 
         labels: {
           style: {
@@ -351,6 +351,7 @@ export class AnalyticsDisplayComponent {
     return this.rankingChart(
       this.sellerAnalytics?.unitsSoldByProduct ?? [],
       "Units sold",
+      true,
     );
   }
 
@@ -474,6 +475,7 @@ export class AnalyticsDisplayComponent {
   private rankingChart(
     items: ProductOrCategoryCount[],
     label: string,
+    showProductName = false,
   ): BarChartOptions {
     return {
       series: [
@@ -528,7 +530,9 @@ export class AnalyticsDisplayComponent {
       },
 
       xaxis: {
-        categories: items.map((x) => x.id),
+        categories: items.map((item) =>
+          showProductName ? item.productName || item.id : item.id,
+        ),
 
         labels: {
           style: {

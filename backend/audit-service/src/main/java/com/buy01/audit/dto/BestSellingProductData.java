@@ -2,22 +2,15 @@ package com.buy01.audit.dto;
 
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Builder
 public class BestSellingProductData {
 
     private String productId;
-
+    private String productName;
     private BigDecimal revenue;
-
-    private Integer ordersCount;
+    private long ordersCount;
 }

@@ -335,6 +335,7 @@ public class OrderServiceImpl implements OrderService {
                                                                         .sellerId(sub.getSellerId())
                                                                         .subOrderId(sub.getId())
                                                                         .productId(item.getProductId())
+                                                                        .productName(item.getProductName())
                                                                         .category("CATEGORIE")
                                                                         .itemPrice(item.getPrice())
                                                                         .quantity(item.getQuantity())

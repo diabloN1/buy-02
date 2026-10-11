@@ -18,10 +18,12 @@ export interface TimeSeriesPoint {
 export interface ProductOrCategoryCount {
   id: string;
   count: number;
+  productName?: string;
 }
 
 export interface BestSellingProductData {
   productId: string;
+  productName: string;
   revenue: number;
   ordersCount: number;
 }

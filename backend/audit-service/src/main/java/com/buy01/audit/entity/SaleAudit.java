@@ -23,6 +23,7 @@ public class SaleAudit {
 
     private String subOrderId;
     private String productId;
+    private String productName;
     private String category;
 
     private BigDecimal itemPrice;

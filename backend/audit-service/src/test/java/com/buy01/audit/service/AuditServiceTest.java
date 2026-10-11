@@ -286,6 +286,7 @@ class AuditServiceImplTest {
                                                 SELLER_ID,
                                                 SUB_ORDER_ID,
                                                 PRODUCT_ID_1,
+                                                "Product_Name",
                                                 "ELECTRONICS",
                                                 itemPrice,
                                                 2,

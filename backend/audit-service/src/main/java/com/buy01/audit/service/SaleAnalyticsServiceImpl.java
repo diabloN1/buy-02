@@ -112,7 +112,8 @@ public class SaleAnalyticsServiceImpl implements SaleAnalyticsService {
                                                                 .and("canceled").is(false)),
 
                                 Aggregation.group(field)
-                                                .sum("quantity").as("totalBought"),
+                                                .sum("quantity").as("totalBought")
+                                                .first("productName").as("productName"),
 
                                 Aggregation.sort(
                                                 Sort.Direction.DESC,
@@ -122,6 +123,7 @@ public class SaleAnalyticsServiceImpl implements SaleAnalyticsService {
 
                                 Aggregation.project()
                                                 .and("_id").as(field)
+                                                .and("productName").as("productName")
                                                 .and("totalBought").as("count"));
 
                 return mongoTemplate
@@ -143,11 +145,12 @@ public class SaleAnalyticsServiceImpl implements SaleAnalyticsService {
                                                                 .and("canceled").is(false)),
 
                                 Aggregation.project()
-                                                .and("_id").as("id")
                                                 .and("productId").as("productId")
+                                                .and("productName").as("productName")
                                                 .andExpression("itemPrice * quantity").as("lineRevenue"),
 
                                 Aggregation.group("productId")
+                                                .first("productName").as("productName")
                                                 .sum("lineRevenue").as("revenue")
                                                 .count().as("ordersCount"),
 
@@ -159,6 +162,7 @@ public class SaleAnalyticsServiceImpl implements SaleAnalyticsService {
 
                                 Aggregation.project()
                                                 .and("_id").as("productId")
+                                                .and("productName").as("productName")
                                                 .and("revenue").as("revenue")
                                                 .and("ordersCount").as("ordersCount"));
 
@@ -181,6 +185,7 @@ public class SaleAnalyticsServiceImpl implements SaleAnalyticsService {
                                                                 .and("canceled").is(false)),
 
                                 Aggregation.group("productId")
+                                                .first("productName").as("productName")
                                                 .sum("quantity").as("totalUnits"),
 
                                 Aggregation.sort(
@@ -189,6 +194,7 @@ public class SaleAnalyticsServiceImpl implements SaleAnalyticsService {
 
                                 Aggregation.project()
                                                 .and("_id").as("productId")
+                                                .and("productName").as("productName")
                                                 .and("totalUnits").as("count"));
 
                 return mongoTemplate

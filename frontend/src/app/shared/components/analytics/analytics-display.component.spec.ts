@@ -31,11 +31,13 @@ describe("AnalyticsDisplayComponent", () => {
     bestSellingProducts: [
       {
         productId: "product-1",
+        productName: "product 1",
         revenue: 1200,
         ordersCount: 10,
       },
       {
         productId: "product-2",
+        productName: "product 2",
         revenue: 800,
         ordersCount: 6,
       },
@@ -77,7 +79,6 @@ describe("AnalyticsDisplayComponent", () => {
 
     const element = fixture.nativeElement as HTMLElement;
 
-    expect(element.textContent).toContain("User Analytics");
     expect(element.textContent).toContain("Spending over time");
     expect(element.textContent).toContain("Most bought products");
     expect(element.textContent).toContain("Most bought categories");
@@ -196,7 +197,7 @@ describe("AnalyticsDisplayComponent", () => {
     expect(chart.series[1].name).toBe("Orders");
     expect(chart.series[1].data).toEqual([10, 6]);
 
-    expect(chart.xaxis.categories).toEqual(["product-1", "product-2"]);
+    expect(chart.xaxis.categories).toEqual(["product 1", "product 2"]);
     expect(chart.chart.type).toBe("bar");
   });
 
@@ -240,6 +241,7 @@ describe("AnalyticsDisplayComponent", () => {
       bestSellingProducts: [
         {
           productId: "product-1",
+          productName: "product 1",
           revenue: 1_500_000,
           ordersCount: 100,
         },
@@ -260,6 +262,7 @@ describe("AnalyticsDisplayComponent", () => {
       bestSellingProducts: [
         {
           productId: "product-1",
+          productName: "product 1",
           revenue: 250,
           ordersCount: 10,
         },

@@ -25,6 +25,7 @@ import {
   SellerAnalytics,
   ProductOrCategoryCount,
 } from "@core/models/analytics.model";
+import { MatIcon } from "@angular/material/icon";
 
 type AreaChartOptions = {
   series: ApexAxisChartSeries;
@@ -78,7 +79,7 @@ type DonutChartOptions = {
 @Component({
   selector: "app-analytics-display",
   standalone: true,
-  imports: [CommonModule, MatCardModule, NgApexchartsModule],
+  imports: [CommonModule, MatCardModule, NgApexchartsModule, MatIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: "./analytics-display.component.html",
   styleUrl: "./analytics-display.component.scss",

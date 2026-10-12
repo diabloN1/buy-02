@@ -39,14 +39,13 @@ import { OrderStatusTimelineComponent } from "@shared/components/order-status-ti
   template: `
     <section class="container">
       <div class="page-header">
-        <button
-          mat-stroked-button
+        <a
           [routerLink]="isSeller() ? '/suborders' : '/orders'"
-          class="back-btn"
+          class="btn btn-outline back-btn"
         >
           <mat-icon>arrow_back</mat-icon>
           {{ isSeller() ? "Back to SubOrders" : "Back to Orders" }}
-        </button>
+        </a>
       </div>
 
       @if (isLoading()) {
@@ -136,7 +135,8 @@ import { OrderStatusTimelineComponent } from "@shared/components/order-status-ti
 
                 <div class="actions-row">
                   <button
-                    mat-flat-button
+                    type="button"
+                    class="btn btn-outline"
                     (click)="redoOrder(currentOrder.id)"
                     [disabled]="isLoading()"
                   >
@@ -146,8 +146,8 @@ import { OrderStatusTimelineComponent } from "@shared/components/order-status-ti
 
                   @if (orderSvc.canCancel(currentOrder.status)) {
                     <button
-                      mat-flat-button
-                      color="warn"
+                      type="button"
+                      class="btn btn-danger"
                       (click)="cancelOrder(currentOrder.id)"
                       [disabled]="isLoading()"
                     >
@@ -158,8 +158,8 @@ import { OrderStatusTimelineComponent } from "@shared/components/order-status-ti
 
                   @if (orderSvc.canDelete(currentOrder.status)) {
                     <button
-                      mat-flat-button
-                      color="warn"
+                      type="button"
+                      class="btn btn-danger"
                       (click)="deleteOrder(currentOrder.id)"
                       [disabled]="isLoading()"
                     >
@@ -281,8 +281,8 @@ import { OrderStatusTimelineComponent } from "@shared/components/order-status-ti
                             track status
                           ) {
                             <button
-                              mat-flat-button
-                              [color]="getActionColor(status)"
+                              type="button"
+                              [class]="status === 'CANCELLED' ? 'btn btn-danger' : 'btn btn-primary'"
                               (click)="
                                 updateSubOrderStatus(
                                   subOrder.id,
@@ -307,8 +307,8 @@ import { OrderStatusTimelineComponent } from "@shared/components/order-status-ti
                             )
                           ) {
                             <button
-                              mat-flat-button
-                              color="warn"
+                              type="button"
+                              class="btn btn-danger"
                               (click)="
                                 deleteSubOrder(subOrder.id)
                               "
@@ -336,14 +336,13 @@ import { OrderStatusTimelineComponent } from "@shared/components/order-status-ti
 
             <p>Order not found</p>
 
-            <button
-              mat-raised-button
-              color="primary"
+            <a
+              class="btn btn-primary"
               [routerLink]="isSeller() ? '/suborders' : '/orders'"
             >
               <mat-icon>receipt_long</mat-icon>
               Back to orders
-            </button>
+            </a>
           </mat-card-content>
         </mat-card>
       }

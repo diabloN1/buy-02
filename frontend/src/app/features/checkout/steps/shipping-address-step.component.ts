@@ -98,6 +98,7 @@ import { NgxMaterialIntlTelInputComponent } from "ngx-material-intl-tel-input";
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="half">
+          <mat-label>Country</mat-label>
           <input
             matInput
             formControlName="country"
@@ -127,12 +128,12 @@ import { NgxMaterialIntlTelInputComponent } from "ngx-material-intl-tel-input";
       </div>
 
       <div class="actions">
-        <button mat-button type="button" routerLink="/cart">
+        <a class="btn btn-outline" routerLink="/cart">
           <mat-icon>arrow_back</mat-icon>
           Back to cart
-        </button>
+        </a>
 
-        <button mat-raised-button color="primary" type="submit">
+        <button class="btn btn-primary" type="submit">
           Review order
           <mat-icon>arrow_forward</mat-icon>
         </button>

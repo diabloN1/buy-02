@@ -105,46 +105,24 @@ import { AuthService } from "@core/services/auth.service";
     `
       .hero {
         position: relative;
-        background: var(--app-gradient-hero);
+        background: var(--app-bg-alt);
         border-bottom: 1px solid var(--app-border);
-        padding: 64px 0 52px;
+        padding: 56px 0 48px;
       }
 
       .hero-inner {
         position: relative;
         z-index: 2;
         text-align: center;
-        max-width: 880px;
+        max-width: 800px;
         display: flex;
         flex-direction: column;
         align-items: center;
       }
 
-      .hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 16px;
-        border-radius: var(--app-radius-full);
-        background: var(--app-surface);
-        border: 1px solid var(--app-border);
-        box-shadow: var(--app-shadow-sm);
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--app-fg);
-        margin-bottom: 24px;
-      }
-
-      .badge-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--app-primary);
-      }
-
       .hero-title {
-        font-size: clamp(2.2rem, 5vw, 3.6rem);
-        margin: 0 0 20px;
+        font-size: clamp(2rem, 4.5vw, 3.2rem);
+        margin: 0 0 16px;
         line-height: 1.15;
         font-weight: 800;
         letter-spacing: -0.035em;
@@ -152,9 +130,8 @@ import { AuthService } from "@core/services/auth.service";
       }
 
       .gradient-text {
-        background: var(--app-gradient-primary);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--app-fg-heading);
+        opacity: 0.9;
       }
 
       .hero-subtitle {

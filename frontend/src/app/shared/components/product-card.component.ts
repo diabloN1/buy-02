@@ -44,9 +44,9 @@ import { SafeUrlPipe } from "@shared/pipes/safe-url.pipe";
             <span class="currency-symbol">$</span>
             <span class="price-value">{{ product.price | number:'1.2-2' }}</span>
           </div>
-          <button mat-icon-button class="view-btn" aria-label="View product details">
+          <span class="view-btn" aria-hidden="true">
             <mat-icon>arrow_forward</mat-icon>
-          </button>
+          </span>
         </div>
       </div>
     </a>
@@ -67,9 +67,9 @@ import { SafeUrlPipe } from "@shared/pipes/safe-url.pipe";
         height: 100%;
       }
       .card:hover {
-        transform: translateY(-5px);
-        border-color: var(--app-primary);
-        box-shadow: var(--app-shadow-lg), var(--app-glow);
+        transform: translateY(-2px);
+        border-color: var(--app-border-hover);
+        box-shadow: var(--app-shadow-lg);
       }
 
       .thumb {
@@ -85,10 +85,10 @@ import { SafeUrlPipe } from "@shared/pipes/safe-url.pipe";
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.5s ease;
+        transition: transform 0.4s ease;
       }
       .card:hover .thumb img {
-        transform: scale(1.06);
+        transform: scale(1.04);
       }
 
       .thumb-placeholder {
@@ -117,7 +117,7 @@ import { SafeUrlPipe } from "@shared/pipes/safe-url.pipe";
         -webkit-backdrop-filter: var(--app-backdrop-blur);
         border: 1px solid var(--app-glass-border);
         color: var(--app-fg);
-        padding: 4px 10px;
+        padding: 3px 8px;
         border-radius: var(--app-radius-full);
         font-size: 11px;
         font-weight: 600;
@@ -130,18 +130,18 @@ import { SafeUrlPipe } from "@shared/pipes/safe-url.pipe";
       }
 
       .body {
-        padding: 18px;
+        padding: 16px;
         display: flex;
         flex-direction: column;
         flex: 1;
-        gap: 8px;
+        gap: 6px;
         background: var(--app-surface);
       }
 
       .product-title {
         margin: 0;
-        font-size: 1.05rem;
-        font-weight: 700;
+        font-size: 0.975rem;
+        font-weight: 600;
         color: var(--app-fg-heading);
         letter-spacing: -0.01em;
         line-height: 1.35;
@@ -157,7 +157,7 @@ import { SafeUrlPipe } from "@shared/pipes/safe-url.pipe";
         overflow: hidden;
         font-size: 13px;
         margin: 0;
-        line-height: 1.5;
+        line-height: 1.45;
         color: var(--app-muted);
         flex: 1;
       }
@@ -166,42 +166,52 @@ import { SafeUrlPipe } from "@shared/pipes/safe-url.pipe";
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 12px;
+        margin-top: 10px;
         border-top: 1px solid var(--app-border);
-        padding-top: 12px;
+        padding-top: 10px;
       }
 
       .price-container {
         display: flex;
         align-items: baseline;
         gap: 2px;
-        color: var(--app-primary);
-        font-weight: 800;
+        color: var(--app-fg-heading);
+        font-weight: 700;
       }
       .currency-symbol {
-        font-size: 14px;
-        font-weight: 600;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--app-muted);
       }
       .price-value {
-        font-size: 1.25rem;
+        font-size: 1.15rem;
         letter-spacing: -0.02em;
       }
 
       .view-btn {
-        width: 34px;
-        height: 34px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
-        background: var(--app-primary-light);
-        color: var(--app-primary);
+        background: var(--app-bg-alt);
+        color: var(--app-fg);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+        flex-shrink: 0;
+      }
+      .view-btn mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.2s ease;
       }
       .card:hover .view-btn {
-        background: var(--app-gradient-primary);
-        color: #ffffff;
-        box-shadow: var(--app-glow);
+        background: var(--app-primary);
+        color: var(--app-primary-text);
       }
     `,
   ],

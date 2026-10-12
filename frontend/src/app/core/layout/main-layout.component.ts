@@ -14,6 +14,7 @@ import { MatDividerModule } from "@angular/material/divider";
 import { AuthService } from "@core/services/auth.service";
 import { ThemeService } from "@core/services/theme.service";
 import { CurrentUserService } from "@core/services/current-user.service";
+import { UserAvatarComponent } from "@shared/components/user-avatar.component";
 
 @Component({
   selector: "app-main-layout",
@@ -28,6 +29,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
     MatIconModule,
     MatMenuModule,
     MatDividerModule,
+    UserAvatarComponent,
   ],
   template: `
     <header class="app-header">
@@ -37,7 +39,9 @@ import { CurrentUserService } from "@core/services/current-user.service";
           <div class="brand-icon">
             <mat-icon>storefront</mat-icon>
           </div>
-          <span class="title">Market<span class="title-accent">place</span></span>
+          <span class="title"
+            >Market<span class="title-accent">place</span></span
+          >
         </a>
 
         <!-- Main Navigation Links -->
@@ -48,36 +52,71 @@ import { CurrentUserService } from "@core/services/current-user.service";
           </a>
 
           @if (auth.isSeller()) {
-            <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+            <a
+              routerLink="/dashboard"
+              routerLinkActive="active"
+              class="nav-link"
+            >
               <mat-icon>dashboard</mat-icon>
               <span>Dashboard</span>
             </a>
 
-            <a routerLink="/seller/products" routerLinkActive="active" class="nav-link">
+            <a
+              routerLink="/seller/products"
+              routerLinkActive="active"
+              class="nav-link"
+            >
               <mat-icon>inventory_2</mat-icon>
               <span>My Products</span>
             </a>
 
-            <a routerLink="/seller/media" routerLinkActive="active" class="nav-link">
+            <a
+              routerLink="/seller/media"
+              routerLinkActive="active"
+              class="nav-link"
+            >
               <mat-icon>perm_media</mat-icon>
               <span>Media</span>
             </a>
           }
 
           @if (auth.isAdmin()) {
-            <a routerLink="/admin/dashboard" routerLinkActive="active" class="nav-link">
+            <a
+              routerLink="/admin/dashboard"
+              routerLinkActive="active"
+              class="nav-link"
+            >
               <mat-icon>admin_panel_settings</mat-icon>
               <span>Dashboard</span>
             </a>
 
-            <a routerLink="/admin/products" routerLinkActive="active" class="nav-link">
+            <a
+              routerLink="/admin/products"
+              routerLinkActive="active"
+              class="nav-link"
+            >
               <mat-icon>inventory</mat-icon>
               <span>Products</span>
             </a>
 
-            <a routerLink="/admin/users" routerLinkActive="active" class="nav-link">
+            <a
+              routerLink="/admin/users"
+              routerLinkActive="active"
+              class="nav-link"
+            >
               <mat-icon>group</mat-icon>
               <span>Users</span>
+            </a>
+          }
+
+          @if (auth.isAuthenticated()) {
+            <a
+              routerLink="/orders"
+              routerLinkActive="active"
+              class="nav-link"
+            >
+              <mat-icon>receipt_long</mat-icon>
+              <span>My Orders</span>
             </a>
           }
         </nav>
@@ -92,7 +131,11 @@ import { CurrentUserService } from "@core/services/current-user.service";
             class="icon-btn hide-on-mobile"
             (click)="theme.toggle()"
             [attr.aria-label]="'Toggle theme mode'"
-            [title]="theme.mode() === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+            [title]="
+              theme.mode() === 'dark'
+                ? 'Switch to Light Mode'
+                : 'Switch to Dark Mode'
+            "
           >
             <mat-icon>
               {{ theme.mode() === "dark" ? "light_mode" : "dark_mode" }}
@@ -114,9 +157,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
               [matMenuTriggerFor]="menu"
               aria-label="User menu"
             >
-              <div class="avatar-circle">
-                {{ (currentUser.user()?.name || 'U').charAt(0).toUpperCase() }}
-              </div>
+              <app-user-avatar [user]="currentUser.user()" [size]="32" />
               <span class="user-name">
                 {{ currentUser.user()?.name }}
               </span>
@@ -131,6 +172,11 @@ import { CurrentUserService } from "@core/services/current-user.service";
               <a mat-menu-item routerLink="/profile">
                 <mat-icon>person</mat-icon>
                 <span>My Profile</span>
+              </a>
+
+              <a mat-menu-item routerLink="/orders">
+                <mat-icon>receipt_long</mat-icon>
+                <span>My Orders</span>
               </a>
 
               <mat-divider />
@@ -217,6 +263,10 @@ import { CurrentUserService } from "@core/services/current-user.service";
               <mat-icon>person</mat-icon>
               <span>Profile</span>
             </a>
+            <a mat-menu-item routerLink="/orders">
+              <mat-icon>receipt_long</mat-icon>
+              <span>My Orders</span>
+            </a>
             <mat-divider />
             <button mat-menu-item (click)="logout()">
               <mat-icon>logout</mat-icon>
@@ -261,7 +311,6 @@ import { CurrentUserService } from "@core/services/current-user.service";
         min-height: 100vh;
       }
 
-      /* Pro App Header (Shadcn/Vercel) */
       .app-header {
         position: sticky;
         top: 0;
@@ -270,11 +319,13 @@ import { CurrentUserService } from "@core/services/current-user.service";
         backdrop-filter: var(--app-backdrop-blur);
         -webkit-backdrop-filter: var(--app-backdrop-blur);
         border-bottom: 1px solid var(--app-border);
-        transition: background-color 0.25s ease, border-color 0.25s ease;
+        transition:
+          background-color 0.25s ease,
+          border-color 0.25s ease;
       }
 
       .header-container {
-        height: 64px; /* Crisp Shadcn standard height */
+        height: 64px;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
         display: flex;
@@ -282,7 +333,6 @@ import { CurrentUserService } from "@core/services/current-user.service";
         gap: 24px;
       }
 
-      /* Minimalist Brand Logo */
       .brand {
         display: inline-flex;
         align-items: center;
@@ -302,7 +352,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
         width: 32px;
         height: 32px;
         border-radius: 8px;
-        background: var(--app-fg-heading); /* High contrast logo */
+        background: var(--app-fg-heading);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -314,7 +364,6 @@ import { CurrentUserService } from "@core/services/current-user.service";
         height: 18px;
       }
 
-      /* Pro App Navigation Links */
       .nav-links {
         display: flex;
         gap: 6px;
@@ -350,7 +399,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
         color: var(--app-fg-heading);
       }
 
-      /* Subtle Shadcn Active State */
+     
       .nav-link.active {
         background: var(--app-surface-hover);
         color: var(--app-fg-heading) !important;
@@ -363,14 +412,14 @@ import { CurrentUserService } from "@core/services/current-user.service";
         flex: 1;
       }
 
-      /* Controls Section */
+      
       .header-controls {
         display: flex;
         align-items: center;
         gap: 12px;
       }
 
-      /* Standardized Icon Buttons (Replacing MDC defaults) */
+     
       .icon-btn {
         width: 36px;
         height: 36px;
@@ -399,13 +448,12 @@ import { CurrentUserService } from "@core/services/current-user.service";
         border-color: var(--app-primary);
       }
 
-      /* Cart Button Special Polish */
+    
       .cart-btn {
         border: 1px solid var(--app-border);
         background: var(--app-surface);
       }
 
-      /* User Profile Pill Dropdown */
       .user-profile-btn {
         display: inline-flex;
         align-items: center;
@@ -432,8 +480,8 @@ import { CurrentUserService } from "@core/services/current-user.service";
         width: 26px;
         height: 26px;
         border-radius: 50%;
-        background: var(--app-gradient-primary);
-        color: #ffffff;
+        background: var(--app-primary);
+        color: var(--app-primary-text);
         font-weight: 600;
         font-size: 12px;
         display: flex;
@@ -470,12 +518,13 @@ import { CurrentUserService } from "@core/services/current-user.service";
         background: var(--app-bg);
       }
 
-      /* Clean Shadcn Footer */
       .app-footer {
         padding: 40px 0;
         border-top: 1px solid var(--app-border);
         background: var(--app-surface);
-        transition: background-color 0.25s ease, border-color 0.25s ease;
+        transition:
+          background-color 0.25s ease,
+          border-color 0.25s ease;
         background: var(--app-bg);
         transition:
           background-color 0.25s ease,
@@ -509,7 +558,6 @@ import { CurrentUserService } from "@core/services/current-user.service";
         margin: 0;
       }
 
-      /* Responsive Setup */
       @media (max-width: 900px) {
         .nav-links,
         .hide-on-mobile {

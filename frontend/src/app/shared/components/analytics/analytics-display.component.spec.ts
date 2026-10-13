@@ -1,12 +1,14 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { of } from "rxjs";
 
 import { AnalyticsDisplayComponent } from "./analytics-display.component";
-
 import { UserAnalytics, SellerAnalytics } from "@core/models/analytics.model";
+import { ProductService } from "@core/services/product.service";
 
 describe("AnalyticsDisplayComponent", () => {
   let component: AnalyticsDisplayComponent;
   let fixture: ComponentFixture<AnalyticsDisplayComponent>;
+  let productServiceSpy: jasmine.SpyObj<ProductService>;
 
   const mockUserAnalytics: UserAnalytics = {
     spentByDay: [
@@ -49,8 +51,15 @@ describe("AnalyticsDisplayComponent", () => {
   };
 
   beforeEach(async () => {
+    // Provide a mock ProductService to satisfy the ProductTooltipComponent dependency
+    productServiceSpy = jasmine.createSpyObj("ProductService", ["get"]);
+    productServiceSpy.get.and.returnValue(
+      of({ id: "test", name: "Test Product", price: 100 } as any),
+    );
+
     await TestBed.configureTestingModule({
       imports: [AnalyticsDisplayComponent],
+      providers: [{ provide: ProductService, useValue: productServiceSpy }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AnalyticsDisplayComponent);
@@ -59,7 +68,6 @@ describe("AnalyticsDisplayComponent", () => {
 
   it("should create component", () => {
     fixture.detectChanges();
-
     expect(component).toBeTruthy();
   });
 
@@ -97,9 +105,10 @@ describe("AnalyticsDisplayComponent", () => {
   });
 
   it("should configure the spending chart with user spending data", () => {
-    component.userAnalytics = mockUserAnalytics;
+    fixture.componentRef.setInput("userAnalytics", mockUserAnalytics);
+    fixture.detectChanges();
 
-    const chart = component.spendingChart;
+    const chart = component.spendingChartOptions;
 
     expect(chart.series.length).toBe(1);
     expect(chart.series[0].name).toBe("Spending");
@@ -116,8 +125,7 @@ describe("AnalyticsDisplayComponent", () => {
 
   it("should return an empty spending series when user analytics are null", () => {
     component.userAnalytics = null;
-
-    const chart = component.spendingChart;
+    const chart = component["buildSpendingChart"](); // testing the private fallback logic directly
 
     expect(chart.series.length).toBe(1);
     expect(chart.series[0].name).toBe("Spending");
@@ -125,9 +133,10 @@ describe("AnalyticsDisplayComponent", () => {
   });
 
   it("should configure the top products chart with product quantities", () => {
-    component.userAnalytics = mockUserAnalytics;
+    fixture.componentRef.setInput("userAnalytics", mockUserAnalytics);
+    fixture.detectChanges();
 
-    const chart = component.topProductsChart;
+    const chart = component.topProductsChartOptions;
 
     expect(chart.series.length).toBe(1);
     expect(chart.series[0].name).toBe("Units bought");
@@ -137,9 +146,10 @@ describe("AnalyticsDisplayComponent", () => {
   });
 
   it("should configure the user categories donut chart", () => {
-    component.userAnalytics = mockUserAnalytics;
+    fixture.componentRef.setInput("userAnalytics", mockUserAnalytics);
+    fixture.detectChanges();
 
-    const chart = component.userCategoriesChart;
+    const chart = component.userCategoriesChartOptions;
 
     expect(chart.series).toEqual([8, 4]);
     expect(chart.labels).toEqual(["Electronics", "Books"]);
@@ -150,8 +160,7 @@ describe("AnalyticsDisplayComponent", () => {
 
   it("should return an empty donut chart when user analytics are null", () => {
     component.userAnalytics = null;
-
-    const chart = component.userCategoriesChart;
+    const chart = component["buildUserCategoriesChart"](); // testing private fallback
 
     expect(chart.series).toEqual([]);
     expect(chart.labels).toEqual([]);
@@ -159,9 +168,10 @@ describe("AnalyticsDisplayComponent", () => {
   });
 
   it("should configure the seller revenue chart with revenue data", () => {
-    component.sellerAnalytics = mockSellerAnalytics;
+    fixture.componentRef.setInput("sellerAnalytics", mockSellerAnalytics);
+    fixture.detectChanges();
 
-    const chart = component.sellerRevenueChart;
+    const chart = component.sellerRevenueChartOptions;
 
     expect(chart.series.length).toBe(1);
     expect(chart.series[0].name).toBe("Revenue");
@@ -177,8 +187,7 @@ describe("AnalyticsDisplayComponent", () => {
 
   it("should return an empty revenue series when seller analytics are null", () => {
     component.sellerAnalytics = null;
-
-    const chart = component.sellerRevenueChart;
+    const chart = component["buildSellerRevenueChart"]();
 
     expect(chart.series.length).toBe(1);
     expect(chart.series[0].name).toBe("Revenue");
@@ -186,9 +195,10 @@ describe("AnalyticsDisplayComponent", () => {
   });
 
   it("should configure the seller best products chart", () => {
-    component.sellerAnalytics = mockSellerAnalytics;
+    fixture.componentRef.setInput("sellerAnalytics", mockSellerAnalytics);
+    fixture.detectChanges();
 
-    const chart = component.sellerBestProductsChart;
+    const chart = component.sellerBestProductsChartOptions;
 
     expect(chart.series.length).toBe(2);
     expect(chart.series[0].name).toBe("Revenue");
@@ -202,12 +212,13 @@ describe("AnalyticsDisplayComponent", () => {
   });
 
   it("should return empty series when seller best products are unavailable", () => {
-    component.sellerAnalytics = {
+    fixture.componentRef.setInput("sellerAnalytics", {
       ...mockSellerAnalytics,
       bestSellingProducts: [],
-    };
+    });
+    fixture.detectChanges();
 
-    const chart = component.sellerBestProductsChart;
+    const chart = component.sellerBestProductsChartOptions;
 
     expect(chart.series[0].data).toEqual([]);
     expect(chart.series[1].data).toEqual([]);
@@ -215,9 +226,10 @@ describe("AnalyticsDisplayComponent", () => {
   });
 
   it("should configure the seller units chart with quantities sold", () => {
-    component.sellerAnalytics = mockSellerAnalytics;
+    fixture.componentRef.setInput("sellerAnalytics", mockSellerAnalytics);
+    fixture.detectChanges();
 
-    const chart = component.sellerUnitsChart;
+    const chart = component.sellerUnitsChartOptions;
 
     expect(chart.series.length).toBe(1);
     expect(chart.series[0].name).toBe("Units sold");
@@ -227,16 +239,17 @@ describe("AnalyticsDisplayComponent", () => {
   });
 
   it("should use the expected chart colors", () => {
-    component.userAnalytics = mockUserAnalytics;
-    component.sellerAnalytics = mockSellerAnalytics;
+    fixture.componentRef.setInput("userAnalytics", mockUserAnalytics);
+    fixture.componentRef.setInput("sellerAnalytics", mockSellerAnalytics);
+    fixture.detectChanges();
 
-    expect(component.spendingChart.colors).toEqual(["#8b5cf6"]);
-    expect(component.sellerRevenueChart.colors).toEqual(["#6366f1"]);
-    expect(component.topProductsChart.colors).toEqual(["#8b5cf6"]);
+    expect(component.spendingChartOptions.colors).toEqual(["#8b5cf6"]);
+    expect(component.sellerRevenueChartOptions.colors).toEqual(["#6366f1"]);
+    expect(component.topProductsChartOptions.colors).toEqual(["#8b5cf6"]);
   });
 
   it("should format large monetary values using millions", () => {
-    component.sellerAnalytics = {
+    fixture.componentRef.setInput("sellerAnalytics", {
       ...mockSellerAnalytics,
       bestSellingProducts: [
         {
@@ -246,9 +259,10 @@ describe("AnalyticsDisplayComponent", () => {
           ordersCount: 100,
         },
       ],
-    };
+    });
+    fixture.detectChanges();
 
-    const chart = component.sellerBestProductsChart;
+    const chart = component.sellerBestProductsChartOptions;
     const revenueAxis = Array.isArray(chart.yaxis)
       ? chart.yaxis[0]
       : chart.yaxis;
@@ -257,7 +271,7 @@ describe("AnalyticsDisplayComponent", () => {
   });
 
   it("should format small monetary values without abbreviating them", () => {
-    component.sellerAnalytics = {
+    fixture.componentRef.setInput("sellerAnalytics", {
       ...mockSellerAnalytics,
       bestSellingProducts: [
         {
@@ -267,9 +281,10 @@ describe("AnalyticsDisplayComponent", () => {
           ordersCount: 10,
         },
       ],
-    };
+    });
+    fixture.detectChanges();
 
-    const chart = component.sellerBestProductsChart;
+    const chart = component.sellerBestProductsChartOptions;
     const revenueAxis = Array.isArray(chart.yaxis)
       ? chart.yaxis[0]
       : chart.yaxis;

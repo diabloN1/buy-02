@@ -260,7 +260,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
                       (click)="updateCart()"
                       [disabled]="quantity() == cartQuantity()"
                     >
-                      <mat-icon>cached</mat-icon> Update quantity
+                      <mat-icon>cached</mat-icon> Update
                     </button>
                     <a class="btn btn-primary" routerLink="/cart">
                       <mat-icon>shopping_cart</mat-icon> View Cart
@@ -295,17 +295,15 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         margin-bottom: 24px;
         font-weight: 500;
         color: var(--app-muted) !important;
-        border-radius: var(--app-radius-sm);
       }
-      .back-btn:hover {
-        color: var(--app-primary) !important;
-        background: var(--app-primary-lighter) !important;
+      .back-btn mat-icon {
+        margin-right: 4px;
       }
 
       .grid {
         display: grid;
         grid-template-columns: 1.1fr 1fr;
-        gap: 32px;
+        gap: 24px; 
         align-items: start;
       }
       @media (max-width: 860px) {
@@ -315,10 +313,14 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         }
       }
 
+
       .gallery {
-        padding: 20px;
-        background: var(--app-surface);
+        padding: 16px;
       }
+      .info-card {
+        padding: 24px;
+      }
+
 
       .main-image-wrap {
         position: relative;
@@ -327,15 +329,16 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         aspect-ratio: 4 / 3;
         background: var(--app-bg-alt);
         cursor: pointer;
+        border: 1px solid var(--app-border);
       }
       .main-image-wrap img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.4s ease;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       }
       .main-image-wrap:hover img {
-        transform: scale(1.03);
+        transform: scale(1.02);
       }
 
       .expand-overlay {
@@ -344,7 +347,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         left: 0;
         right: 0;
         padding: 12px;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
         color: #ffffff;
         display: flex;
         align-items: center;
@@ -352,7 +355,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         font-size: 13px;
         font-weight: 500;
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transition: opacity 0.2s ease;
       }
       .main-image-wrap:hover .expand-overlay {
         opacity: 1;
@@ -368,9 +371,9 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         color: var(--app-muted);
       }
       .ph mat-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
+        font-size: 40px;
+        width: 40px;
+        height: 40px;
       }
 
 
@@ -381,30 +384,26 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         flex-wrap: wrap;
       }
       .thumb {
-        border: 2px solid transparent;
         padding: 0;
-        background: none;
+        background: var(--app-bg-alt);
         border-radius: var(--app-radius-sm);
+        border: 1px solid var(--app-border);
         overflow: hidden;
         cursor: pointer;
         transition: all 0.2s ease;
-        box-shadow: var(--app-shadow-sm);
-      }
-      .thumb.on {
-        border-color: var(--app-primary);
-        transform: translateY(-2px);
-        box-shadow: var(--app-glow);
       }
       .thumb img {
-        width: 72px;
-        height: 72px;
+        width: 64px;
+        height: 64px;
         object-fit: cover;
         display: block;
       }
 
-      .info-card {
-        padding: 28px;
-        background: var(--app-surface);
+      .thumb.on {
+        border-color: var(--app-surface);
+        box-shadow:
+          0 0 0 2px var(--app-surface),
+          0 0 0 4px var(--app-primary);
       }
 
 
@@ -415,26 +414,74 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         flex-wrap: wrap;
       }
 
-      /* Typography & Badges */
       .stock-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 10px;
+        border-radius: var(--app-radius-full);
+        background: var(--app-success-light);
+        color: var(--app-success);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 16px;
+      }
+      .stock-pill.out-of-stock {
+        background: var(--app-danger-light);
+        color: var(--app-danger);
+        border-color: rgba(239, 68, 68, 0.2);
+      }
+      .stock-pill mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+
+
+      .category-pill {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         padding: 4px 12px;
         border-radius: var(--app-radius-full);
-        background: var(--app-success-light);
-        color: var(--app-success);
+        background: var(--app-bg-alt); 
+        border: 1px solid var(--app-border);
+        color: var(--app-fg);
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 600;
       }
-      .stock-pill.out-of-stock {
-        background: var(--app-danger-light);
-        color: var(--app-danger);
-      }
-      .stock-pill mat-icon {
+      .category-pill mat-icon {
         font-size: 16px;
         width: 16px;
         height: 16px;
+        color: var(--app-primary);
+      }
+
+      .edit-pill-btn {
+        height: 28px !important;
+        padding: 0 10px !important;
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        border-radius: var(--app-radius-full) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        color: var(--app-fg) !important;
+        border: 1px solid var(--app-border) !important;
+        text-decoration: none !important;
+        transition: all 0.15s ease !important;
+      }
+      .edit-pill-btn mat-icon {
+        font-size: 14px !important;
+        width: 14px !important;
+        height: 14px !important;
+        line-height: 14px !important;
+      }
+      .edit-pill-btn:hover {
+        background: var(--app-surface-hover) !important;
+        border-color: var(--app-border-hover) !important;
+        color: var(--app-fg-heading) !important;
       }
 
 
@@ -484,128 +531,74 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
       }
 
       .title {
-        font-size: clamp(1.8rem, 3.5vw, 2.4rem);
-        font-weight: 800;
-        letter-spacing: -0.025em;
+        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-weight: 700;
+        letter-spacing: -0.04em;
         line-height: 1.2;
         overflow-wrap: anywhere;
-        letter-spacing: -0.03em;
-        line-height: 1.25;
-        margin: 0 0 16px;
+        margin: 0 0 12px;
         color: var(--app-fg-heading);
       }
 
       .price-box {
         display: flex;
-        align-items: baseline;
+        align-items: flex-start;
         gap: 2px;
-        color: var(--app-primary);
-        font-weight: 800;
-        margin-bottom: 20px;
+        margin-bottom: 24px;
       }
       .price-box .currency {
-        font-size: 1.2rem;
-      }
-      .actions {
-        margin-top: 24px;
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-      .actions a {
-        margin: 0;
-      }
-
-      .quantity-stepper {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        color: var(--app-fg);
-      }
-
-      .quantity-stepper mat-icon {
-        width: 20px;
-        height: 20px;
+        font-size: 1rem;
+        font-weight: 600;
         color: var(--app-muted);
-      }
-
-      .quantity-value {
-        min-width: 24px;
-        text-align: center;
-        font-size: 16px;
-      }
-
-      .quantity-selector {
-        margin: 16px 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        color: var(--app-fg);
-      }
-
-      .connect-btn {
-        border-color: var(--app-primary);
-        color: var(--app-primary);
-      }
-      .connect-btn:hover {
-        background-color: var(--app-primary);
-        color: var(--app-primary-contrast, #fff);
-      }
-      .out-of-stock {
-        color: var(--app-muted);
-        font-size: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
+        margin-top: 4px;
       }
       .price-box .amount {
-        font-size: 2.2rem;
-        letter-spacing: -0.02em;
+        font-size: 2.25rem;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        color: var(--app-fg-heading);
       }
 
 
       .seller-card {
         display: flex;
         align-items: center;
-        gap: 14px;
-        padding: 12px 16px;
-        background: var(--app-bg-alt);
+        gap: 12px;
+        padding: 12px;
+        background: var(--app-surface);
         border: 1px solid var(--app-border);
         border-radius: var(--app-radius-sm);
+        margin-bottom: 16px;
       }
-      .seller-avatar {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
+      .seller-avatar,
+      .seller-avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--app-radius-full);
         object-fit: cover;
       }
       .seller-avatar-placeholder {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background: var(--app-gradient-primary);
-        color: #ffffff;
+        background: var(--app-bg-alt);
+        border: 1px solid var(--app-border);
+        color: var(--app-muted);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 700;
+        font-weight: 600;
       }
       .seller-details {
         display: flex;
         flex-direction: column;
+        line-height: 1.4;
       }
       .seller-role {
         font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: var(--app-primary);
-        letter-spacing: 0.05em;
+        font-weight: 600;
+        color: var(--app-muted);
       }
       .seller-name {
         font-size: 14px;
+        font-weight: 600;
         color: var(--app-fg-heading);
       }
 
@@ -630,12 +623,12 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
       .divider {
         height: 1px;
         background: var(--app-border);
-        margin: 16px 0;
+        margin: 20px 0;
       }
 
       .description-block h3 {
-        font-size: 15px;
-        font-weight: 700;
+        font-size: 14px;
+        font-weight: 600;
         margin: 0 0 8px;
         color: var(--app-fg-heading);
       }
@@ -668,9 +661,35 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
 
       .auth-prompt {
         display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 24px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .edit-btn,
+      .buy-btn {
+        width: 100%;
+        max-width: 100%;
+        height: 44px;
+        box-sizing: border-box;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
+        padding: 0 16px;
+      }
+
+      .auth-prompt {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: var(--app-bg-alt);
+        border-radius: var(--app-radius-sm);
+        border: 1px solid var(--app-border);
+        font-size: 14px;
       }
 
       .minifab {
@@ -735,6 +754,59 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         visibility: hidden;
       }
 
+      .quantity-selector,
+      .quantity-display {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--app-fg-heading);
+        margin-bottom: 12px;
+      }
+
+      .quantity-stepper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--app-surface);
+        border: 1px solid var(--app-border);
+        padding: 4px;
+        border-radius: var(--app-radius-sm);
+      }
+      .quantity-value {
+        min-width: 24px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .minifab {
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 4px !important;
+        background: transparent !important;
+        color: var(--app-fg) !important;
+        box-shadow: none !important;
+        border: 1px solid transparent !important;
+        transition: background 0.15s ease !important;
+      }
+      .minifab mat-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+        line-height: 16px !important;
+      }
+      .minifab:hover:not(:disabled) {
+        background: var(--app-surface-hover) !important;
+        border-color: var(--app-border) !important;
+      }
+      .minifab:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+
       .in-cart-card {
         display: flex;
         flex-direction: column;
@@ -751,24 +823,22 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
       .in-cart-message {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         color: var(--app-primary);
         font-weight: 600;
-        font-size: 14px;
+        font-size: 13px;
       }
-
       .check-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-        color: var(--app-primary);
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
       }
 
       .in-cart-actions {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 4px;
       }
     `,
   ],

@@ -32,7 +32,11 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
   ],
   template: `
     <section class="auth-wrap">
-      <div class="glass-card auth-card">
+      <!-- Premium Ambient Background -->
+      <div class="auth-bg-pattern"></div>
+      <div class="auth-ambient-glow"></div>
+
+      <div class="glass-card auth-card animate-pop-in">
         <div class="auth-header">
           <div class="brand-badge">
             <mat-icon>storefront</mat-icon>
@@ -41,8 +45,9 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
           <p class="muted">Sign in to manage your orders & products</p>
         </div>
 
-        <form [formGroup]="form" (ngSubmit)="submit()" class="stack">
-          <mat-form-field appearance="outline">
+        <form [formGroup]="form" (ngSubmit)="submit()" class="stack auth-form">
+          <!-- subscriptSizing="dynamic" fixes the ugly bottom spacing! -->
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
             <mat-label>Email address</mat-label>
             <mat-icon matPrefix>email</mat-icon>
             <input
@@ -55,7 +60,7 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
           </mat-form-field>
           <app-field-error [control]="form.controls.email" />
 
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
             <mat-label>Password</mat-label>
             <mat-icon matPrefix>lock</mat-icon>
             <input
@@ -85,15 +90,21 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
             class="submit-btn"
             [disabled]="form.invalid || loading()"
           >
-            <span *ngIf="!loading()">Sign in to Marketplace</span>
-            <span *ngIf="loading()">Signing in…</span>
+            @if (!loading()) {
+              <span>Sign in to Marketplace</span>
+            } @else {
+              <mat-icon class="spinner-icon">autorenew</mat-icon>
+              <span>Signing in…</span>
+            }
           </button>
         </form>
 
         <div class="auth-footer">
           <p class="muted">
             Don't have an account?
-            <a routerLink="/auth/register" class="auth-link">Create an account</a>
+            <a routerLink="/auth/register" class="auth-link"
+              >Create an account</a
+            >
           </p>
         </div>
       </div>
@@ -102,49 +113,101 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
   styles: [
     `
       .auth-wrap {
-        min-height: calc(100vh - 180px);
+        position: relative;
+        min-height: calc(100vh - 68px);
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 40px 16px;
-        background: var(--app-gradient-hero);
+        background: var(--app-bg-alt);
+        overflow: hidden;
+      }
+
+      /* Premium Background Effects */
+      .auth-bg-pattern {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background-image: radial-gradient(
+          var(--app-border-hover) 1px,
+          transparent 1px
+        );
+        background-size: 24px 24px;
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      .auth-ambient-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80vw;
+        height: 80vh;
+        background: radial-gradient(
+          circle,
+          var(--app-primary-light) 0%,
+          transparent 60%
+        );
+        opacity: 0.5;
+        filter: blur(60px);
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      /* Dark mode adjustment for ambient glow */
+      :host-context(.dark-theme) .auth-ambient-glow {
+        opacity: 0.1;
       }
 
       .auth-card {
+        position: relative;
+        z-index: 2;
         width: 100%;
         max-width: 420px;
         padding: 40px 32px;
-        box-shadow: var(--app-shadow-xl);
+        background: var(--app-glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--app-glass-border);
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+        border-radius: var(--app-radius-lg);
       }
 
       .auth-header {
         text-align: center;
-        margin-bottom: 28px;
+        margin-bottom: 32px;
         display: flex;
         flex-direction: column;
         align-items: center;
       }
 
       .brand-badge {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-        background: var(--app-gradient-primary);
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(
+          135deg,
+          var(--app-primary) 0%,
+          var(--app-primary-hover) 100%
+        );
         color: #ffffff;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 16px;
-        box-shadow: var(--app-glow);
+        margin-bottom: 20px;
+        box-shadow:
+          0 8px 16px -4px rgba(0, 0, 0, 0.2),
+          inset 0 1px 1px rgba(255, 255, 255, 0.2);
       }
       .brand-badge mat-icon {
-        font-size: 26px;
-        width: 26px;
-        height: 26px;
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
       }
 
       h1 {
-        margin: 0 0 6px;
+        margin: 0 0 8px;
         font-size: 1.75rem;
         font-weight: 800;
         letter-spacing: -0.03em;
@@ -154,6 +217,13 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
       p.muted {
         margin: 0;
         font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px; /* Perfectly spaces fields now that subscriptSizing="dynamic" is used */
       }
 
       .submit-btn {
@@ -161,12 +231,26 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
         font-size: 15px !important;
         font-weight: 600 !important;
         border-radius: var(--app-radius-sm) !important;
-        margin-top: 8px;
+        margin-top: 12px;
+        transition: transform var(--transition-fast) !important;
+      }
+      .submit-btn:active {
+        transform: scale(0.98) !important;
+      }
+
+      .spinner-icon {
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+      }
+      @keyframes spin {
+        100% {
+          transform: rotate(360deg);
+        }
       }
 
       .auth-footer {
-        margin-top: 24px;
-        padding-top: 20px;
+        margin-top: 28px;
+        padding-top: 24px;
         border-top: 1px solid var(--app-border);
         text-align: center;
       }
@@ -176,8 +260,10 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
         font-weight: 600;
         text-decoration: none;
         margin-left: 4px;
+        transition: color var(--transition-fast);
       }
       .auth-link:hover {
+        color: var(--app-accent);
         text-decoration: underline;
       }
     `,

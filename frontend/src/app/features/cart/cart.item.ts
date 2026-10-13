@@ -9,23 +9,28 @@ import { CartService } from "@core/services/cart.service";
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatIconModule],
   template: `
-    <div class="cart-item">
+    <!-- Added subtle fade-in for list rendering -->
+    <div class="cart-item animate-fade-in">
+      <!-- Product Details (Image & Title) -->
       <div class="item-details">
-        @if (imageUrl) {
-          <img [src]="imageUrl" alt="product image" class="thumb" />
-        } @else {
-          <div class="thumb-placeholder">
-            <mat-icon>inventory_2</mat-icon>
-          </div>
-        }
-        <span class="item-name">{{ productName }}</span>
+        <div class="image-wrapper">
+          @if (imageUrl) {
+            <img [src]="imageUrl" alt="product image" class="thumb" />
+          } @else {
+            <div class="thumb-placeholder">
+              <mat-icon>inventory_2</mat-icon>
+            </div>
+          }
+        </div>
+        <span class="item-name" [title]="productName">{{ productName }}</span>
       </div>
 
+      <!-- Pro Unified Stepper (Matches Product Details Page) -->
       <div class="item-quantity">
-        <div class="qty-group">
+        <div class="pro-stepper">
           <button
-            mat-icon-button
-            class="qty-btn"
+            type="button"
+            class="stepper-btn"
             (click)="updateItemQuantity(quantity - 1)"
             [disabled]="quantity <= 1"
             aria-label="Decrease quantity"
@@ -34,8 +39,8 @@ import { CartService } from "@core/services/cart.service";
           </button>
           <span class="quantity-value">{{ quantity }}</span>
           <button
-            mat-icon-button
-            class="qty-btn"
+            type="button"
+            class="stepper-btn"
             (click)="updateItemQuantity(quantity + 1)"
             [disabled]="quantity >= availableStock"
             aria-label="Increase quantity"
@@ -45,198 +50,251 @@ import { CartService } from "@core/services/cart.service";
         </div>
       </div>
 
-      <span class="item-price">{{ price | currency }}</span>
+      <!-- Price & Actions -->
+      <div class="item-actions">
+        <span class="item-price">{{ price | currency }}</span>
 
-      <button
-        mat-icon-button
-        class="remove-btn"
-        (click)="deleteItem()"
-        aria-label="Remove item"
-      >
-        <mat-icon>close</mat-icon>
-      </button>
+        <button
+          type="button"
+          class="remove-btn"
+          (click)="deleteItem()"
+          aria-label="Remove item"
+          title="Remove from cart"
+        >
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </div>
     </div>
   `,
   styles: [
     `
+      /* ==========================================================================
+         Row Layout & Interactions
+         ========================================================================== */
       .cart-item {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 16px 4px;
+        padding: 20px 16px;
         border-bottom: 1px solid var(--app-border);
-        gap: 16px;
+        gap: 24px;
+        background: transparent;
+        transition:
+          background-color var(--transition-fast),
+          border-radius var(--transition-fast);
+      }
+
+      /* Premium subtle row highlight on hover */
+      .cart-item:hover {
+        background: var(--app-surface-hover);
+        border-radius: var(--app-radius-sm);
       }
 
       .cart-item:last-child {
         border-bottom: none;
       }
 
+      /* ==========================================================================
+         Image & Title
+         ========================================================================== */
       .item-details {
         display: flex;
         align-items: center;
         gap: 16px;
         flex: 1;
+        min-width: 0; /* Enables text truncation */
+      }
+
+      .image-wrapper {
+        width: 56px;
+        height: 56px;
+        flex-shrink: 0;
+        border-radius: var(--app-radius-sm);
+        border: 1px solid var(--app-border);
+        overflow: hidden;
+        box-shadow: var(--app-shadow-sm);
+        background: var(--app-bg-alt);
       }
 
       .thumb {
-        width: 48px;
-        height: 48px;
+        width: 100%;
+        height: 100%;
         object-fit: cover;
-        border-radius: var(--app-radius-sm);
-        border: 1px solid var(--app-border);
         display: block;
-        flex-shrink: 0;
+        transition: transform var(--transition-normal);
+      }
+
+      /* Micro-interaction: Slight image zoom on row hover */
+      .cart-item:hover .thumb {
+        transform: scale(1.05);
       }
 
       .thumb-placeholder {
-        width: 48px;
-        height: 48px;
-        border-radius: var(--app-radius-sm);
-        border: 1px dashed var(--app-border-hover);
+        width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--app-muted);
-        background: var(--app-bg-alt);
-        flex-shrink: 0;
+        color: var(--app-muted-light);
       }
 
       .item-name {
-        font-weight: 500;
+        font-weight: 600;
         color: var(--app-fg-heading);
-        font-size: 14px;
-        overflow-wrap: anywhere;
+        font-size: 15px;
+        line-height: 1.4;
+
+        /* Premium line-clamp for multiline support */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
       }
 
+      /* ==========================================================================
+         Pro Unified Quantity Stepper 
+         ========================================================================== */
+      .item-quantity {
+        display: flex;
+        align-items: center;
+      }
 
-      .qty-group {
+      .pro-stepper {
         display: inline-flex;
         align-items: center;
-        border: 1px solid var(--app-border);
-        border-radius: var(--app-radius-sm);
         background: var(--app-surface);
-        height: 32px;
+        border: 1px solid var(--app-border);
+        border-radius: var(--app-radius-full);
+        padding: 4px;
+        box-shadow: var(--app-shadow-sm);
       }
 
-      .qty-btn {
-        width: 30px !important;
-        height: 30px !important;
-        padding: 0 !important;
-        color: var(--app-muted) !important;
-        border-radius: 0 !important;
-        display: inline-flex;
+      .stepper-btn {
+        display: flex;
         align-items: center;
         justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        color: var(--app-fg);
+        cursor: pointer;
+        transition: all var(--transition-fast);
       }
 
-      .qty-btn:first-child {
-        border-top-left-radius: var(--app-radius-sm) !important;
-        border-bottom-left-radius: var(--app-radius-sm) !important;
+      .stepper-btn mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
       }
 
-      .qty-btn:last-child {
-        border-top-right-radius: var(--app-radius-sm) !important;
-        border-bottom-right-radius: var(--app-radius-sm) !important;
+      .stepper-btn:hover:not(:disabled) {
+        background: var(--app-bg-alt);
+        color: var(--app-fg-heading);
       }
 
-      .qty-btn mat-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-        line-height: 16px;
-      }
-
-      .qty-btn:not(:disabled):hover {
-        background: var(--app-surface-hover) !important;
-        color: var(--app-fg) !important;
-      }
-
-      .qty-btn:disabled {
-        opacity: 0.4;
+      .stepper-btn:disabled {
+        opacity: 0.3;
         cursor: not-allowed;
       }
 
       .quantity-value {
-        width: 32px;
+        min-width: 32px;
         text-align: center;
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--app-fg);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--app-fg-heading);
         font-variant-numeric: tabular-nums;
-        border-left: 1px solid var(--app-border);
-        border-right: 1px solid var(--app-border);
-        line-height: 30px;
+      }
+
+      /* ==========================================================================
+         Price & Actions
+         ========================================================================== */
+      .item-actions {
+        display: flex;
+        align-items: center;
+        gap: 24px;
       }
 
       .item-price {
         color: var(--app-fg-heading);
-        font-weight: 600;
-        font-size: 14px;
-        min-width: 70px;
+        font-weight: 700;
+        font-size: 16px;
+        min-width: 80px;
         text-align: right;
         font-variant-numeric: tabular-nums;
+        letter-spacing: -0.02em;
       }
 
-
       .remove-btn {
-        width: 32px !important;
-        height: 32px !important;
-        padding: 0 !important;
-        color: var(--app-muted) !important;
-        border-radius: var(--app-radius-sm) !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        color: var(--app-muted);
+        border-radius: var(--app-radius-sm);
+        cursor: pointer;
+        transition: all var(--transition-fast);
       }
 
       .remove-btn mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
-        line-height: 18px;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
       }
 
       .remove-btn:hover {
-        background: var(--app-danger-light) !important;
-        color: var(--app-danger) !important;
+        background: var(--app-danger-light);
+        color: var(--app-danger);
+        transform: scale(0.95);
       }
 
-      @media (max-width: 600px) {
+      /* ==========================================================================
+         Responsive Mobile Grid
+         ========================================================================== */
+      @media (max-width: 640px) {
         .cart-item {
           display: grid;
-          grid-template-columns: 1fr auto auto;
+          grid-template-columns: 1fr auto;
           grid-template-areas:
-            "details details remove"
-            "quantity price remove";
-          gap: 12px 16px;
-          padding: 16px 4px;
+            "details remove"
+            "quantity actions";
+          gap: 16px 12px;
+          padding: 16px 12px;
         }
 
         .item-details {
           grid-area: details;
-          min-width: 0;
-        }
-
-        .item-name {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow-wrap: normal;
         }
 
         .item-quantity {
           grid-area: quantity;
-          justify-self: start;
+          /* Align stepper to match the image padding above it */
+          padding-left: 72px;
         }
 
-        .item-price {
-          grid-area: price;
-          align-self: center;
-          min-width: auto;
-          text-align: left;
+        .item-actions {
+          grid-area: actions;
+          gap: 12px;
+          justify-content: flex-end;
         }
 
         .remove-btn {
           grid-area: remove;
-          align-self: center;
+          justify-self: end;
+          align-self: start;
+          /* Move the button slightly up so it perfectly aligns with title text */
+          margin-top: -4px;
+          margin-right: -8px;
+        }
+
+        /* Adjust price to sit nicely next to the stepper on mobile */
+        .item-price {
+          min-width: auto;
         }
       }
     `,

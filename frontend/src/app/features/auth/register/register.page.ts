@@ -31,11 +31,16 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
     MatButtonModule,
     MatSelectModule,
     MatIconModule,
-    FieldErrorComponent,
+    FieldErrorComponent, // Removed the duplicate MatIconModule import
   ],
   template: `
-    <section class="auth-wrap">
-      <div class="glass-card auth-card">
+    <section class="auth-wrap animate-fade-in">
+      <!-- Premium Ambient Background -->
+      <div class="auth-bg-pattern"></div>
+      <div class="auth-ambient-glow"></div>
+
+      <!-- Card Entrance Animation -->
+      <div class="glass-card auth-card animate-pop-in delay-1">
         <div class="auth-header">
           <div class="brand-badge">
             <mat-icon>person_add</mat-icon>
@@ -44,57 +49,83 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
           <p class="muted">Join Marketplace as a buyer or seller</p>
         </div>
 
-        <form [formGroup]="form" (ngSubmit)="submit()" class="stack">
-          <mat-form-field appearance="outline">
-            <mat-label>Full name</mat-label>
-            <mat-icon matPrefix>person</mat-icon>
-            <input matInput formControlName="name" placeholder="John Doe" autocomplete="name" />
-          </mat-form-field>
-          <app-field-error [control]="form.controls.name" />
+        <form
+          [formGroup]="form"
+          (ngSubmit)="submit()"
+          class="auth-form animate-fade-in delay-2"
+        >
+          <div class="field-group">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Full name</mat-label>
+              <mat-icon matPrefix>person</mat-icon>
+              <input
+                matInput
+                formControlName="name"
+                placeholder="John Doe"
+                autocomplete="name"
+              />
+            </mat-form-field>
+            <app-field-error [control]="form.controls.name" />
+          </div>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Email address</mat-label>
-            <mat-icon matPrefix>email</mat-icon>
-            <input
-              matInput
-              type="email"
-              formControlName="email"
-              placeholder="you@example.com"
-              autocomplete="email"
-            />
-          </mat-form-field>
-          <app-field-error [control]="form.controls.email" />
+          <div class="field-group">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Email address</mat-label>
+              <mat-icon matPrefix>email</mat-icon>
+              <input
+                matInput
+                type="email"
+                formControlName="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+              />
+            </mat-form-field>
+            <app-field-error [control]="form.controls.email" />
+          </div>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Password</mat-label>
-            <mat-icon matPrefix>lock</mat-icon>
-            <input
-              matInput
-              type="password"
-              formControlName="password"
-              placeholder="Min. 8 characters"
-              autocomplete="new-password"
-            />
-          </mat-form-field>
-          <app-field-error [control]="form.controls.password" />
+          <div class="field-group">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Password</mat-label>
+              <mat-icon matPrefix>lock</mat-icon>
+              <input
+                matInput
+                type="password"
+                formControlName="password"
+                placeholder="Min. 8 characters"
+                autocomplete="new-password"
+              />
+            </mat-form-field>
+            <app-field-error [control]="form.controls.password" />
+          </div>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Account role</mat-label>
-            <mat-icon matPrefix>badge</mat-icon>
-            <mat-select formControlName="role">
-              <mat-option value="USER">Client — Browse & Buy products</mat-option>
-              <mat-option value="SELLER">Seller — List & Sell products</mat-option>
-            </mat-select>
-          </mat-form-field>
+          <div class="field-group">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+              <mat-label>Account role</mat-label>
+              <mat-icon matPrefix>badge</mat-icon>
+              <mat-select formControlName="role">
+                <mat-option value="USER"
+                  >Client — Browse & Buy products</mat-option
+                >
+                <mat-option value="SELLER"
+                  >Seller — List & Sell products</mat-option
+                >
+              </mat-select>
+            </mat-form-field>
+          </div>
 
+          <!-- FIXED BUTTON CONTENT PROJECTION -->
           <button
             mat-flat-button
             color="primary"
             class="submit-btn"
             [disabled]="form.invalid || loading()"
           >
-            <span *ngIf="!loading()">Create Account</span>
-            <span *ngIf="loading()">Creating account…</span>
+            @if (loading()) {
+              <mat-icon class="spinner-icon">autorenew</mat-icon>
+            }
+            <span>{{
+              loading() ? "Creating account…" : "Create Account"
+            }}</span>
           </button>
         </form>
 
@@ -110,49 +141,107 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
   styles: [
     `
       .auth-wrap {
-        min-height: calc(100vh - 180px);
+        position: relative;
+        min-height: calc(100vh - 68px);
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 40px 16px;
-        background: var(--app-gradient-hero);
+        background: var(--app-bg-alt);
+        overflow: hidden;
+      }
+
+      /* Premium Background Effects */
+      .auth-bg-pattern {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background-image: radial-gradient(
+          var(--app-border-hover) 1px,
+          transparent 1px
+        );
+        background-size: 24px 24px;
+        opacity: 0.6;
+        pointer-events: none;
+      }
+
+      .auth-ambient-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80vw;
+        height: 80vh;
+        background: radial-gradient(
+          circle,
+          var(--app-primary-light) 0%,
+          transparent 60%
+        );
+        opacity: 0.5;
+        filter: blur(60px);
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      :host-context(.dark-theme) .auth-ambient-glow {
+        opacity: 0.1;
       }
 
       .auth-card {
+        position: relative;
+        z-index: 2;
         width: 100%;
         max-width: 440px;
         padding: 40px 32px;
-        box-shadow: var(--app-shadow-xl);
+        background: var(--app-glass-bg);
+        backdrop-filter: var(--app-backdrop-blur);
+        -webkit-backdrop-filter: var(--app-backdrop-blur);
+        border: 1px solid var(--app-glass-border);
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+        border-radius: var(--app-radius-lg);
+      }
+
+      @media (max-width: 640px) {
+        .auth-card {
+          padding: 32px 24px;
+        }
       }
 
       .auth-header {
         text-align: center;
-        margin-bottom: 28px;
+        margin-bottom: 32px;
         display: flex;
         flex-direction: column;
         align-items: center;
       }
 
       .brand-badge {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-        background: var(--app-gradient-primary);
-        color: #ffffff;
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(
+          135deg,
+          var(--app-primary) 0%,
+          var(--app-primary-hover) 100%
+        );
+        color: var(--app-primary-text);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 16px;
-        box-shadow: var(--app-glow);
+        margin-bottom: 20px;
+        box-shadow:
+          0 8px 16px -4px rgba(0, 0, 0, 0.2),
+          inset 0 1px 1px rgba(255, 255, 255, 0.2);
       }
+
       .brand-badge mat-icon {
-        font-size: 26px;
-        width: 26px;
-        height: 26px;
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
       }
 
       h1 {
-        margin: 0 0 6px;
+        margin: 0 0 8px;
         font-size: 1.75rem;
         font-weight: 800;
         letter-spacing: -0.03em;
@@ -162,19 +251,47 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
       p.muted {
         margin: 0;
         font-size: 14px;
+        line-height: 1.5;
+      }
+
+      /* Form Fields Layout */
+      .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px; /* Precise spacing between input and error text */
+      }
+
+      mat-form-field {
+        width: 100%;
       }
 
       .submit-btn {
-        height: 46px;
+        height: 48px; /* Taller button for prominent primary action */
         font-size: 15px !important;
         font-weight: 600 !important;
         border-radius: var(--app-radius-sm) !important;
         margin-top: 8px;
       }
 
+      .spinner-icon {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
       .auth-footer {
-        margin-top: 24px;
-        padding-top: 20px;
+        margin-top: 28px;
+        padding-top: 24px;
         border-top: 1px solid var(--app-border);
         text-align: center;
       }
@@ -184,8 +301,11 @@ import { applyFormErrors } from "@shared/utils/form-error.util";
         font-weight: 600;
         text-decoration: none;
         margin-left: 4px;
+        transition: color var(--transition-fast);
       }
+
       .auth-link:hover {
+        color: var(--app-accent);
         text-decoration: underline;
       }
     `,
@@ -230,7 +350,9 @@ export class RegisterPage {
         if (err.status === 400 && err.error?.details) {
           applyFormErrors(this.form, err.error.details);
         } else {
-          this.notify.error(err.error?.message || "An error occurred during registration.");
+          this.notify.error(
+            err.error?.message || "An error occurred during registration.",
+          );
         }
       },
     });

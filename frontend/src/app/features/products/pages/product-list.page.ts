@@ -46,20 +46,26 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
     EmptyStateComponent,
   ],
   template: `
-    <section class="container catalog-section">
+    <!-- Added animate-fade-in to the main container -->
+    <section class="container catalog-section animate-fade-in">
       <div class="catalog-header">
         <div class="header-left">
           <div class="header-tag">Marketplace</div>
           <h1 class="header-title">
             All Products
             @if (!loading()) {
-              <span class="count-badge">{{ total() }}</span>
+              <span class="count-badge animate-pop-in">{{ total() }}</span>
             }
           </h1>
         </div>
 
         <div class="header-actions" [formGroup]="filterForm">
-          <mat-form-field appearance="outline" class="search-field">
+          <!-- PRO TIP: subscriptSizing="dynamic" removes the empty error space under the input natively! -->
+          <mat-form-field
+            appearance="outline"
+            class="search-field"
+            subscriptSizing="dynamic"
+          >
             <mat-icon matPrefix class="search-icon">search</mat-icon>
             <mat-label>Search catalog…</mat-label>
             <input
@@ -100,7 +106,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         <div class="app-card filter-panel" [formGroup]="filterForm">
           <div class="filter-grid">
             <!-- Category Filter -->
-            <mat-form-field appearance="outline">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-label>Category</mat-label>
               <mat-select formControlName="categoryId">
                 <mat-option [value]="null">All Categories</mat-option>
@@ -112,7 +118,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
 
             <!-- Price Range Filter -->
             <div class="price-range">
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
                 <mat-label>Min Price</mat-label>
                 <input
                   matInput
@@ -123,7 +129,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
                 <span matTextPrefix>$&nbsp;</span>
               </mat-form-field>
               <span class="range-separator">-</span>
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="outline" subscriptSizing="dynamic">
                 <mat-label>Max Price</mat-label>
                 <input
                   matInput
@@ -136,7 +142,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
             </div>
 
             <!-- Date Range Filter -->
-            <mat-form-field appearance="outline">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
               <mat-label>Date Added</mat-label>
               <mat-date-range-input [rangePicker]="picker">
                 <input
@@ -177,6 +183,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         <app-loading-spinner label="Searching products…" />
       } @else if (!items().length) {
         <app-empty-state
+          class="animate-fade-in"
           icon="search_off"
           title="No matching products found"
           description="Try modifying your search keywords or clear filters."
@@ -188,7 +195,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
           }
         </div>
 
-        <div class="paginator-card">
+        <div class="paginator-card animate-fade-in delay-3">
           <mat-paginator
             [length]="total()"
             [pageSize]="pageSize()"
@@ -214,9 +221,8 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
 
       .catalog-header {
         display: flex;
-        align-items: flex-end;
+        align-items: center; /* Changed to center to balance the dynamic input heights */
         justify-content: space-between;
-        margin-bottom: 24px; 
         flex-wrap: wrap;
         gap: 24px;
       }
@@ -237,13 +243,14 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
       .search-field {
         width: 340px;
         max-width: 100%;
-        margin-bottom: -1.34375em; 
+        /* Removed hacky negative margins! subscriptSizing="dynamic" in HTML handles this cleanly now */
       }
 
       .filter-toggle-btn {
-        height: 56px; 
+        height: 56px; /* Matches default Material Input height perfectly */
         border-radius: var(--app-radius-sm);
         position: relative;
+        transition: all var(--transition-fast);
       }
       .filter-toggle-btn.active {
         background: var(--app-primary-lighter);
@@ -259,44 +266,48 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         color: var(--app-primary-text);
         font-size: 11px;
         font-weight: 700;
-        width: 20px;
-        height: 20px;
+        width: 22px;
+        height: 22px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
+        border-radius: var(--app-radius-full);
         border: 2px solid var(--app-bg);
+        animation: popIn 0.3s var(--ease-spring) forwards; /* Using global var for bounce */
       }
 
       /* Filter Panel Styles */
       .filter-panel {
         padding: 24px;
-        margin-bottom: 36px;
         background: var(--app-surface-elevated);
-        animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-origin: top center;
+        animation: slideDownSpring 0.35s var(--ease-spring) forwards;
       }
 
       .filter-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 20px;
+        align-items: end; /* Keeps inputs perfectly bottom-aligned */
       }
 
       .price-range {
         display: flex;
-        align-items: baseline;
+        align-items: center;
         gap: 12px;
       }
 
       .range-separator {
-        color: var(--app-muted);
-        font-weight: bold;
+        color: var(--app-muted-light);
+        font-weight: 600;
       }
 
       .filter-actions {
         display: flex;
         justify-content: flex-end;
-        margin-top: 12px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--app-border); /* Subtle divider */
       }
 
       /* Grid & Paginator */
@@ -304,7 +315,30 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 24px;
-        margin-bottom: 16px;
+      }
+
+      /* Pro stagger animation for the product cards as they render */
+      .grid > * {
+        animation: fadeInUp 0.4s var(--ease-out) forwards;
+        opacity: 0;
+      }
+      .grid > *:nth-child(1) {
+        animation-delay: 0ms;
+      }
+      .grid > *:nth-child(2) {
+        animation-delay: 50ms;
+      }
+      .grid > *:nth-child(3) {
+        animation-delay: 100ms;
+      }
+      .grid > *:nth-child(4) {
+        animation-delay: 150ms;
+      }
+      .grid > *:nth-child(5) {
+        animation-delay: 200ms;
+      }
+      .grid > *:nth-child(n + 6) {
+        animation-delay: 250ms;
       }
 
       .paginator-card {
@@ -316,6 +350,11 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         display: flex;
         justify-content: flex-end;
         overflow: hidden;
+        transition: box-shadow var(--transition-normal);
+      }
+
+      .paginator-card:hover {
+        box-shadow: var(--app-shadow);
       }
 
       /* Forces the material paginator to blend into our custom card */
@@ -324,18 +363,18 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         color: var(--app-fg) !important;
       }
 
-      @keyframes slideDown {
+      @keyframes slideDownSpring {
         from {
           opacity: 0;
-          transform: translateY(-10px);
+          transform: translateY(-16px) scaleY(0.95);
         }
         to {
           opacity: 1;
-          transform: translateY(0);
+          transform: translateY(0) scaleY(1);
         }
       }
 
-      /* Same header typography as before */
+      /* Typography */
       .header-tag {
         font-size: 12px;
         font-weight: 700;
@@ -344,6 +383,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         color: var(--app-primary);
         margin-bottom: 4px;
       }
+
       .header-title {
         font-size: clamp(1.8rem, 3.5vw, 2.5rem);
         font-weight: 800;
@@ -353,14 +393,17 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         align-items: center;
         gap: 12px;
       }
+
       .count-badge {
         font-size: 13px;
         font-weight: 700;
         padding: 4px 12px;
         border-radius: var(--app-radius-full);
-        background: var(--app-primary-light);
+        background: var(--app-primary-lighter);
         color: var(--app-primary);
+        border: 1px solid var(--app-border); /* Matches the Shadcn aesthetic better */
       }
+
       .search-icon {
         margin-right: 8px;
         color: var(--app-muted);

@@ -36,13 +36,15 @@ const MAX_SIZE = 2 * 1024 * 1024;
     LoadingSpinnerComponent,
   ],
   template: `
-    <section class="container form-section">
-      <a mat-button class="back-btn" routerLink="/seller/products">
-        <mat-icon>arrow_back</mat-icon>
+    <section class="container form-section animate-fade-in">
+      <!-- Pro Back Button -->
+      <a class="btn btn-ghost back-btn" routerLink="/seller/products">
+        <mat-icon class="back-icon">arrow_back</mat-icon>
         <span>Back to my products</span>
       </a>
 
-      <div class="glass-card panel">
+      <!-- Glass/App Card Panel with Staggered Entry -->
+      <div class="app-card panel animate-fade-in delay-1">
         <div class="form-header">
           <h1>{{ id() ? "Edit Product" : "Create New Product" }}</h1>
           <p class="muted">
@@ -51,49 +53,78 @@ const MAX_SIZE = 2 * 1024 * 1024;
         </div>
 
         @if (loading()) {
-          <app-loading-spinner label="Loading product data…" />
+          <div class="loading-wrapper animate-pop-in">
+            <app-loading-spinner label="Loading product data…" />
+          </div>
         } @else {
-          <form [formGroup]="form" (ngSubmit)="submit()" class="stack">
-            <mat-form-field appearance="outline">
-              <mat-label>Product Name</mat-label>
-              <mat-icon matPrefix>label</mat-icon>
-              <input
-                matInput
-                formControlName="name"
-                placeholder="e.g. Premium Wireless Headphones"
-              />
-            </mat-form-field>
-            <app-field-error [control]="form.controls.name" />
-
-      
-            <mat-form-field appearance="outline">
-              <mat-label>Category</mat-label>
-              <mat-icon matPrefix>category</mat-icon>
-              <mat-select
-                formControlName="categoryId"
-                placeholder="Select a category"
+          <!-- Stack class handles vertical rhythm perfectly -->
+          <form
+            [formGroup]="form"
+            (ngSubmit)="submit()"
+            class="form-body stack delay-2"
+          >
+            <div class="field-group">
+              <mat-form-field
+                appearance="outline"
+                subscriptSizing="dynamic"
+                class="w-full"
               >
-                @for (cat of categories(); track cat.id) {
-                  <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-            <app-field-error [control]="form.controls.categoryId" />
+                <mat-label>Product Name</mat-label>
+                <mat-icon matPrefix>label</mat-icon>
+                <input
+                  matInput
+                  formControlName="name"
+                  placeholder="e.g. Premium Wireless Headphones"
+                />
+              </mat-form-field>
+              <app-field-error [control]="form.controls.name" />
+            </div>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Description</mat-label>
-              <textarea
-                matInput
-                rows="4"
-                formControlName="description"
-                placeholder="Provide a detailed product description…"
-              ></textarea>
-            </mat-form-field>
-            <app-field-error [control]="form.controls.description" />
+            <div class="field-group">
+              <mat-form-field
+                appearance="outline"
+                subscriptSizing="dynamic"
+                class="w-full"
+              >
+                <mat-label>Category</mat-label>
+                <mat-icon matPrefix>category</mat-icon>
+                <mat-select
+                  formControlName="categoryId"
+                  placeholder="Select a category"
+                >
+                  @for (cat of categories(); track cat.id) {
+                    <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <app-field-error [control]="form.controls.categoryId" />
+            </div>
 
+            <div class="field-group">
+              <mat-form-field
+                appearance="outline"
+                subscriptSizing="dynamic"
+                class="w-full"
+              >
+                <mat-label>Description</mat-label>
+                <textarea
+                  matInput
+                  rows="5"
+                  formControlName="description"
+                  placeholder="Provide a detailed product description…"
+                ></textarea>
+              </mat-form-field>
+              <app-field-error [control]="form.controls.description" />
+            </div>
+
+            <!-- Responsive Grid for Row Inputs -->
             <div class="row-inputs">
-              <div class="field-half">
-                <mat-form-field appearance="outline" class="w-full">
+              <div class="field-group">
+                <mat-form-field
+                  appearance="outline"
+                  subscriptSizing="dynamic"
+                  class="w-full"
+                >
                   <mat-label>Price ($ USD)</mat-label>
                   <mat-icon matPrefix>attach_money</mat-icon>
                   <input
@@ -107,8 +138,12 @@ const MAX_SIZE = 2 * 1024 * 1024;
                 <app-field-error [control]="form.controls.price" />
               </div>
 
-              <div class="field-half">
-                <mat-form-field appearance="outline" class="w-full">
+              <div class="field-group">
+                <mat-form-field
+                  appearance="outline"
+                  subscriptSizing="dynamic"
+                  class="w-full"
+                >
                   <mat-label>Quantity in Stock</mat-label>
                   <mat-icon matPrefix>inventory_2</mat-icon>
                   <input
@@ -122,13 +157,21 @@ const MAX_SIZE = 2 * 1024 * 1024;
               </div>
             </div>
 
-            <!-- Media Upload Area -->
+            <!-- Enhanced Media Upload Area -->
             <div class="media-section">
-              <label class="media-label">Product Media Images (Max 5)</label>
+              <div class="media-header">
+                <label class="media-label">Product Media Images</label>
+                <span
+                  class="media-counter"
+                  [class.maxed]="images().length >= 5"
+                >
+                  {{ images().length }} / 5
+                </span>
+              </div>
 
               @if (images().length < 5) {
                 <label
-                  class="dropzone"
+                  class="dropzone animate-fade-in"
                   appFileDrop
                   (filesDropped)="onFiles($event)"
                 >
@@ -144,67 +187,73 @@ const MAX_SIZE = 2 * 1024 * 1024;
                     <mat-icon>cloud_upload</mat-icon>
                   </div>
                   <div class="drop-text">
-                    <strong>Drag & drop images here</strong> or
-                    <button
-                      type="button"
-                      mat-button
-                      color="primary"
-                      (click)="f.click()"
-                    >
-                      browse files
-                    </button>
+                    <span class="highlight">Click to upload</span> or drag and
+                    drop
                   </div>
-                  <small class="muted">PNG, JPG, WebP up to 2 MB each</small>
+                  <p class="drop-hint">SVG, PNG, JPG or GIF (max. 2MB)</p>
                 </label>
               } @else {
-                <div class="dropzone max-reached">
-                  <mat-icon>block</mat-icon>
-                  <div>Maximum of 5 images reached.</div>
-                  <small class="muted"
-                    >Remove an existing image to upload another.</small
-                  >
+                <div class="dropzone max-reached animate-fade-in">
+                  <div class="drop-icon">
+                    <mat-icon>block</mat-icon>
+                  </div>
+                  <div class="drop-text">Maximum image limit reached</div>
+                  <p class="drop-hint">Remove an image to upload another.</p>
                 </div>
               }
 
               @if (uploading()) {
-                <div class="muted upload-progress">
-                  Uploading image assets… {{ progress() }}%
+                <div class="upload-progress animate-pop-in">
+                  <mat-icon class="spinner">sync</mat-icon>
+                  <span>Uploading image assets… {{ progress() }}%</span>
                 </div>
               }
 
               @if (images().length) {
-                <div class="thumbs-grid">
+                <div class="thumbs-grid animate-fade-in delay-1">
                   @for (image of images(); track image.url) {
-                    <div class="thumb-card">
-                      <img [src]="image.url" alt="" />
-                      <button
-                        mat-icon-button
-                        type="button"
-                        class="remove-img-btn"
-                        (click)="removeImage(image)"
-                        aria-label="Remove image"
-                      >
-                        <mat-icon>close</mat-icon>
-                      </button>
+                    <div
+                      class="thumb-card animate-pop-in"
+                      [style.animation-delay]="$index * 50 + 'ms'"
+                    >
+                      <img [src]="image.url" alt="Product thumbnail" />
+                      <div class="thumb-overlay">
+                        <button
+                          type="button"
+                          class="remove-img-btn"
+                          (click)="removeImage(image)"
+                          aria-label="Remove image"
+                          matTooltip="Remove image"
+                        >
+                          <mat-icon>delete_outline</mat-icon>
+                        </button>
+                      </div>
                     </div>
                   }
                 </div>
               }
             </div>
 
+            <!-- Standardized Form Actions -->
             <div class="form-actions">
               <a
                 routerLink="/seller/products"
                 class="btn btn-outline cancel-btn"
-                >Cancel</a
               >
+                Cancel
+              </a>
               <button
                 type="submit"
                 class="btn btn-primary save-btn"
                 [disabled]="form.invalid || saving()"
               >
-                <span *ngIf="!saving()">Save Product</span>
-                <span *ngIf="saving()">Saving Product…</span>
+                @if (saving()) {
+                  <mat-icon class="spinner">sync</mat-icon>
+                  <span>Saving…</span>
+                } @else {
+                  <mat-icon>save</mat-icon>
+                  <span>Save Product</span>
+                }
               </button>
             </div>
           </form>
@@ -214,141 +263,312 @@ const MAX_SIZE = 2 * 1024 * 1024;
   `,
   styles: [
     `
+      /* Layout & Spacing */
       .form-section {
-        padding-top: 24px;
-        padding-bottom: 64px;
+        padding-top: 32px;
+        padding-bottom: 80px;
+        max-width: 840px; /* Constrain width for optimal reading experience */
       }
-      .back-btn {
-        margin-bottom: 20px;
-        color: var(--app-muted) !important;
-      }
+
       .panel {
-        padding: 36px;
-        max-width: 760px;
+        padding: 40px;
         width: 100%;
         margin: 0 auto;
-        box-shadow: var(--app-shadow-lg);
       }
+
+      @media (max-width: 640px) {
+        .form-section {
+          padding-top: 24px;
+        }
+        .panel {
+          padding: 24px 20px;
+        }
+      }
+
+      .loading-wrapper {
+        padding: 48px 0;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* Back Button Micro-interaction */
+      .back-btn {
+        margin-bottom: 24px;
+        padding-left: 8px !important; /* Tighten left padding */
+        color: var(--app-muted) !important;
+        font-weight: 600;
+      }
+      .back-btn:hover {
+        color: var(--app-fg-heading) !important;
+        background: transparent !important;
+      }
+      .back-icon {
+        margin-right: 4px;
+        transition: transform var(--transition-normal);
+      }
+      .back-btn:hover .back-icon {
+        transform: translateX(-4px);
+      }
+
+      /* Header */
       .form-header {
-        margin-bottom: 28px;
+        margin-bottom: 32px;
       }
       .form-header h1 {
-        font-size: 1.75rem;
+        font-size: clamp(1.5rem, 4vw, 2rem);
         font-weight: 800;
-        letter-spacing: -0.025em;
-        margin: 0 0 4px;
+        letter-spacing: -0.03em;
+        margin: 0 0 8px;
         color: var(--app-fg-heading);
       }
-      .row-inputs {
-        display: flex;
-        gap: 16px;
+
+      /* Form Fields */
+      .form-body {
+        gap: 24px; /* Increased stack gap since subscriptSizing is dynamic */
       }
-      .field-half {
-        flex: 1;
-      }
+
       .w-full {
         width: 100%;
       }
+
+      .field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px; /* Space between input and error */
+      }
+
+      .row-inputs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+
+      @media (max-width: 640px) {
+        .row-inputs {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Textarea tweak */
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+
+      /* ==========================================================================
+         Pro Media Dropzone (Shadcn aesthetic)
+         ========================================================================== */
       .media-section {
-        margin: 16px 0 24px;
+        margin: 8px 0 0;
       }
+
+      .media-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
       .media-label {
-        font-size: 13px;
-        font-weight: 700;
+        font-size: 14px;
+        font-weight: 600;
         color: var(--app-fg-heading);
-        margin-bottom: 8px;
-        display: block;
       }
+
+      .media-counter {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--app-muted);
+        background: var(--app-bg-alt);
+        padding: 2px 8px;
+        border-radius: var(--app-radius-full);
+      }
+      .media-counter.maxed {
+        background: var(--app-warning-light);
+        color: var(--app-warning);
+      }
+
       .dropzone {
-        padding: 36px 24px;
+        padding: 40px 24px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 8px;
+        justify-content: center;
+        gap: 12px;
         text-align: center;
+        background: var(--app-bg-alt);
         border: 2px dashed var(--app-border);
         border-radius: var(--app-radius);
         cursor: pointer;
-        transition: all 0.25s ease;
-        background: var(--app-bg-alt);
+        transition: all var(--transition-normal);
+        outline: none;
       }
+
       .dropzone:hover {
         border-color: var(--app-primary);
         background: var(--app-primary-lighter);
       }
+
+      .dropzone:focus-visible {
+        box-shadow: var(--app-glow);
+        border-color: var(--app-primary);
+      }
+
       .dropzone.max-reached {
         cursor: not-allowed;
-        opacity: 0.7;
+        opacity: 0.8;
+        background: var(--app-bg-alt);
+        border-color: var(--app-border);
       }
-      .drop-icon mat-icon {
-        font-size: 38px;
-        width: 38px;
-        height: 38px;
+      .dropzone.max-reached:hover {
+        border-color: var(--app-border);
+      }
+
+      .drop-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--app-surface);
+        box-shadow: var(--app-shadow-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--app-muted);
+        transition:
+          color var(--transition-fast),
+          transform var(--transition-normal);
+      }
+
+      .dropzone:hover:not(.max-reached) .drop-icon {
         color: var(--app-primary);
+        transform: translateY(-2px);
       }
+
+      .drop-text {
+        font-size: 15px;
+        color: var(--app-fg);
+        font-weight: 500;
+      }
+      .drop-text .highlight {
+        color: var(--app-primary);
+        font-weight: 600;
+      }
+
+      .drop-hint {
+        font-size: 13px;
+        color: var(--app-muted);
+        margin: 0;
+      }
+
+      /* Upload Progress indicator */
+      .upload-progress {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 16px;
+        padding: 12px 16px;
+        background: var(--app-primary-lighter);
+        color: var(--app-primary);
+        border-radius: var(--app-radius-sm);
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      /* ==========================================================================
+         Thumbnails Grid
+         ========================================================================== */
       .thumbs-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 14px;
-        margin-top: 16px;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 16px;
+        margin-top: 24px;
       }
+
       .thumb-card {
         position: relative;
         aspect-ratio: 1 / 1;
         border-radius: var(--app-radius-sm);
         overflow: hidden;
         border: 1px solid var(--app-border);
+        background: var(--app-surface);
         box-shadow: var(--app-shadow-sm);
       }
+
       .thumb-card img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: transform var(--transition-normal);
       }
-      .remove-img-btn {
+
+      .thumb-overlay {
         position: absolute;
-        top: 4px;
-        right: 4px;
-        background: rgba(15, 23, 42, 0.75);
-        color: #ffffff;
-        width: 28px !important;
-        height: 28px !important;
+        inset: 0;
+        background: rgba(9, 9, 11, 0.4);
+        opacity: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
+        transition: opacity var(--transition-fast);
       }
+
+      .thumb-card:hover .thumb-overlay {
+        opacity: 1;
+      }
+
+      .thumb-card:hover img {
+        transform: scale(1.05);
+      }
+
+      /* Glassmorphism delete button */
+      .remove-img-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        transform: scale(0.9);
+      }
+
       .remove-img-btn:hover {
         background: var(--app-danger);
+        transform: scale(1);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
       }
+
+      /* Form Actions */
       .form-actions {
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        gap: 12px;
-        margin-top: 16px;
-        padding-top: 20px;
+        gap: 16px;
+        margin-top: 24px;
+        padding-top: 24px;
         border-top: 1px solid var(--app-border);
       }
+
       .cancel-btn,
       .save-btn {
-        height: 40px;
-        padding: 0 20px;
-        font-size: 14px;
-        font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1;
-        box-sizing: border-border-box;
+        min-width: 120px;
+        height: 44px; /* Slightly taller for primary form actions */
       }
-      @media (max-width: 600px) {
-        .panel {
-          padding: 24px;
-        }
-        .row-inputs {
-          flex-direction: column;
-          gap: 0;
+
+      /* Spinner animation for saving/uploading states */
+      .spinner {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        100% {
+          transform: rotate(360deg);
         }
       }
     `,
@@ -370,15 +590,14 @@ export class ProductFormPage {
 
   readonly images = signal<ProductImage[]>([]);
   readonly deletedImageIds = signal<string[]>([]);
-  readonly categories = signal<Category[]>([]); 
-
+  readonly categories = signal<Category[]>([]);
 
   readonly form = this.fb.nonNullable.group({
     name: [
       "",
       [Validators.required, Validators.minLength(3), Validators.maxLength(100)],
     ],
-    categoryId: ["", [Validators.required]], 
+    categoryId: ["", [Validators.required]],
     description: [
       "",
       [
@@ -402,7 +621,6 @@ export class ProductFormPage {
       this.loading.set(true);
       this.svc.get(id).subscribe({
         next: (p) => {
-        
           this.form.patchValue({
             name: p.name,
             categoryId: p.categoryId,

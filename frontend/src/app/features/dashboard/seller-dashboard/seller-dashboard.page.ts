@@ -31,18 +31,22 @@ import { CurrentUserService } from "@core/services/current-user.service";
   ],
   template: `
     <section class="container dashboard-section">
-      <div class="welcome-header">
+      <!-- Welcome Header -->
+      <div class="welcome-header animate-fade-in">
         <div class="welcome-text">
-          <div class="welcome-tag">Seller Portal</div>
-          <h1 class="welcome-title">
+          <div class="welcome-tag animate-pop-in delay-1">Seller Portal</div>
+          <h1 class="welcome-title delay-1">
             Welcome back, {{ currentUser.user()?.name }} 👋
           </h1>
-          <p class="muted">
+          <p class="muted delay-2">
             Manage your store products, media assets, and inventory performance.
           </p>
         </div>
 
-        <a routerLink="/seller/products/new" class="btn btn-primary">
+        <a
+          routerLink="/seller/products/new"
+          class="btn btn-primary create-btn delay-2"
+        >
           <mat-icon>add</mat-icon>
           <span>Create New Product</span>
         </a>
@@ -50,7 +54,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
 
       <!-- Stat Cards -->
       <div class="stats-grid">
-        <div class="app-card stat-card">
+        <div class="app-card stat-card animate-fade-in delay-1">
           <div class="stat-icon p-icon"><mat-icon>inventory_2</mat-icon></div>
           <div class="stat-content">
             <div class="stat-label">Total Products</div>
@@ -58,7 +62,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
           </div>
         </div>
 
-        <div class="app-card stat-card">
+        <div class="app-card stat-card animate-fade-in delay-2">
           <div class="stat-icon m-icon"><mat-icon>collections</mat-icon></div>
           <div class="stat-content">
             <div class="stat-label">Media Assets</div>
@@ -66,11 +70,14 @@ import { CurrentUserService } from "@core/services/current-user.service";
           </div>
         </div>
 
-        <div class="app-card stat-card">
+        <div class="app-card stat-card animate-fade-in delay-3">
           <div class="stat-icon l-icon"><mat-icon>schedule</mat-icon></div>
           <div class="stat-content">
             <div class="stat-label">Latest Item</div>
-            <div class="stat-value text-truncate">
+            <div
+              class="stat-value text-truncate"
+              [title]="items().length ? latest().name : '—'"
+            >
               {{ items().length ? latest().name : "—" }}
             </div>
           </div>
@@ -78,7 +85,7 @@ import { CurrentUserService } from "@core/services/current-user.service";
       </div>
 
       <!-- Secondary Navigation Shortcuts -->
-      <div class="shortcuts-bar">
+      <div class="shortcuts-bar animate-fade-in delay-3">
         <a routerLink="/seller/products" class="btn btn-secondary">
           <mat-icon>list_alt</mat-icon>
           <span>Manage All Products</span>
@@ -92,11 +99,11 @@ import { CurrentUserService } from "@core/services/current-user.service";
 
       <!-- Recent Products Grid -->
       <div class="recent-section">
-        <div class="section-title-row">
+        <div class="section-title-row animate-fade-in delay-3">
           <h2>Recent Products</h2>
           <a routerLink="/seller/products" class="btn btn-ghost link-btn">
             <span>View all</span>
-            <mat-icon>arrow_forward</mat-icon>
+            <mat-icon class="arrow-icon">arrow_forward</mat-icon>
           </a>
         </div>
 
@@ -115,82 +122,113 @@ import { CurrentUserService } from "@core/services/current-user.service";
   styles: [
     `
       .dashboard-section {
-        padding-top: 40px;
+        padding-top: 48px; /* Slightly increased for premium spacing */
         padding-bottom: 64px;
         display: flex;
         flex-direction: column;
-        gap: 32px;
+        gap: 36px;
       }
 
+      /* ==========================================================================
+         Header
+         ========================================================================== */
       .welcome-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        gap: 20px;
+        gap: 24px;
         flex-wrap: wrap;
       }
 
       .welcome-text {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 8px;
       }
 
       .welcome-tag {
         display: inline-flex;
         align-items: center;
-        font-size: 12px;
-        font-weight: 600;
+        font-size: 11px;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
         color: var(--app-primary);
         background: var(--app-primary-lighter);
-        padding: 4px 10px;
+        padding: 4px 12px;
         border-radius: var(--app-radius-full);
         align-self: flex-start;
         margin-bottom: 4px;
+        border: 1px solid var(--app-border);
       }
 
       .welcome-title {
-        font-size: clamp(1.5rem, 3vw, 2rem);
+        font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
         margin: 0;
+        color: var(--app-fg-heading);
       }
 
       .welcome-text .muted {
         margin: 0;
         font-size: 15px;
+        max-width: 600px;
+        line-height: 1.5;
       }
 
+      .create-btn {
+        height: 44px; /* Taller hero action button */
+        padding: 0 24px;
+      }
+
+      /* ==========================================================================
+         Stat Cards
+         ========================================================================== */
       .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
       }
 
       .stat-card {
         padding: 24px;
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 20px;
+        transition:
+          transform var(--transition-normal),
+          box-shadow var(--transition-normal);
+        cursor: default; /* Indicates it's a data widget, not a link */
+      }
+
+      .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--app-shadow-lg);
       }
 
       .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: var(--app-radius);
+        width: 56px;
+        height: 56px;
+        border-radius: var(--app-radius-lg);
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+        transition: transform var(--transition-spring);
+      }
+
+      .stat-card:hover .stat-icon {
+        transform: scale(1.08); /* Icon pops slightly when card is hovered */
       }
 
       .stat-icon mat-icon {
-        font-size: 24px;
-        width: 24px;
-        height: 24px;
+        font-size: 26px;
+        width: 26px;
+        height: 26px;
       }
 
-  
+      /* Refined Pastel/Pro Icon Backgrounds */
       .p-icon {
         background: var(--app-primary-lighter);
         color: var(--app-primary);
@@ -207,22 +245,24 @@ import { CurrentUserService } from "@core/services/current-user.service";
       .stat-content {
         display: flex;
         flex-direction: column;
-        gap: 2px;
-        min-width: 0; 
+        gap: 4px;
+        min-width: 0;
       }
 
       .stat-label {
         font-size: 13px;
-        font-weight: 500;
+        font-weight: 600;
         color: var(--app-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
       }
 
       .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 1.75rem;
+        font-weight: 800;
         color: var(--app-fg-heading);
-        letter-spacing: -0.025em;
-        line-height: 1.2;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
       }
 
       .stat-value.text-truncate {
@@ -231,18 +271,26 @@ import { CurrentUserService } from "@core/services/current-user.service";
         text-overflow: ellipsis;
       }
 
+      /* ==========================================================================
+         Shortcuts Bar
+         ========================================================================== */
       .shortcuts-bar {
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
         padding-top: 8px;
+        border-top: 1px solid var(--app-border); /* Subtle divider */
+        margin-top: 8px;
       }
 
+      /* ==========================================================================
+         Recent Products Section
+         ========================================================================== */
       .recent-section {
         display: flex;
         flex-direction: column;
-        gap: 20px;
-        padding-top: 16px;
+        gap: 24px;
+        padding-top: 24px;
       }
 
       .section-title-row {
@@ -252,24 +300,51 @@ import { CurrentUserService } from "@core/services/current-user.service";
       }
 
       .section-title-row h2 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
         margin: 0;
+        color: var(--app-fg-heading);
       }
 
       .link-btn {
         color: var(--app-primary) !important;
         font-weight: 600;
-        padding: 0 8px;
+        padding: 0 12px;
       }
-      .link-btn mat-icon {
+
+      /* Micro-interaction: Arrow slides on hover */
+      .arrow-icon {
         font-size: 18px;
         width: 18px;
         height: 18px;
+        transition: transform var(--transition-normal);
+      }
+      .link-btn:hover .arrow-icon {
+        transform: translateX(4px);
       }
 
+      /* Pro stagger animation for the product cards as they render */
       .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 24px;
+      }
+      .grid > * {
+        animation: fadeInUp 0.4s var(--ease-out) forwards;
+        opacity: 0;
+      }
+      .grid > *:nth-child(1) {
+        animation-delay: 0ms;
+      }
+      .grid > *:nth-child(2) {
+        animation-delay: 50ms;
+      }
+      .grid > *:nth-child(3) {
+        animation-delay: 100ms;
+      }
+      .grid > *:nth-child(4) {
+        animation-delay: 150ms;
       }
     `,
   ],

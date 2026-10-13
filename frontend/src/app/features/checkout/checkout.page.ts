@@ -23,6 +23,7 @@ import { Address, CreateOrderRequest } from "@core/models/order.model";
 import { ShippingAddressStepComponent } from "./steps/shipping-address-step.component";
 import { ReviewOrderStepComponent } from "./steps/review-order-step.component";
 import { ConfirmationStepComponent } from "./steps/confirmation-step.component";
+import { LoadingSpinnerComponent } from "@shared/components/loading-spinner.component";
 
 @Component({
   selector: "app-checkout-wizard",
@@ -36,117 +37,208 @@ import { ConfirmationStepComponent } from "./steps/confirmation-step.component";
     MatCardModule,
     MatProgressSpinnerModule,
     RouterModule,
-
+    LoadingSpinnerComponent,
     ShippingAddressStepComponent,
     ReviewOrderStepComponent,
     ConfirmationStepComponent,
   ],
   template: `
-    <section class="container">
-      <h1 class="page-title">Checkout</h1>
+    <section class="container checkout-section animate-fade-in">
+      <div class="page-header">
+        <h1 class="page-title">Checkout</h1>
+        <div class="trust-badge animate-pop-in delay-1">
+          <mat-icon>lock</mat-icon>
+          <span>Secure Encrypted Connection</span>
+        </div>
+      </div>
 
       @if (cart(); as c) {
         @if (c.items.length === 0) {
-          <div class="empty-state">
-            <mat-icon>shopping_cart</mat-icon>
-            <p>Your cart is empty</p>
-
-            <a class="btn btn-primary" routerLink="/products">
-              Browse products
+          <!-- Premium Empty State -->
+          <div class="empty-state animate-fade-in">
+            <div class="empty-icon-wrap">
+              <mat-icon>remove_shopping_cart</mat-icon>
+            </div>
+            <h2>Your cart is empty</h2>
+            <p class="muted">
+              You need items in your cart to proceed to checkout.
+            </p>
+            <a class="btn btn-primary continue-btn" routerLink="/products">
+              <mat-icon>arrow_back</mat-icon>
+              <span>Browse products</span>
             </a>
           </div>
         } @else {
-          <mat-card class="wizard-card">
-            <mat-stepper [linear]="true" #stepper>
+          <!-- Wizard Container -->
+          <div class="app-card wizard-card animate-fade-in delay-1">
+            <mat-stepper [linear]="true" #stepper class="pro-stepper">
               <mat-step [stepControl]="addressForm" label="Shipping Address">
-                <app-shipping-address-step
-                  [addressForm]="addressForm"
-                  (next)="stepper.next()"
-                />
+                <div class="step-content-wrap">
+                  <app-shipping-address-step
+                    [addressForm]="addressForm"
+                    (next)="stepper.next()"
+                  />
+                </div>
               </mat-step>
 
               <mat-step label="Review Order" [completed]="orderId() !== null">
-                <app-review-order-step
-                  [cart]="c"
-                  [addressForm]="addressForm"
-                  (previous)="stepper.previous()"
-                  (placeOrder)="placeOrder(stepper)"
-                />
+                <div class="step-content-wrap">
+                  <app-review-order-step
+                    [cart]="c"
+                    [addressForm]="addressForm"
+                    (previous)="stepper.previous()"
+                    (placeOrder)="placeOrder(stepper)"
+                  />
+                </div>
               </mat-step>
 
               <mat-step label="Confirmation">
-                <app-confirmation-step [orderId]="orderId()" />
+                <div class="step-content-wrap">
+                  <app-confirmation-step [orderId]="orderId()" />
+                </div>
               </mat-step>
             </mat-stepper>
-          </mat-card>
+          </div>
         }
       } @else {
-        <div class="loading-wrap">
-          <mat-spinner [diameter]="40" />
-          <span class="muted">Loading cart…</span>
-        </div>
+        <!-- Consistent App Loading State -->
+        <app-loading-spinner label="Initializing secure checkout…" />
       }
     </section>
   `,
   styles: [
     `
-      .container {
-        max-width: 720px;
+      .checkout-section {
+        max-width: 800px; /* Perfect width for focused checkout forms */
         margin: 0 auto;
-        padding: 24px 16px;
+        padding-top: 40px;
+        padding-bottom: 80px;
+      }
+
+      /* ==========================================================================
+         Header & Trust Badge
+         ========================================================================== */
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 32px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--app-border);
       }
 
       .page-title {
-        font-size: 1.75rem;
+        font-size: clamp(1.75rem, 4vw, 2.25rem);
         font-weight: 800;
-        margin-bottom: 24px;
-        color: var(--app-fg);
+        letter-spacing: -0.03em;
+        margin: 0;
+        color: var(--app-fg-heading);
       }
 
+      .trust-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--app-success);
+        background: var(--app-success-light);
+        padding: 6px 12px;
+        border-radius: var(--app-radius-full);
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+      }
+      .trust-badge mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+
+      /* ==========================================================================
+         Wizard Card
+         ========================================================================== */
       .wizard-card {
-        padding: 8px;
-        background: var(--app-surface);
-        border-radius: var(--app-radius);
-        box-shadow: var(--app-shadow);
+        padding: 24px;
       }
 
-      mat-card,
-      mat-stepper {
-        background-color: transparent;
+      .pro-stepper {
+        background-color: transparent !important;
       }
 
-      mat-step-header {
-        border-radius: var(--app-radius) !important;
+      /* Adds nice breathing room inside the active steps */
+      .step-content-wrap {
+        padding-top: 32px;
+        padding-bottom: 16px;
       }
 
+      @media (max-width: 600px) {
+        .wizard-card {
+          padding: 16px 8px;
+        }
+        .step-content-wrap {
+          padding-top: 24px;
+        }
+      }
+
+      /* ==========================================================================
+         Premium Empty State
+         ========================================================================== */
       .empty-state {
-        text-align: center;
-        padding: 64px 24px;
-        color: var(--app-muted);
-      }
-
-      .empty-state mat-icon {
-        font-size: 64px;
-        width: 64px;
-        height: 64px;
-        color: var(--app-bg);
-        margin-bottom: 16px;
-      }
-
-      .loading-wrap {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
-        padding: 64px 0;
+        text-align: center;
+        padding: 80px 24px;
+        background: var(--app-surface);
+        border: 1px dashed var(--app-border-hover);
+        border-radius: var(--app-radius-lg);
+      }
+
+      .empty-icon-wrap {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--app-bg-alt);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        border: 1px solid var(--app-border);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+      }
+
+      .empty-icon-wrap mat-icon {
+        font-size: 36px;
+        width: 36px;
+        height: 36px;
+        color: var(--app-muted-light);
+      }
+
+      .empty-state h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 8px;
+        color: var(--app-fg-heading);
+      }
+
+      .empty-state p {
+        font-size: 15px;
+        margin: 0 0 32px;
         color: var(--app-muted);
       }
 
-      ::ng-deep .mat-step-header:hover,
-      ::ng-deep .mat-step-header[aria-selected="true"] {
-        border: 1px solid transparent !important;
-        border-radius: 8px !important;
-        background-color: rgba(255, 255, 255, 0.1);
+      .continue-btn {
+        height: 48px;
+        padding: 0 28px;
+        font-size: 15px;
+      }
+      .continue-btn mat-icon {
+        margin-right: 4px;
+        transition: transform var(--transition-fast);
+      }
+      .continue-btn:hover mat-icon {
+        transform: translateX(-4px);
       }
     `,
   ],

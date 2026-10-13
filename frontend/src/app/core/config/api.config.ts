@@ -60,4 +60,8 @@ export const API = {
     status: (subOrderId: string) => `/suborders/${subOrderId}/status`,
     delete: (subOrderId: string) => `/suborders/${subOrderId}`,
   },
+  analytics: {
+    user: "/analytics/user",
+    seller: "/analytics/seller",
+  },
 } as const;

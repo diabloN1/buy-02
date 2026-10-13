@@ -414,7 +414,6 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         flex-wrap: wrap;
       }
 
-
       .stock-pill {
         display: inline-flex;
         align-items: center;
@@ -437,6 +436,52 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         font-size: 14px;
         width: 14px;
         height: 14px;
+      }
+
+
+      .category-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: var(--app-radius-full);
+        background: var(--app-bg-alt); 
+        border: 1px solid var(--app-border);
+        color: var(--app-fg);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .category-pill mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: var(--app-primary);
+      }
+
+      .edit-pill-btn {
+        height: 28px !important;
+        padding: 0 10px !important;
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        border-radius: var(--app-radius-full) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        color: var(--app-fg) !important;
+        border: 1px solid var(--app-border) !important;
+        text-decoration: none !important;
+        transition: all 0.15s ease !important;
+      }
+      .edit-pill-btn mat-icon {
+        font-size: 14px !important;
+        width: 14px !important;
+        height: 14px !important;
+        line-height: 14px !important;
+      }
+      .edit-pill-btn:hover {
+        background: var(--app-surface-hover) !important;
+        border-color: var(--app-border-hover) !important;
+        color: var(--app-fg-heading) !important;
       }
 
 
@@ -575,7 +620,6 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         color: var(--app-muted);
       }
 
-
       .divider {
         height: 1px;
         background: var(--app-border);
@@ -597,6 +641,25 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
 
 
       .actions-group {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 24px;
+      }
+      .edit-btn,
+      .buy-btn {
+        width: 100%;
+        max-width: 100%;
+        height: 44px;
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 16px;
+      }
+
+      .auth-prompt {
         display: flex;
         flex-direction: column;
         gap: 16px;
@@ -638,6 +701,57 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
       .connect-btn {
         height: 32px !important;
         padding: 0 12px !important;
+      }
+
+      .quantity-selector,
+      .quantity-display {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--app-fg-heading);
+        margin-bottom: 12px;
+      }
+
+      .quantity-stepper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--app-surface);
+        border: 1px solid var(--app-border);
+        padding: 4px;
+        border-radius: var(--app-radius-sm);
+      }
+      .quantity-value {
+        min-width: 24px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .minifab {
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 4px !important;
+        background: transparent !important;
+        color: var(--app-fg) !important;
+        box-shadow: none !important;
+        border: 1px solid transparent !important;
+        transition: background 0.15s ease !important;
+      }
+      .minifab mat-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+        line-height: 16px !important;
+      }
+      .minifab:hover:not(:disabled) {
+        background: var(--app-surface-hover) !important;
+        border-color: var(--app-border) !important;
+      }
+      .minifab:disabled {
+        visibility: hidden;
       }
 
       .quantity-selector,

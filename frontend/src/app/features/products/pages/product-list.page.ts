@@ -216,7 +216,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         display: flex;
         align-items: flex-end;
         justify-content: space-between;
-        margin-bottom: 24px; 
+        margin-bottom: 24px;
         flex-wrap: wrap;
         gap: 24px;
       }
@@ -227,6 +227,36 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         gap: 6px;
       }
 
+      /* --- Typography --- */
+      .header-tag {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--app-primary);
+        margin-bottom: 4px;
+      }
+
+      .header-title {
+        font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .count-badge {
+        font-size: 13px;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: var(--app-radius-full);
+        background: var(--app-primary-light);
+        color: var(--app-primary);
+      }
+
+      /* --- Actions & Search --- */
       .header-actions {
         display: flex;
         align-items: center;
@@ -237,14 +267,22 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
       .search-field {
         width: 340px;
         max-width: 100%;
-        margin-bottom: -1.34375em; 
+        margin-bottom: -1.34375em;
       }
 
+      .search-icon {
+        margin-right: 8px;
+        color: var(--app-muted);
+        font-weight: bold;
+      }
+
+      /* --- Filter Button & Badge --- */
       .filter-toggle-btn {
-        height: 56px; 
+        height: 56px;
         border-radius: var(--app-radius-sm);
         position: relative;
       }
+
       .filter-toggle-btn.active {
         background: var(--app-primary-lighter);
         border-color: var(--app-primary);
@@ -268,7 +306,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         border: 2px solid var(--app-bg);
       }
 
-      /* Filter Panel Styles */
+      /* --- Filter Panel --- */
       .filter-panel {
         padding: 24px;
         margin-bottom: 36px;
@@ -299,26 +337,25 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         margin-top: 12px;
       }
 
-      /* Grid & Paginator */
+      /* --- Grid & Paginator --- */
       .grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 24px;
-        margin-bottom: 16px;
+        margin-bottom: 40px;
       }
 
       .paginator-card {
         background: var(--app-surface);
         border: 1px solid var(--app-border);
         border-radius: var(--app-radius);
-        padding: 4px 16px;
+        padding: 8px 16px;
         box-shadow: var(--app-shadow-sm);
         display: flex;
         justify-content: flex-end;
         overflow: hidden;
       }
 
-      /* Forces the material paginator to blend into our custom card */
       .pro-paginator {
         background: transparent !important;
         color: var(--app-fg) !important;
@@ -333,37 +370,6 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
           opacity: 1;
           transform: translateY(0);
         }
-      }
-
-      /* Same header typography as before */
-      .header-tag {
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--app-primary);
-        margin-bottom: 4px;
-      }
-      .header-title {
-        font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-        font-weight: 800;
-        letter-spacing: -0.03em;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-      .count-badge {
-        font-size: 13px;
-        font-weight: 700;
-        padding: 4px 12px;
-        border-radius: var(--app-radius-full);
-        background: var(--app-primary-light);
-        color: var(--app-primary);
-      }
-      .search-icon {
-        margin-right: 8px;
-        color: var(--app-muted);
       }
     `,
   ],
@@ -396,11 +402,10 @@ export class ProductListPage implements OnInit {
   readonly loading = signal(true);
 
   constructor() {
-    // React to any filter changes
     this.filterForm.valueChanges
       .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed())
       .subscribe(() => {
-        this.page.set(1); // Reset to first page on filter change
+        this.page.set(1); 
         this.updateActiveFilterCount();
         this.load();
       });
@@ -418,7 +423,6 @@ export class ProductListPage implements OnInit {
   }
 
   clearFilters() {
-    // Reset everything except keyword to default null
     this.filterForm.patchValue({
       minPrice: null,
       maxPrice: null,

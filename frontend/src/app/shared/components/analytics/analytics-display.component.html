@@ -1,0 +1,255 @@
+@if (userAnalytics; as analytics) {
+  @if (
+    analytics.spentByDay.length > 0 ||
+    analytics.mostBoughtProducts.length > 0 ||
+    analytics.mostBoughtCategories.length > 0
+  ) {
+    <h2>Shopping Analytics</h2>
+
+    <div class="chart-grid">
+      <!-- Spending -->
+      @if (analytics.spentByDay.length > 0) {
+        <mat-card class="analytics-card analytics-card--wide">
+          <mat-card-header>
+            <mat-card-title> Spending over time </mat-card-title>
+            <mat-card-subtitle>
+              Customer spending trend across the selected period.
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="chart-container chart-container--large">
+              <apx-chart
+                [series]="spendingChartOptions.series"
+                [chart]="spendingChartOptions.chart"
+                [colors]="spendingChartOptions.colors"
+                [stroke]="spendingChartOptions.stroke"
+                [xaxis]="spendingChartOptions.xaxis"
+                [yaxis]="spendingChartOptions.yaxis"
+                [grid]="spendingChartOptions.grid"
+                [tooltip]="spendingChartOptions.tooltip"
+                [dataLabels]="spendingChartOptions.dataLabels"
+              ></apx-chart>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Most bought products (HAS CUSTOM TOOLTIP) -->
+      @if (analytics.mostBoughtProducts.length > 0) {
+        <mat-card class="analytics-card">
+          <mat-card-header>
+            <mat-card-title> Most bought products </mat-card-title>
+            <mat-card-subtitle>
+              Products ranked by quantity purchased.
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div
+              class="chart-container"
+              (mousemove)="trackMouse($event)"
+              (mouseleave)="hideTooltip()"
+            >
+              <apx-chart
+                [series]="topProductsChartOptions.series"
+                [chart]="topProductsChartOptions.chart"
+                [colors]="topProductsChartOptions.colors"
+                [plotOptions]="topProductsChartOptions.plotOptions"
+                [xaxis]="topProductsChartOptions.xaxis"
+                [yaxis]="topProductsChartOptions.yaxis"
+                [grid]="topProductsChartOptions.grid"
+                [tooltip]="topProductsChartOptions.tooltip"
+                [dataLabels]="topProductsChartOptions.dataLabels"
+              ></apx-chart>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Most bought categories -->
+      @if (analytics.mostBoughtCategories.length > 0) {
+        <mat-card class="analytics-card">
+          <mat-card-header>
+            <mat-card-title> Most bought categories </mat-card-title>
+            <mat-card-subtitle>
+              Distribution of purchased items by category.
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="chart-container chart-container--medium">
+              <apx-chart
+                [series]="userCategoriesChartOptions.series"
+                [chart]="userCategoriesChartOptions.chart"
+                [colors]="userCategoriesChartOptions.colors"
+                [labels]="userCategoriesChartOptions.labels"
+                [legend]="userCategoriesChartOptions.legend"
+                [dataLabels]="userCategoriesChartOptions.dataLabels"
+                [plotOptions]="userCategoriesChartOptions.plotOptions"
+                [tooltip]="userCategoriesChartOptions.tooltip"
+                [responsive]="userCategoriesChartOptions.responsive"
+              ></apx-chart>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  } @else {
+    <!-- User empty state -->
+    <div class="analytics-empty analytics-empty--user">
+      <div class="analytics-empty__icon">
+        <mat-icon>shopping_bag</mat-icon>
+      </div>
+
+      <h3>No shopping analytics yet</h3>
+
+      <p>
+        Your shopping insights will appear here once you start making purchases.
+        Track your spending, discover your favorite products, and explore your
+        shopping habits.
+      </p>
+    </div>
+  }
+} @else {
+  <!-- Empty State -->
+  <div class="analytics-empty analytics-empty--user">
+    <div class="analytics-empty__icon">
+      <mat-icon>query_stats</mat-icon>
+    </div>
+
+    <h3>Shopping analytics unavailable</h3>
+
+    <p>Your shopping analytics will appear here when your data is available.</p>
+  </div>
+}
+
+@if (sellerAnalytics; as analytics) {
+  @if (
+    analytics.revenueByDay.length > 0 ||
+    analytics.bestSellingProducts.length > 0 ||
+    analytics.unitsSoldByProduct.length > 0
+  ) {
+    <h2>Sales Analytics</h2>
+
+    <div class="chart-grid">
+      <!-- Revenue -->
+      @if (analytics.revenueByDay.length > 0) {
+        <mat-card class="analytics-card analytics-card--wide">
+          <mat-card-header>
+            <mat-card-title> Revenue over time </mat-card-title>
+            <mat-card-subtitle>
+              Seller revenue trend across the selected period.
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="chart-container chart-container--large">
+              <apx-chart
+                [series]="sellerRevenueChartOptions.series"
+                [chart]="sellerRevenueChartOptions.chart"
+                [colors]="sellerRevenueChartOptions.colors"
+                [stroke]="sellerRevenueChartOptions.stroke"
+                [fill]="sellerRevenueChartOptions.fill"
+                [xaxis]="sellerRevenueChartOptions.xaxis"
+                [yaxis]="sellerRevenueChartOptions.yaxis"
+                [grid]="sellerRevenueChartOptions.grid"
+                [tooltip]="sellerRevenueChartOptions.tooltip"
+                [dataLabels]="sellerRevenueChartOptions.dataLabels"
+              ></apx-chart>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Best-selling products (HAS CUSTOM TOOLTIP) -->
+      @if (analytics.bestSellingProducts.length > 0) {
+        <mat-card class="analytics-card">
+          <mat-card-header>
+            <mat-card-title> Best selling products </mat-card-title>
+            <mat-card-subtitle>
+              Products ranked by sales and orders.
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div
+              class="chart-container"
+              (mousemove)="trackMouse($event)"
+              (mouseleave)="hideTooltip()"
+            >
+              <apx-chart
+                [series]="sellerBestProductsChartOptions.series"
+                [chart]="sellerBestProductsChartOptions.chart"
+                [colors]="sellerBestProductsChartOptions.colors"
+                [plotOptions]="sellerBestProductsChartOptions.plotOptions"
+                [xaxis]="sellerBestProductsChartOptions.xaxis"
+                [yaxis]="sellerBestProductsChartOptions.yaxis"
+                [grid]="sellerBestProductsChartOptions.grid"
+                [tooltip]="sellerBestProductsChartOptions.tooltip"
+                [dataLabels]="sellerBestProductsChartOptions.dataLabels"
+              ></apx-chart>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Units sold (HAS CUSTOM TOOLTIP) -->
+      @if (analytics.unitsSoldByProduct.length > 0) {
+        <mat-card class="analytics-card">
+          <mat-card-header>
+            <mat-card-title> Units sold by product </mat-card-title>
+            <mat-card-subtitle>
+              Total quantity sold for each product.
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div
+              class="chart-container"
+              (mousemove)="trackMouse($event)"
+              (mouseleave)="hideTooltip()"
+            >
+              <apx-chart
+                [series]="sellerUnitsChartOptions.series"
+                [chart]="sellerUnitsChartOptions.chart"
+                [colors]="sellerUnitsChartOptions.colors"
+                [plotOptions]="sellerUnitsChartOptions.plotOptions"
+                [xaxis]="sellerUnitsChartOptions.xaxis"
+                [yaxis]="sellerUnitsChartOptions.yaxis"
+                [grid]="sellerUnitsChartOptions.grid"
+                [tooltip]="sellerUnitsChartOptions.tooltip"
+                [dataLabels]="sellerUnitsChartOptions.dataLabels"
+              ></apx-chart>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  } @else {
+    <!-- Seller empty state -->
+    <div class="analytics-empty analytics-empty--seller">
+      <div class="analytics-empty__icon">
+        <mat-icon>storefront</mat-icon>
+      </div>
+
+      <h3>No sales analytics yet</h3>
+
+      <p>
+        Your sales insights will appear here when your products start generating
+        sales. Monitor your revenue, discover your best-selling products, and
+        track the quantities sold.
+      </p>
+    </div>
+  }
+}
+
+<!-- The new Tooltip Component injected at the very bottom -->
+<app-product-tooltip
+  [productId]="tooltipProductId()"
+  [metrics]="tooltipMetrics()"
+  [x]="tooltipX()"
+  [y]="tooltipY()"
+  [visible]="tooltipVisible()"
+>
+</app-product-tooltip>  

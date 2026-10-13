@@ -1,10 +1,11 @@
 package com.buy02.cart.aop;
 
-import com.buy02.cart.event.AuditEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import com.buy02.cart.event.audit.AuditEvent;
 
 @Service
 @RequiredArgsConstructor

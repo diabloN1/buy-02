@@ -1,101 +1,318 @@
 <?xml version="1.0"?>
-<testsuite name="Chrome Headless 147.0.0.0 (Linux 0.0.0)" package="" timestamp="2026-10-02T22:48:53" id="0" hostname="blackhole" tests="91" errors="0" failures="0" time="0.725">
+<testsuite name="Chrome Headless 154.0.0.0 (Windows 10)" package="" timestamp="2026-10-13T12:05:08" id="0" hostname="Black-Hole" tests="283" errors="0" failures="0" time="2.94">
   <properties>
-    <property name="browser.fullName" value="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.0.0 Safari/537.36"/>
+    <property name="browser.fullName" value="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36"/>
   </properties>
-  <testcase name="ProductService should list products with pagination" time="0.015" classname="ProductService"/>
-  <testcase name="ProductService should delete product by id" time="0.004" classname="ProductService"/>
-  <testcase name="ProductService should get product by id" time="0.002" classname="ProductService"/>
-  <testcase name="ProductFormPage should initialize empty form in create mode" time="0.133" classname="ProductFormPage"/>
-  <testcase name="authGuard should redirect to /auth/login with returnUrl if unauthenticated" time="0.003" classname="authGuard"/>
-  <testcase name="authGuard should allow navigation if user is authenticated" time="0.001" classname="authGuard"/>
-  <testcase name="MediaManagementPage should load user media on init" time="0.061" classname="MediaManagementPage"/>
-  <testcase name="NotificationService should show info snackbar" time="0.002" classname="NotificationService"/>
-  <testcase name="NotificationService should show success snackbar" time="0.001" classname="NotificationService"/>
-  <testcase name="NotificationService should show error snackbar" time="0.001" classname="NotificationService"/>
-  <testcase name="NotFoundPage should create 404 page" time="0.006" classname="NotFoundPage"/>
-  <testcase name="AppComponent should create the app and initialize theme" time="0.049" classname="AppComponent"/>
-  <testcase name="SessionService should initialize session when no token present" time="0.002" classname="SessionService"/>
-  <testcase name="FileDropDirective should create host component with directive" time="0.005" classname="FileDropDirective"/>
-  <testcase name="AuthService should be created" time="0.002" classname="AuthService"/>
-  <testcase name="AuthService logout should send POST request to /api/v1/auth/logout and clear storage" time="0.004" classname="AuthService logout"/>
-  <testcase name="AuthService register should send POST request to /api/v1/auth/register and save token" time="0.004" classname="AuthService register"/>
-  <testcase name="AuthService login should send POST request to /api/v1/auth/login and save token" time="0.002" classname="AuthService login"/>
-  <testcase name="ProductDetailsPage should update item quantity in cart and trigger success toast" time="0.029" classname="ProductDetailsPage"/>
-  <testcase name="ProductDetailsPage should add item to cart and trigger success toast" time="0.008" classname="ProductDetailsPage"/>
-  <testcase name="ProductDetailsPage should allow buying if product is not owned by the current user and is in stock" time="0.008" classname="ProductDetailsPage"/>
-  <testcase name="ProductDetailsPage should determine ownership correctly" time="0.008" classname="ProductDetailsPage"/>
-  <testcase name="ProductDetailsPage should fetch cart quantity on init (via effect) if user and product exist" time="0.007" classname="ProductDetailsPage"/>
-  <testcase name="ProductDetailsPage should fetch product details and seller widget" time="0.009" classname="ProductDetailsPage"/>
-  <testcase name="AdminUsersPage should load users on init" time="0.03" classname="AdminUsersPage"/>
-  <testcase name="ProfileService should update profile" time="0.002" classname="ProfileService"/>
-  <testcase name="ProfileService should get current profile (me)" time="0.001" classname="ProfileService"/>
-  <testcase name="ProfilePage should load user profile details on init" time="0.033" classname="ProfilePage"/>
-  <testcase name="ProfilePage should delete avatar when deleteAvatar is called" time="0.012" classname="ProfilePage"/>
-  <testcase name="ProfilePage should update profile when form is saved" time="0.01" classname="ProfilePage"/>
-  <testcase name="HomePage should load products on init" time="0.02" classname="HomePage"/>
-  <testcase name="EmptyStateComponent should emit action event when button is clicked" time="0.004" classname="EmptyStateComponent"/>
-  <testcase name="EmptyStateComponent should render default icon and title" time="0.002" classname="EmptyStateComponent"/>
-  <testcase name="EmptyStateComponent should render custom title, description, and action button" time="0.004" classname="EmptyStateComponent"/>
-  <testcase name="AdminProductsPage should load products on init" time="0.023" classname="AdminProductsPage"/>
-  <testcase name="RegisterPage should initialize with empty invalid form" time="0.026" classname="RegisterPage"/>
-  <testcase name="GlobalErrorHandler should handle non-Error objects and notify generic message" time="0.002" classname="GlobalErrorHandler"/>
-  <testcase name="GlobalErrorHandler should handle Error object and notify error message" time="0.001" classname="GlobalErrorHandler"/>
-  <testcase name="ConfirmDialogComponent should close dialog with false on cancel click" time="0.006" classname="ConfirmDialogComponent"/>
-  <testcase name="ConfirmDialogComponent should close dialog with true on confirm click" time="0.005" classname="ConfirmDialogComponent"/>
-  <testcase name="ConfirmDialogComponent should create component and render title &amp; message" time="0.005" classname="ConfirmDialogComponent"/>
-  <testcase name="SellerDashboardPage should load seller statistics and recent products" time="0.015" classname="SellerDashboardPage"/>
-  <testcase name="UserService getWidget should return user widget by id" time="0.001" classname="UserService getWidget"/>
-  <testcase name="UserService me should return current user profile" time="0.001" classname="UserService me"/>
-  <testcase name="UserService list should send correct pagination params" time="0.001" classname="UserService list"/>
-  <testcase name="UserService list should return paginated list of users" time="0.001" classname="UserService list"/>
-  <testcase name="UserService delete should delete user by id" time="0.001" classname="UserService delete"/>
-  <testcase name="UserService get should return user by id" time="0.002" classname="UserService get"/>
-  <testcase name="UserService count should return user count" time="0.002" classname="UserService count"/>
-  <testcase name="UserService should be created" time="0.001" classname="UserService"/>
-  <testcase name="roleGuard should deny access and redirect if user lacks role" time="0.001" classname="roleGuard"/>
-  <testcase name="roleGuard should allow access if user has required role" time="0.001" classname="roleGuard"/>
-  <testcase name="AdminDashboardPage should load aggregated dashboard counts on init" time="0.009" classname="AdminDashboardPage"/>
-  <testcase name="ThemeService should toggle theme mode" time="0.002" classname="ThemeService"/>
-  <testcase name="ThemeService should initialize saved dark theme from localStorage" time="0.001" classname="ThemeService"/>
-  <testcase name="ThemeService should initialize default light theme" time="0" classname="ThemeService"/>
-  <testcase name="CurrentUserService clear should set user to null" time="0.001" classname="CurrentUserService clear"/>
-  <testcase name="CurrentUserService load should call userService.me when force=true even if user is already loaded" time="0.001" classname="CurrentUserService load"/>
-  <testcase name="CurrentUserService load should not call userService.me when already loading" time="0.001" classname="CurrentUserService load"/>
-  <testcase name="CurrentUserService should be created" time="0.001" classname="CurrentUserService"/>
-  <testcase name="ImagePreviewComponent should create and bind input signals" time="0.004" classname="ImagePreviewComponent"/>
-  <testcase name="LoginPage should login successfully and navigate" time="0.023" classname="LoginPage"/>
-  <testcase name="LoginPage should initialize with empty invalid form" time="0.009" classname="LoginPage"/>
-  <testcase name="SafeUrlPipe should bypass security trust for valid URL string" time="0.001" classname="SafeUrlPipe"/>
-  <testcase name="SafeUrlPipe should return empty string if url is null or undefined or empty" time="0.001" classname="SafeUrlPipe"/>
-  <testcase name="FieldErrorComponent should render required error when control is touched and invalid" time="0.002" classname="FieldErrorComponent"/>
-  <testcase name="FieldErrorComponent should not render error text if control is untouched or has no errors" time="0.001" classname="FieldErrorComponent"/>
-  <testcase name="FieldErrorComponent should render weakPassword error message" time="0.001" classname="FieldErrorComponent"/>
-  <testcase name="FieldErrorComponent should render email error message" time="0.001" classname="FieldErrorComponent"/>
-  <testcase name="TokenStorage should store and retrieve token" time="0.001" classname="TokenStorage"/>
-  <testcase name="TokenStorage should be created" time="0.006" classname="TokenStorage"/>
-  <testcase name="TokenStorage should clear token from localStorage" time="0.001" classname="TokenStorage"/>
-  <testcase name="jwt.util decodeJwt should return decoded payload for a valid JWT token" time="0.001" classname="jwt.util decodeJwt"/>
-  <testcase name="jwt.util decodeJwt should return null for an invalid JWT string" time="0.001" classname="jwt.util decodeJwt"/>
-  <testcase name="jwt.util isExpired should return false if token has no exp claim" time="0" classname="jwt.util isExpired"/>
+  <testcase name="CurrentUserService load should call userService.me when force=true even if user is already loaded" time="0.014" classname="CurrentUserService load"/>
+  <testcase name="CurrentUserService load should not call userService.me when already loading" time="0.002" classname="CurrentUserService load"/>
+  <testcase name="CurrentUserService clear should set user to null" time="0.002" classname="CurrentUserService clear"/>
+  <testcase name="CurrentUserService should be created" time="0.002" classname="CurrentUserService"/>
+  <testcase name="ReviewOrderStepComponent should display the product image when imageUrl is available" time="0.082" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should display the item prices" time="0.008" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should calculate the cart total" time="0.006" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should display the shipping address" time="0.007" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should render the correct action buttons" time="0.005" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should display the placeholder when imageUrl is missing" time="0.005" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should emit placeOrder when Place order is clicked" time="0.006" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should create" time="0.004" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should emit previous when Edit address is clicked" time="0.005" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should display all cart items" time="0.006" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should calculate the total item count" time="0.004" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should display the cart total" time="0.004" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should have a link to the cart" time="0.004" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should emit previous when Back is clicked" time="0.005" classname="ReviewOrderStepComponent"/>
+  <testcase name="ReviewOrderStepComponent should display the total item count" time="0.004" classname="ReviewOrderStepComponent"/>
+  <testcase name="ShippingAddressStepComponent should render the Back to cart link" time="0.149" classname="ShippingAddressStepComponent"/>
+  <testcase name="ShippingAddressStepComponent should emit next when the form is submitted" time="0.073" classname="ShippingAddressStepComponent"/>
+  <testcase name="ShippingAddressStepComponent should have required validators on address fields" time="0.049" classname="ShippingAddressStepComponent"/>
+  <testcase name="ShippingAddressStepComponent should make the form valid when all fields are filled" time="0.041" classname="ShippingAddressStepComponent"/>
+  <testcase name="ShippingAddressStepComponent should render all address fields" time="0.044" classname="ShippingAddressStepComponent"/>
+  <testcase name="ShippingAddressStepComponent should render the phone input" time="0.046" classname="ShippingAddressStepComponent"/>
+  <testcase name="ShippingAddressStepComponent should render the Review order button" time="0.047" classname="ShippingAddressStepComponent"/>
+  <testcase name="ShippingAddressStepComponent should display the form values" time="0.04" classname="ShippingAddressStepComponent"/>
+  <testcase name="ShippingAddressStepComponent should create" time="0.046" classname="ShippingAddressStepComponent"/>
+  <testcase name="ShippingAddressStepComponent should use the provided address form" time="0.057" classname="ShippingAddressStepComponent"/>
+  <testcase name="ConfirmationStepComponent should not display the order id when it is null" time="0.007" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should render the view orders link" time="0.003" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should render the continue shopping link" time="0.004" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should link the view orders link to the orders page" time="0.002" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should display the order id when provided" time="0.003" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should create" time="0.003" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should have a null order id by default" time="0.014" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should accept an order id" time="0.003" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should not render any action buttons" time="0.003" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should display the order placed message" time="0.003" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should link the continue shopping link to the products page" time="0.003" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should display the payment information" time="0.003" classname="ConfirmationStepComponent"/>
+  <testcase name="ConfirmationStepComponent should render the confirmation icon" time="0.003" classname="ConfirmationStepComponent"/>
+  <testcase name="FileDropDirective should create host component with directive" time="0.006" classname="FileDropDirective"/>
+  <testcase name="MediaManagementPage should load user media on init" time="0.04" classname="MediaManagementPage"/>
   <testcase name="jwt.util isExpired should return true if token exp is in the past" time="0.001" classname="jwt.util isExpired"/>
   <testcase name="jwt.util isExpired should return false if token exp is in the future" time="0" classname="jwt.util isExpired"/>
-  <testcase name="validators passwordStrength should return weakPassword error if password has no numbers" time="0.001" classname="validators passwordStrength"/>
+  <testcase name="jwt.util isExpired should return false if token has no exp claim" time="0" classname="jwt.util isExpired"/>
+  <testcase name="jwt.util decodeJwt should return null for an invalid JWT string" time="0" classname="jwt.util decodeJwt"/>
+  <testcase name="jwt.util decodeJwt should return decoded payload for a valid JWT token" time="0" classname="jwt.util decodeJwt"/>
+  <testcase name="NotFoundPage should create 404 page" time="0.004" classname="NotFoundPage"/>
+  <testcase name="CartPage should clear cart items and call cartSvc.clearCart" time="0.018" classname="CartPage"/>
+  <testcase name="CartPage should remove a specific item via removeItem" time="0.005" classname="CartPage"/>
+  <testcase name="CartPage should keep cart items intact when clearCart call errors" time="0.004" classname="CartPage"/>
+  <testcase name="CartPage should show empty state when cart has no items" time="0.005" classname="CartPage"/>
+  <testcase name="CartPage should render one app-cart-item per cart item" time="0.005" classname="CartPage"/>
+  <testcase name="CartPage should display the total price in the summary" time="0.004" classname="CartPage"/>
+  <testcase name="CartPage should compute cartTotal as 0 for an empty cart" time="0.005" classname="CartPage"/>
+  <testcase name="CartPage should compute itemCount as the sum of all item quantities" time="0.004" classname="CartPage"/>
+  <testcase name="CartPage should update quantity for a specific item via updateItemQuantity" time="0.005" classname="CartPage"/>
+  <testcase name="CartPage should create and load the cart on init" time="0.004" classname="CartPage"/>
+  <testcase name="CartPage should not crash updateItemQuantity when cart is null" time="0.004" classname="CartPage"/>
+  <testcase name="CartPage should not crash removeItem when cart is null" time="0.005" classname="CartPage"/>
+  <testcase name="CartPage should show loading spinner while cart is undefined" time="0.006" classname="CartPage"/>
+  <testcase name="CartPage should compute cartTotal as sum of (price × quantity) for all items" time="0.003" classname="CartPage"/>
+  <testcase name="CartPage should compute itemCount as 0 for an empty cart" time="0.004" classname="CartPage"/>
+  <testcase name="LoginPage should initialize with empty invalid form" time="0.036" classname="LoginPage"/>
+  <testcase name="LoginPage should login successfully and navigate" time="0.009" classname="LoginPage"/>
+  <testcase name="GlobalErrorHandler should handle non-Error objects and notify generic message" time="0.002" classname="GlobalErrorHandler"/>
+  <testcase name="GlobalErrorHandler should handle Error object and notify error message" time="0.001" classname="GlobalErrorHandler"/>
+  <testcase name="SellerDashboardPage should load seller statistics and recent products" time="0.025" classname="SellerDashboardPage"/>
+  <testcase name="CheckoutWizardComponent should set the order id after placing an order" time="0.053" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should not place an order when cart is empty" time="0.044" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should calculate the cart total" time="0.043" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should not place an order when cart is null" time="0.048" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should advance the stepper after placing an order" time="0.641" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should load the cart on initialization" time="0.04" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should validate required address fields" time="0.04" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should reject an invalid zip code" time="0.048" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should calculate the cart item count" time="0.041" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should create" time="0.042" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should create an order with the cart total" time="0.042" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should reject a short full name" time="0.04" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should accept a valid zip code" time="0.045" classname="CheckoutWizardComponent"/>
+  <testcase name="CheckoutWizardComponent should show a success notification after placing an order" time="0.036" classname="CheckoutWizardComponent"/>
+  <testcase name="ConfirmDialogComponent with default labels should fall back to Cancel and Confirm labels" time="0.005" classname="ConfirmDialogComponent with default labels"/>
+  <testcase name="ConfirmDialogComponent with default labels should use the primary style when danger is not set" time="0.002" classname="ConfirmDialogComponent with default labels"/>
+  <testcase name="ConfirmDialogComponent with custom data should close dialog with false on cancel click" time="0.002" classname="ConfirmDialogComponent with custom data"/>
+  <testcase name="ConfirmDialogComponent with custom data should close dialog with true on confirm click" time="0.001" classname="ConfirmDialogComponent with custom data"/>
+  <testcase name="ConfirmDialogComponent with custom data should create component and render title &amp; message" time="0.001" classname="ConfirmDialogComponent with custom data"/>
+  <testcase name="ConfirmDialogComponent with custom data should render custom button labels" time="0.002" classname="ConfirmDialogComponent with custom data"/>
+  <testcase name="ConfirmDialogComponent with custom data should use the danger style when danger is true" time="0.003" classname="ConfirmDialogComponent with custom data"/>
+  <testcase name="OrdersPage should stop loading when an action fails" time="0.024" classname="OrdersPage"/>
+  <testcase name="OrdersPage should cancel pending order after confirmation" time="0.002" classname="OrdersPage"/>
+  <testcase name="OrdersPage should use seller service in seller mode" time="0.005" classname="OrdersPage"/>
+  <testcase name="OrdersPage should delete suborder after confirmation" time="0.003" classname="OrdersPage"/>
+  <testcase name="OrdersPage should not delete suborder when dialog is rejected" time="0.002" classname="OrdersPage"/>
+  <testcase name="OrdersPage should change page" time="0.002" classname="OrdersPage"/>
+  <testcase name="OrdersPage should delete order after confirmation" time="0.003" classname="OrdersPage"/>
+  <testcase name="OrdersPage should load buyer orders" time="0.005" classname="OrdersPage"/>
+  <testcase name="OrdersPage should show default error when loading fails without message" time="0.003" classname="OrdersPage"/>
+  <testcase name="OrdersPage should update suborder status" time="0.003" classname="OrdersPage"/>
+  <testcase name="OrdersPage should return zero for an order with no items" time="0.011" classname="OrdersPage"/>
+  <testcase name="OrdersPage should be in buyer mode by default" time="0.003" classname="OrdersPage"/>
+  <testcase name="OrdersPage should not cancel when dialog is rejected" time="0.003" classname="OrdersPage"/>
+  <testcase name="OrdersPage should show backend error when loading fails" time="0.003" classname="OrdersPage"/>
+  <testcase name="OrdersPage should count total items" time="0.003" classname="OrdersPage"/>
+  <testcase name="OrdersPage should redo order after confirmation" time="0.003" classname="OrdersPage"/>
+  <testcase name="OrdersPage should load orders on init" time="0.003" classname="OrdersPage"/>
+  <testcase name="OrdersPage should create" time="0.003" classname="OrdersPage"/>
+  <testcase name="OrderDetailsPage should delete order after confirmation" time="0.034" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should not delete order when confirmation is rejected" time="0.004" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should delete suborder after confirmation" time="0.004" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should not load when order id is missing" time="0.003" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should not redo order when confirmation is rejected" time="0.003" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should load seller suborder" time="0.003" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should stop loading when delete fails" time="0.004" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should load buyer order" time="0.003" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should not delete suborder when confirmation is rejected" time="0.002" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should redo order after confirmation" time="0.002" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should handle load error with backend message" time="0.003" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should resolve buyer order route" time="0.003" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should not cancel when confirmation is rejected" time="0.002" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should stop loading when redo fails" time="0.002" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should handle load error without backend message" time="0.002" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should stop loading when suborder status update fails" time="0.002" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should resolve seller suborder route" time="0.002" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should stop loading when cancel fails" time="0.003" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should return warn for cancelled action" time="0.003" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should return primary for normal status" time="0.002" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should cancel pending order after confirmation" time="0.002" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should create" time="0.002" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should update suborder status" time="0.003" classname="OrderDetailsPage"/>
+  <testcase name="OrderDetailsPage should stop loading when suborder deletion fails" time="0.003" classname="OrderDetailsPage"/>
+  <testcase name="AdminUsersPage should load users on init" time="0.019" classname="AdminUsersPage"/>
+  <testcase name="ProfilePage should load user profile details on init" time="0.037" classname="ProfilePage"/>
+  <testcase name="ProfilePage should update profile when form is saved" time="0.007" classname="ProfilePage"/>
+  <testcase name="ProfilePage should delete avatar when deleteAvatar is called" time="0.005" classname="ProfilePage"/>
+  <testcase name="SafeUrlPipe should return empty string if url is null or undefined or empty" time="0.001" classname="SafeUrlPipe"/>
+  <testcase name="SafeUrlPipe should bypass security trust for valid URL string" time="0" classname="SafeUrlPipe"/>
+  <testcase name="SellerProductsPage should load seller products on init" time="0.015" classname="SellerProductsPage"/>
+  <testcase name="NotificationService should show success snackbar" time="0.002" classname="NotificationService"/>
+  <testcase name="NotificationService should show info snackbar" time="0.001" classname="NotificationService"/>
+  <testcase name="NotificationService should show error snackbar" time="0.001" classname="NotificationService"/>
+  <testcase name="AdminDashboardPage should load aggregated dashboard counts on init" time="0.007" classname="AdminDashboardPage"/>
   <testcase name="validators passwordStrength should return weakPassword error if password is less than 8 characters" time="0" classname="validators passwordStrength"/>
+  <testcase name="validators passwordStrength should return weakPassword error if password has no numbers" time="0.001" classname="validators passwordStrength"/>
   <testcase name="validators passwordStrength should return null for empty string or null value" time="0" classname="validators passwordStrength"/>
-  <testcase name="validators passwordStrength should return null for valid password with 8+ chars, letters and numbers" time="0" classname="validators passwordStrength"/>
   <testcase name="validators passwordStrength should return weakPassword error if password has no letters" time="0" classname="validators passwordStrength"/>
-  <testcase name="LoadingSpinnerComponent should create loading spinner" time="0.004" classname="LoadingSpinnerComponent"/>
-  <testcase name="MediaService should fetch paginated user media" time="0.002" classname="MediaService"/>
-  <testcase name="MediaService should delete media file" time="0.002" classname="MediaService"/>
-  <testcase name="MediaService should get total media count" time="0.002" classname="MediaService"/>
+  <testcase name="validators passwordStrength should return null for valid password with 8+ chars, letters and numbers" time="0" classname="validators passwordStrength"/>
+  <testcase name="AnalyticsDisplayComponent should configure the seller units chart with quantities sold" time="0.005" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should configure the seller revenue chart with revenue data" time="0.003" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should configure the spending chart with user spending data" time="0.004" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should return an empty spending series when user analytics are null" time="0.001" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should render user analytics section when user analytics are provided" time="0.002" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should configure the top products chart with product quantities" time="0.002" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should not render analytics sections when inputs are null" time="0.002" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should use the expected chart colors" time="0.003" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should render seller analytics section when seller analytics are provided" time="0.003" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should return an empty donut chart when user analytics are null" time="0.002" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should format small monetary values without abbreviating them" time="0.003" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should return an empty revenue series when seller analytics are null" time="0.001" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should return empty series when seller best products are unavailable" time="0.003" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should create component" time="0.001" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should format large monetary values using millions" time="0.002" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should configure the seller best products chart" time="0.004" classname="AnalyticsDisplayComponent"/>
+  <testcase name="AnalyticsDisplayComponent should configure the user categories donut chart" time="0.007" classname="AnalyticsDisplayComponent"/>
+  <testcase name="ProductService should list products with pagination" time="0.002" classname="ProductService"/>
+  <testcase name="ProductService should delete product by id" time="0.001" classname="ProductService"/>
+  <testcase name="ProductService should get product by id" time="0.001" classname="ProductService"/>
+  <testcase name="UserService get should return user by id" time="0.001" classname="UserService get"/>
+  <testcase name="UserService delete should delete user by id" time="0.001" classname="UserService delete"/>
+  <testcase name="UserService should be created" time="0.001" classname="UserService"/>
+  <testcase name="UserService getWidget should return user widget by id" time="0.001" classname="UserService getWidget"/>
+  <testcase name="UserService list should send correct pagination params" time="0.001" classname="UserService list"/>
+  <testcase name="UserService list should return paginated list of users" time="0.001" classname="UserService list"/>
+  <testcase name="UserService me should return current user profile" time="0.001" classname="UserService me"/>
+  <testcase name="UserService count should return user count" time="0.001" classname="UserService count"/>
+  <testcase name="MediaService should delete media file" time="0.001" classname="MediaService"/>
+  <testcase name="MediaService should fetch paginated user media" time="0.001" classname="MediaService"/>
+  <testcase name="MediaService should get total media count" time="0.001" classname="MediaService"/>
   <testcase name="MediaService should return correct image URL" time="0.001" classname="MediaService"/>
-  <testcase name="SellerProductsPage should load seller products on init" time="0.022" classname="SellerProductsPage"/>
-  <testcase name="ProductCardComponent should display product details" time="0.004" classname="ProductCardComponent"/>
+  <testcase name="CartItemComponent should disable the decrease button when quantity is 1" time="0.002" classname="CartItemComponent"/>
+  <testcase name="CartItemComponent should call cartSvc.updateItemQuantity and emit quantityChange on increase" time="0.003" classname="CartItemComponent"/>
+  <testcase name="CartItemComponent should render the placeholder icon when imageUrl is null" time="0.002" classname="CartItemComponent"/>
+  <testcase name="CartItemComponent should call cartSvc.removeCartItem and emit remove on deleteItem" time="0.003" classname="CartItemComponent"/>
+  <testcase name="CartItemComponent should call cartSvc.updateItemQuantity and emit quantityChange on decrease" time="0.002" classname="CartItemComponent"/>
+  <testcase name="CartItemComponent should not call updateItemQuantity when quantity &lt; 1" time="0.002" classname="CartItemComponent"/>
+  <testcase name="CartItemComponent should disable the increase button when quantity equals availableStock" time="0.003" classname="CartItemComponent"/>
+  <testcase name="CartItemComponent should not emit quantityChange when updateItemQuantity call errors" time="0.003" classname="CartItemComponent"/>
+  <testcase name="CartItemComponent should not emit remove when removeCartItem call errors" time="0.004" classname="CartItemComponent"/>
+  <testcase name="CartItemComponent should not call updateItemQuantity when quantity > availableStock" time="0.003" classname="CartItemComponent"/>
+  <testcase name="CartItemComponent should create and display product details" time="0.003" classname="CartItemComponent"/>
+  <testcase name="CartItemComponent should render the product image when imageUrl is provided" time="0.004" classname="CartItemComponent"/>
+  <testcase name="AuthService logout should send POST request to /api/v1/auth/logout and clear storage" time="0.004" classname="AuthService logout"/>
+  <testcase name="AuthService register should send POST request to /api/v1/auth/register and save token" time="0.002" classname="AuthService register"/>
+  <testcase name="AuthService login should send POST request to /api/v1/auth/login and save token" time="0.001" classname="AuthService login"/>
+  <testcase name="AuthService should be created" time="0" classname="AuthService"/>
+  <testcase name="ImagePreviewComponent should create and bind input signals" time="0.002" classname="ImagePreviewComponent"/>
+  <testcase name="EmptyStateComponent should emit action event when button is clicked" time="0.005" classname="EmptyStateComponent"/>
+  <testcase name="EmptyStateComponent should render default icon and title" time="0.002" classname="EmptyStateComponent"/>
+  <testcase name="EmptyStateComponent should render custom title, description, and action button" time="0.002" classname="EmptyStateComponent"/>
+  <testcase name="ProductFormPage should initialize empty form in create mode" time="0.042" classname="ProductFormPage"/>
   <testcase name="ProductListPage should load products on init" time="0.025" classname="ProductListPage"/>
-  <testcase name="ProductListPage should trigger search on query change with debounce" time="0.013" classname="ProductListPage"/>
+  <testcase name="roleGuard should deny access and redirect if user lacks role" time="0.001" classname="roleGuard"/>
+  <testcase name="roleGuard should allow access if user has required role" time="0" classname="roleGuard"/>
+  <testcase name="LoadingSpinnerComponent should create loading spinner" time="0.003" classname="LoadingSpinnerComponent"/>
+  <testcase name="OrderService deleteOrder should delete an order" time="0.001" classname="OrderService deleteOrder"/>
+  <testcase name="OrderService canCancel should allow cancellation only for PENDING orders" time="0.001" classname="OrderService canCancel"/>
+  <testcase name="OrderService getAvailableStatusTransitions should not allow transitions from CANCELLED" time="0.001" classname="OrderService getAvailableStatusTransitions"/>
+  <testcase name="OrderService getAvailableStatusTransitions should allow PENDING to transition to CONFIRMED or CANCELLED" time="0" classname="OrderService getAvailableStatusTransitions"/>
+  <testcase name="OrderService getAvailableStatusTransitions should not allow transitions from DELIVERED" time="0" classname="OrderService getAvailableStatusTransitions"/>
+  <testcase name="OrderService getAvailableStatusTransitions should allow CONFIRMED to transition to SHIPPED" time="0.001" classname="OrderService getAvailableStatusTransitions"/>
+  <testcase name="OrderService getAvailableStatusTransitions should allow SHIPPED to transition to DELIVERED" time="0" classname="OrderService getAvailableStatusTransitions"/>
+  <testcase name="OrderService getStatusColor should return the correct color for each status" time="0" classname="OrderService getStatusColor"/>
+  <testcase name="OrderService canDelete should allow deletion of CANCELLED and DELIVERED orders" time="0" classname="OrderService canDelete"/>
+  <testcase name="OrderService getStatusIcon should return the correct icon for each status" time="0.001" classname="OrderService getStatusIcon"/>
+  <testcase name="OrderService should be created" time="0.001" classname="OrderService"/>
+  <testcase name="OrderService createOrder should create an order" time="0.001" classname="OrderService createOrder"/>
+  <testcase name="OrderService cancelOrder should cancel an order" time="0.001" classname="OrderService cancelOrder"/>
+  <testcase name="OrderService getUserOrders should send correct pagination parameters" time="0.001" classname="OrderService getUserOrders"/>
+  <testcase name="OrderService getUserOrders should calculate overall status for every order" time="0.001" classname="OrderService getUserOrders"/>
+  <testcase name="OrderService getUserOrders should return paginated orders with overall statuses" time="0.002" classname="OrderService getUserOrders"/>
+  <testcase name="OrderService redoOrder should redo an order" time="0.001" classname="OrderService redoOrder"/>
+  <testcase name="OrderService getOrder should calculate overall status from sub-orders" time="0.001" classname="OrderService getOrder"/>
+  <testcase name="OrderService getOrder should use the earliest status in the status flow" time="0.001" classname="OrderService getOrder"/>
+  <testcase name="OrderService getOrder should default overall status to PENDING when there are no sub-orders" time="0.001" classname="OrderService getOrder"/>
+  <testcase name="OrderService getOrder should return an order with its overall status" time="0" classname="OrderService getOrder"/>
+  <testcase name="authGuard should redirect to /auth/login with returnUrl if unauthenticated" time="0.001" classname="authGuard"/>
+  <testcase name="authGuard should allow navigation if user is authenticated" time="0" classname="authGuard"/>
+  <testcase name="ThemeService should initialize saved dark theme from localStorage" time="0" classname="ThemeService"/>
+  <testcase name="ThemeService should initialize default light theme" time="0" classname="ThemeService"/>
+  <testcase name="ThemeService should toggle theme mode" time="0.001" classname="ThemeService"/>
+  <testcase name="AdminProductsPage should load products on init" time="0.018" classname="AdminProductsPage"/>
+  <testcase name="OrderStatusTimelineComponent steps (cancelled) should return only the placed and cancelled steps" time="0.006" classname="OrderStatusTimelineComponent steps (cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (cancelled) should fall back to createdAt and no actor when there is no cancel history" time="0.003" classname="OrderStatusTimelineComponent steps (cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (cancelled) should label a buyer cancellation as Buyer" time="0.002" classname="OrderStatusTimelineComponent steps (cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent statusPillClass should return pill-primary for CONFIRMED, SHIPPED and DELIVERED" time="0.002" classname="OrderStatusTimelineComponent statusPillClass"/>
+  <testcase name="OrderStatusTimelineComponent statusPillClass should return pill-warn for CANCELLED" time="0.002" classname="OrderStatusTimelineComponent statusPillClass"/>
+  <testcase name="OrderStatusTimelineComponent statusPillClass should return an empty string for PENDING" time="0.003" classname="OrderStatusTimelineComponent statusPillClass"/>
+  <testcase name="OrderStatusTimelineComponent should create" time="0.002" classname="OrderStatusTimelineComponent"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should use the outline icon for an upcoming CONFIRMED step" time="0.003" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should label the actor as Buyer when changedBy is not the seller id" time="0.002" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should use the PENDING history timestamp when present" time="0.003" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should label the actor as Seller when changedBy matches the seller id" time="0.002" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should use createdAt for the PENDING step when history has no PENDING entry" time="0.002" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should use the status icon for current and upcoming steps" time="0.003" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should leave future steps without timestamp or actor" time="0.002" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should take timestamps from history for reached steps" time="0.002" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should use the check icon for completed steps" time="0.002" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should not mutate the original status history" time="0.002" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should mark earlier steps completed and the current step as current" time="0.002" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should return the four steps in fixed order" time="0.002" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should use the expected titles" time="0.002" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should handle undefined status history" time="0.004" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent steps (non-cancelled) should mark everything completed except DELIVERED when delivered" time="0.002" classname="OrderStatusTimelineComponent steps (non-cancelled)"/>
+  <testcase name="OrderStatusTimelineComponent template should render one element per step" time="0.002" classname="OrderStatusTimelineComponent template"/>
+  <testcase name="OrderStatusTimelineComponent template should not render a connector after the last step" time="0.002" classname="OrderStatusTimelineComponent template"/>
+  <testcase name="OrderStatusTimelineComponent template should render the cancelled layout" time="0.003" classname="OrderStatusTimelineComponent template"/>
+  <testcase name="OrderStatusTimelineComponent template should flag completed and current steps" time="0.002" classname="OrderStatusTimelineComponent template"/>
+  <testcase name="OrderStatusTimelineComponent template should show Pending for steps without a timestamp" time="0.003" classname="OrderStatusTimelineComponent template"/>
+  <testcase name="OrderStatusTimelineComponent template should render the sub-order status in the pill with the matching class" time="0.003" classname="OrderStatusTimelineComponent template"/>
+  <testcase name="HomePage should load products on init" time="0.012" classname="HomePage"/>
+  <testcase name="AppComponent should create the app and initialize theme" time="0.034" classname="AppComponent"/>
+  <testcase name="TokenStorage should be created" time="0.002" classname="TokenStorage"/>
+  <testcase name="TokenStorage should clear token from localStorage" time="0.002" classname="TokenStorage"/>
+  <testcase name="TokenStorage should store and retrieve token" time="0.002" classname="TokenStorage"/>
+  <testcase name="ProductDetailsPage should fetch product details and seller widget" time="0.033" classname="ProductDetailsPage"/>
+  <testcase name="FieldErrorComponent should not render error text if control is untouched or has no errors" time="0.002" classname="FieldErrorComponent"/>
+  <testcase name="FieldErrorComponent should render required error when control is touched and invalid" time="0.002" classname="FieldErrorComponent"/>
+  <testcase name="FieldErrorComponent should render email error message" time="0.001" classname="FieldErrorComponent"/>
+  <testcase name="FieldErrorComponent should render weakPassword error message" time="0.002" classname="FieldErrorComponent"/>
+  <testcase name="RegisterPage should initialize with empty invalid form" time="0.019" classname="RegisterPage"/>
+  <testcase name="SessionService should initialize session when no token present" time="0.002" classname="SessionService"/>
+  <testcase name="SubOrderService should calculate status for every seller order" time="0.001" classname="SubOrderService"/>
+  <testcase name="SubOrderService should get a suborder and calculate its overall status" time="0.001" classname="SubOrderService"/>
+  <testcase name="SubOrderService should default status to PENDING when no status matches" time="0.001" classname="SubOrderService"/>
+  <testcase name="SubOrderService should delete a suborder" time="0.001" classname="SubOrderService"/>
+  <testcase name="SubOrderService should get seller orders with pagination" time="0.001" classname="SubOrderService"/>
+  <testcase name="SubOrderService should create" time="0.001" classname="SubOrderService"/>
+  <testcase name="SubOrderService should update suborder status" time="0.001" classname="SubOrderService"/>
+  <testcase name="ProfileService should get current profile (me)" time="0.001" classname="ProfileService"/>
+  <testcase name="ProfileService should update profile" time="0.001" classname="ProfileService"/>
+  <testcase name="ProductCardComponent should display product details" time="0.004" classname="ProductCardComponent"/>
   <system-out>
-    <![CDATA[
+    <![CDATA[Chrome Headless 154.0.0.0 (Windows 10) ERROR: Error: err
+Error: err
+    at errorFactory (http://localhost:9876/_karma_webpack_/webpack:/src/app/features/cart/cart.item.spec.ts:129:68)
+    at Observable._subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/observable/throwError.js:5:51)
+    at Observable._trySubscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:37:25)
+    at cb (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:31:30)
+    at errorContext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/util/errorContext.js:19:9)
+    at Observable.subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:22:21)
+    at CartItemComponent.updateItemQuantity (http://localhost:9876/_karma_webpack_/webpack:/src/app/features/cart/cart.item.ts:260:63)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/src/app/features/cart/cart.item.spec.ts:133:15)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+,Chrome Headless 154.0.0.0 (Windows 10) ERROR: Error: err
+Error: err
+    at errorFactory (http://localhost:9876/_karma_webpack_/webpack:/src/app/features/cart/cart.item.spec.ts:139:64)
+    at Observable._subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/observable/throwError.js:5:51)
+    at Observable._trySubscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:37:25)
+    at cb (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:31:30)
+    at errorContext (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/util/errorContext.js:19:9)
+    at Observable.subscribe (http://localhost:9876/_karma_webpack_/webpack:/node_modules/rxjs/dist/esm/internal/Observable.js:22:21)
+    at CartItemComponent.deleteItem (http://localhost:9876/_karma_webpack_/webpack:/src/app/features/cart/cart.item.ts:271:49)
+    at UserContext.apply (http://localhost:9876/_karma_webpack_/webpack:/src/app/features/cart/cart.item.spec.ts:143:15)
+    at _ZoneDelegate.invoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone.js:398:28)
+    at ProxyZoneSpec.onInvoke (http://localhost:9876/_karma_webpack_/webpack:/node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
+,Chrome Headless 154.0.0.0 (Windows 10) LOG: Object{id: 'p1', name: 'Smartphone', description: 'High end smartphone', price: 999.99, quantity: 5, userId: 'u1', categoryId: 'c1', images: [Object{id: ..., url: ..., existing: ...}], createdAt: '2026-01-01'}
+
 ]]>
   </system-out>
   <system-err/>

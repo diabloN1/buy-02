@@ -147,7 +147,6 @@ class OrderServiceImplTest {
             verify(cartClient).getCart();
             verify(orderRepository).save(any());
             verify(subOrderRepository).saveAll(anyList());
-            verify(cartClient).clearCart();
         }
 
         @Test
@@ -169,7 +168,6 @@ class OrderServiceImplTest {
 
             verify(orderRepository, never()).save(any());
             verify(subOrderRepository, never()).saveAll(anyList());
-            verify(cartClient, never()).clearCart();
         }
 
         @Test
@@ -196,7 +194,6 @@ class OrderServiceImplTest {
 
             verify(orderRepository, never()).save(any());
             verify(subOrderRepository, never()).saveAll(anyList());
-            verify(cartClient, never()).clearCart();
         }
     }
 

@@ -24,7 +24,7 @@ import com.buy01.product.DTOs.ProductResponse;
 import com.buy01.product.DTOs.ProductSearchFilter;
 import com.buy01.product.entity.Category;
 import com.buy01.product.entity.Product;
-import com.buy01.product.event.AuditAction;
+import com.buy01.product.event.audit.AuditAction;
 import com.buy01.product.exception.custom.BadRequestException;
 import com.buy01.product.exception.custom.ForbiddenException;
 import com.buy01.product.exception.custom.NotFoundException;

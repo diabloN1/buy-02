@@ -23,6 +23,10 @@ export interface AuthWorkerFixtures {
     };
   };
 
+  userAuth: {
+    accessToken: string;
+  };
+
   sellerAuth: {
     accessToken: string;
   };
@@ -55,72 +59,45 @@ export const test = base.extend<AuthFixtures, AuthWorkerFixtures>({
     },
   ],
 
-  sellerAuth: [
+  userAuth: [
     async ({ testUsers }, use) => {
-      const api = await createApi();
+      const auth = await authenticate(testUsers, "USER");
 
-      const { name, email, password } = testUsers.seller;
-
-      let auth = await api.registerUser(name, email, password, "SELLER");
-
-      if (!auth.accessToken) {
-        auth = await api.loginUser(email, password);
-      }
-
-      if (!auth.accessToken) {
-        throw new Error(`Authentication failed for ${email}`);
-      }
-
-      await use({
-        accessToken: auth.accessToken,
-      });
+      await use({ accessToken: auth.accessToken });
     },
     { scope: "worker" },
   ],
-  
-  /**
-   * Authenticated page as USER.
-   */
-  userPage: async ({ browser, testUsers }, use) => {
+
+  sellerAuth: [
+    async ({ testUsers }, use) => {
+      const auth = await authenticate(testUsers, "SELLER");
+
+      await use({ accessToken: auth.accessToken });
+    },
+    { scope: "worker" },
+  ],
+
+  // Authenticated page as USER.
+  userPage: async ({ browser, userAuth }, use) => {
     const context = await browser.newContext({
       ignoreHTTPSErrors: true,
     });
 
     const page = await context.newPage();
 
-    // Register USER or log in if already registered.
-    const api = await createApi();
-
-    const { name, email, password } = testUsers.user;
-
-    let auth = await api.registerUser(name, email, password, "USER");
-
-    if (!auth.accessToken) {
-      auth = await api.loginUser(email, password);
-    }
-
-    const token = auth.accessToken;
-
-    if (!token) {
-      throw new Error(`Authentication failed for ${email}: no access token`);
-    }
-
-    // Inject JWT into localStorage before the application loads.
     await page.addInitScript(
       ({ key, value }) => {
         localStorage.setItem(key, value);
       },
-      { key: "mp.token", value: token },
+      { key: "mp.token", value: userAuth.accessToken },
     );
 
     await use(page);
 
     await context.close();
   },
-
-  /**
-   * Authenticated page as SELLER.
-   */
+  
+  // Authenticated page as SELLER.
   sellerPage: async ({ browser, sellerAuth }, use) => {
     const context = await browser.newContext({
       ignoreHTTPSErrors: true,
@@ -146,7 +123,29 @@ export const test = base.extend<AuthFixtures, AuthWorkerFixtures>({
   },
 });
 
-/**
- * Re-export expect so tests can import everything from this fixture.
- */
+type UserRole = "USER" | "SELLER";
+
+async function authenticate(
+  testUsers: AuthWorkerFixtures["testUsers"],
+  role: UserRole,
+) {
+  const api = await createApi();
+
+  const credentials = role === "SELLER" ? testUsers.seller : testUsers.user;
+
+  const { name, email, password } = credentials;
+
+  let auth = await api.registerUser(name, email, password, role);
+
+  if (!auth.accessToken) {
+    auth = await api.loginUser(email, password);
+  }
+
+  if (!auth.accessToken) {
+    throw new Error(`Authentication failed for ${email}`);
+  }
+
+  return auth;
+}
+
 export { expect } from "@playwright/test";

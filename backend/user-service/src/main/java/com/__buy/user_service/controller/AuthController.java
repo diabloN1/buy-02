@@ -59,7 +59,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public AuthResponse refreshToken(
-            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            @CookieValue(required = false) String refreshToken,
             HttpServletResponse response) {
 
         if (refreshToken == null) {
@@ -77,7 +77,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", "").httpOnly(true).secure(false)
-                .sameSite("Lax").path("/users/auth/refresh").maxAge(0).build();
+                .sameSite("Lax").path("/api/users/auth/refresh").maxAge(0).build();
 
         response.addHeader("Set-Cookie", cookie.toString());
 

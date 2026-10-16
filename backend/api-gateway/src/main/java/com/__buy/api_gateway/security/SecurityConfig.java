@@ -1,7 +1,6 @@
 package com.__buy.api_gateway.security;
 
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -33,116 +32,118 @@ import org.springframework.http.HttpMethod;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Value("${jwt.secret}")
-    private String secret;
+        @Value("${jwt.secret}")
+        private String secret;
 
-    private final RateLimitFilter rateLimitFilter;
+        private final RateLimitFilter rateLimitFilter;
 
-    public SecurityConfig(RateLimitFilter rateLimitFilter) {
-        this.rateLimitFilter = rateLimitFilter;
-    }
-    
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        public SecurityConfig(RateLimitFilter rateLimitFilter) {
+                this.rateLimitFilter = rateLimitFilter;
+        }
 
-        http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/media/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/widget/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users/auth/**").permitAll()
+        @Bean
+        SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-                        .anyRequest().authenticated())
-                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
-                .oauth2ResourceServer(oauth -> oauth
-                        .jwt(jwt -> jwt
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                http
+                                .csrf(csrf -> csrf.disable())
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/actuator/health").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/media/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/users/widget/**").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/users/auth/**").permitAll()
 
-        ;
+                                                .anyRequest().authenticated())
+                                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
+                                .oauth2ResourceServer(oauth -> oauth
+                                                .jwt(jwt -> jwt
+                                                                .jwtAuthenticationConverter(
+                                                                                jwtAuthenticationConverter())));
 
-        // Security exceptions
-        http.exceptionHandling(ex -> ex
-                .authenticationEntryPoint((req, res, authEx) -> {
-                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    res.setContentType("application/json");
-                    res.getWriter().write("""
-                                {"code":"UNAUTHORIZED","message":"Token expired or invalid","details":null,"timestamp":"%s"}
-                            """.formatted(java.time.LocalDateTime.now()));
-                })
-                .accessDeniedHandler((req, res, accessDeniedEx) -> {
-                    res.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    res.setContentType("application/json");
-                    res.getWriter().write("""
-                                {"code":"FORBIDDEN","message":"You do not have permission to access this resource","details":null,"timestamp":"%s"}
-                            """.formatted(java.time.LocalDateTime.now()));
-                }));
-        return http.build();
-    }
+                ;
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+                // Security exceptions
+                http.exceptionHandling(ex -> ex
+                                .authenticationEntryPoint((req, res, authEx) -> {
+                                        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                        res.setContentType("application/json");
+                                        res.getWriter().write(
+                                                        """
+                                                                            {"code":"UNAUTHORIZED","message":"Token expired or invalid","details":null,"timestamp":"%s"}
+                                                                        """
+                                                                        .formatted(java.time.LocalDateTime.now()));
+                                })
+                                .accessDeniedHandler((req, res, accessDeniedEx) -> {
+                                        res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                                        res.setContentType("application/json");
+                                        res.getWriter().write(
+                                                        """
+                                                                            {"code":"FORBIDDEN","message":"You do not have permission to access this resource","details":null,"timestamp":"%s"}
+                                                                        """
+                                                                        .formatted(java.time.LocalDateTime.now()));
+                                }));
+                return http.build();
+        }
 
-        CorsConfiguration config = new CorsConfiguration();
+        @Bean
+        CorsConfigurationSource corsConfigurationSource() {
 
-        config.setAllowCredentials(true);
+                CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(
-                List.of("https://localhost:4200"));
-                        
-        config.setAllowedMethods(
-                List.of(
-                        "GET",
-                        "POST",
-                        "PUT",
-                        "PATCH",
-                        "DELETE",
-                        "OPTIONS"
-                )
-        );
+                config.setAllowCredentials(true);
 
-        config.setAllowedHeaders(
-                List.of(
-                        "Authorization",
-                        "Content-Type",
-                        "Accept"
-                )
-        );
+                config.setAllowedOrigins(
+                                List.of("https://localhost:4200"));
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                config.setAllowedMethods(
+                                List.of(
+                                                "GET",
+                                                "POST",
+                                                "PUT",
+                                                "PATCH",
+                                                "DELETE",
+                                                "OPTIONS"));
 
-        source.registerCorsConfiguration(
-                "/**",
-                config);
+                config.setAllowedHeaders(
+                                List.of(
+                                                "Authorization",
+                                                "Content-Type",
+                                                "Accept"));
 
-        return source;
-    }
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-    @Bean
-    JwtDecoder jwtDecoder() {
+                source.registerCorsConfiguration(
+                                "/**",
+                                config);
 
-        SecretKey key = new SecretKeySpec(
-                secret.getBytes(),
-                "HmacSHA384");
+                return source;
+        }
 
-        return NimbusJwtDecoder
-                .withSecretKey(key)
-                .macAlgorithm(org.springframework.security.oauth2.jose.jws.MacAlgorithm.HS384)
-                .build();
-    }
+        @Bean
+        JwtDecoder jwtDecoder() {
 
-    @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+                SecretKey key = new SecretKeySpec(
+                                secret.getBytes(),
+                                "HmacSHA384");
 
-        authoritiesConverter.setAuthoritiesClaimName("role");
-        authoritiesConverter.setAuthorityPrefix("ROLE_");
+                return NimbusJwtDecoder
+                                .withSecretKey(key)
+                                .macAlgorithm(org.springframework.security.oauth2.jose.jws.MacAlgorithm.HS384)
+                                .build();
+        }
 
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+        @Bean
+        JwtAuthenticationConverter jwtAuthenticationConverter() {
+                JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
-        return converter;
-    }
+                authoritiesConverter.setAuthoritiesClaimName("role");
+                authoritiesConverter.setAuthorityPrefix("ROLE_");
+
+                JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+                converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+
+                return converter;
+        }
 }

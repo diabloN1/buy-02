@@ -7,11 +7,11 @@ import {
   signal,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { ActivatedRoute, RouterLink } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { shareReplay, switchMap } from "rxjs";
+import { catchError, shareReplay, switchMap, tap, throwError } from "rxjs";
 import { ProductService } from "@core/services/product.service";
 import { Product } from "@core/models/product.model";
 import { LoadingSpinnerComponent } from "@shared/components/loading-spinner.component";
@@ -126,10 +126,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
             <!-- Seller Information Badge -->
             @if (seller(); as seller) {
               <div class="seller-card">
-                <app-user-avatar
-                  [user]="seller"
-                  [size]="40"
-                />
+                <app-user-avatar [user]="seller" [size]="40" />
 
                 <div class="seller-details">
                   <span class="seller-role">Verified Seller</span>
@@ -290,7 +287,6 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         padding-bottom: 64px;
       }
 
-  
       .back-btn {
         margin-bottom: 24px;
         font-weight: 500;
@@ -373,7 +369,6 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         height: 48px;
       }
 
-
       .thumbs {
         display: flex;
         gap: 12px;
@@ -407,7 +402,6 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         background: var(--app-surface);
       }
 
-
       .pill-group {
         display: flex;
         gap: 8px;
@@ -437,14 +431,13 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         height: 16px;
       }
 
-
       .category-pill {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         padding: 4px 12px;
         border-radius: var(--app-radius-full);
-        background: var(--app-bg-alt); 
+        background: var(--app-bg-alt);
         border: 1px solid var(--app-border);
         color: var(--app-fg);
         font-size: 12px;
@@ -566,7 +559,6 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         letter-spacing: -0.02em;
       }
 
-
       .seller-card {
         display: flex;
         align-items: center;
@@ -646,7 +638,6 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         margin: 0;
       }
 
-
       .actions-group {
         display: flex;
         flex-direction: column;
@@ -678,7 +669,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         color: var(--app-fg);
         background-color: transparent;
       }
-      
+
       .connect-btn {
         height: 32px !important;
         padding: 0 12px !important;
@@ -745,7 +736,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         border-radius: var(--app-radius-sm);
       }
       .dark-theme .in-cart-card {
-        background: rgba(99, 102, 241, 0.05); 
+        background: rgba(99, 102, 241, 0.05);
       }
 
       .in-cart-message {
@@ -775,6 +766,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
 })
 export class ProductDetailsPage {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly svc = inject(ProductService);
   private readonly userService = inject(UserService);
   private readonly cartService = inject(CartService);
@@ -782,7 +774,17 @@ export class ProductDetailsPage {
   readonly currentUser = inject(CurrentUserService);
 
   private readonly product$ = this.route.paramMap.pipe(
-    switchMap((params) => this.svc.get(params.get("id")!)),
+    switchMap((params) => {
+      return this.svc.get(params.get("id")!).pipe(
+        catchError((err) => {
+          if (err.status === 404) {
+            this.router.navigateByUrl("/not-found");
+          }
+
+          return throwError(() => err.error);
+        }),
+      );
+    }),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 

@@ -4,9 +4,9 @@ import { NotificationService } from './notification.service';
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
   private readonly notify = inject(NotificationService);
-  handleError(error: unknown): void {
-    // console.error('[GlobalError]', error);
-    const msg = error instanceof Error ? error.message : 'Unexpected error';
+  handleError(error: Error): void {
+    console.error('[GlobalError]', error);
+    const msg = error && error.message ? error.message : 'Unexpected error';
     this.notify.error(msg);
   }
 }

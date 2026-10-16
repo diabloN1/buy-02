@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import com.buy02.order.aop.AuditEventProducer;
 import com.buy02.order.client.CartClient;
 import com.buy02.order.client.ProductClient;
 import com.buy02.order.dto.CartResponse;
@@ -61,6 +62,9 @@ class OrderServiceImplTest {
 
     @Mock
     private OrderMapper orderMapper;
+
+    @Mock
+    private AuditEventProducer eventProducer;
 
     @InjectMocks
     private OrderServiceImpl orderService;
@@ -451,8 +455,10 @@ class OrderServiceImplTest {
                     .build();
 
             SubOrder newSubOrder = SubOrder.builder()
-                    .id("new-sub")
-                    .build();
+                .id("new-sub")
+                .items(new ArrayList<>(subOrder.getItems()))
+                .statusHistory(new ArrayList<>())
+                .build();
 
             when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
                     .thenReturn(Optional.of(order));

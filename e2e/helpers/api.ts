@@ -2,6 +2,12 @@ import { APIRequestContext, expect, request } from "@playwright/test";
 
 export const API_BASE = "https://localhost:8080/api";
 
+export interface Category {
+  id: string;
+  name: string;
+  description: string;
+}
+
 class ApiHelper {
   private context!: APIRequestContext;
 
@@ -35,22 +41,46 @@ class ApiHelper {
         data: { name, email, password, role },
       },
     );
+
     const body = await response.json();
 
     return body;
   }
 
   async loginUser(email: string, password: string) {
-    const response = await this.context.post(`${API_BASE}/users/auth/login`, {
-      data: { email, password },
-    });
+    const response = await this.context.post(
+      `${API_BASE}/users/auth/login`,
+      {
+        data: { email, password },
+      },
+    );
+
     const body = await response.json();
+
     expect(
       response.ok(),
       `Login failed: ${body.message || response.statusText()}`,
     ).toBe(true);
 
     return body;
+  }
+
+  async getCategories(): Promise<Category[]> {
+    const response = await this.context.get(`${API_BASE}/categories`);
+
+    expect(
+      response.ok(),
+      `Failed to retrieve categories: ${response.status()} ${response.statusText()}`,
+    ).toBe(true);
+
+    const categories: Category[] = await response.json();
+
+    expect(
+      categories.length,
+      "No categories available for E2E product seeding",
+    ).toBeGreaterThan(0);
+
+    return categories;
   }
 
   async createProduct(payload: {
@@ -71,10 +101,12 @@ class ApiHelper {
     });
 
     const body = await response.json();
+
     expect(
       response.ok(),
       `Product creation failed: ${body.message || response.statusText()}`,
     ).toBe(true);
+
     return body.id;
   }
 

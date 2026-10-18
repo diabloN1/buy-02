@@ -1,9 +1,9 @@
-import { test, expect } from "../fixtures/auth.fixtures";
+import { test, expect } from "../fixtures/cart.fixtures";
 
 test.describe('Product Details', () => {
-  test('should display product details correctly', async ({ userPage }) => {
-    await userPage.goto('/products');
-    const firstCard = userPage.locator('app-product-card').first();
+  test('should display product details correctly', async ({ productPage }) => {
+    await productPage.goto('/products');
+    const firstCard = productPage.locator('app-product-card').first();
     await firstCard.waitFor({ state: 'visible', timeout: 10_000 });
 
     const productUrl = await firstCard.locator('a').getAttribute('href');
@@ -13,31 +13,31 @@ test.describe('Product Details', () => {
     }
 
     await firstCard.click();
-    await expect(userPage).toHaveURL(/\/products\/.+/);
+    await expect(productPage).toHaveURL(/\/products\/.+/);
 
-    await expect(userPage.locator('.product-title, h1, h2').first()).toBeVisible();
+    await expect(productPage.locator('.product-title, h1, h2').first()).toBeVisible();
   });
 
-  test('should have back to products link', async ({ userPage }) => {
-    await userPage.goto('/products');
-    const firstCard = userPage.locator('app-product-card').first();
+  test('should have back to products link', async ({ productPage }) => {
+    await productPage.goto('/products');
+    const firstCard = productPage.locator('app-product-card').first();
     await firstCard.waitFor({ state: 'visible', timeout: 10_000 });
 
     await firstCard.click();
-    await userPage.waitForURL(/\/products\/.+/);
+    await productPage.waitForURL(/\/products\/.+/);
 
-    await expect(userPage.locator('a:has-text("Back"), a[routerLink]').last()).toBeVisible();
+    await expect(productPage.locator('a:has-text("Back"), a[routerLink]').last()).toBeVisible();
   });
 
-  test('show 404 for non-existent product', async ({ userPage }) => {
-    await userPage.goto('/products/non-existent-product-12345');
+  test('show 404 for non-existent product', async ({ productPage }) => {
+    await productPage.goto('/products/non-existent-product-12345');
 
-    await expect(userPage.locator('text=404')).toBeVisible({ timeout: 5000 });
+    await expect(productPage.locator('text=404')).toBeVisible({ timeout: 5000 });
   });
 
-  test('should display inventory status correctly', async ({ userPage }) => {
-    await userPage.goto('/products');
-    const firstCard = userPage.locator('app-product-card').first();
+  test('should display inventory status correctly', async ({ productPage }) => {
+    await productPage.goto('/products');
+    const firstCard = productPage.locator('app-product-card').first();
     await firstCard.waitFor({ state: 'visible', timeout: 10_000 });
 
     await expect(firstCard.locator('.qty-pill')).toBeVisible();

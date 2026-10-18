@@ -1,7 +1,7 @@
-import { test, expect } from "../fixtures/auth.fixtures";
+import { test, expect } from "../fixtures/product.fixtures";
 
 test.describe('Products', () => {
-  test('home page loads with featured products', async ({ userPage }) => {
+  test('home page loads with featured products', async ({ userPage, seededProducts }) => {
     await userPage.goto('/');
 
     await expect(userPage.locator('h1')).toContainText('Discover & Trade Products');
@@ -16,7 +16,7 @@ test.describe('Products', () => {
     await expect(userPage.locator('app-product-card').first()).toBeVisible({ timeout: 10_000 });
   });
 
-  test('should search products by keyword', async ({ userPage }) => {
+  test('should search products by keyword', async ({ userPage, seededProducts }) => {
     await userPage.goto('/products');
 
     await expect(userPage.locator('app-product-card').first()).toBeVisible({ timeout: 10_000 });

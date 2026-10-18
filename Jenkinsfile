@@ -9,6 +9,39 @@ def services = [
     'cart-service'
 ]
 
+def rollbackDeployment() {
+    if (!params.ROLLBACK_ON_FAILURE) {
+        echo 'Rollback is disabled.'
+        error(
+            'Deployment verification failed and rollback is disabled.'
+        )
+    }
+
+    def previousBuild = currentBuild.previousSuccessfulBuild
+
+    if (previousBuild == null) {
+        error('No previous successful build exists for rollback.')
+    }
+
+    def previousVersion = "1.0.${previousBuild.number}"
+
+    echo "Rolling back to ${previousVersion}..."
+
+    sh """
+        export IMAGE_TAG=${previousVersion}
+
+        docker compose \
+            -f docker-compose.jenkins.yml \
+            up -d --no-build
+    """
+
+    echo "Rollback to ${previousVersion} completed."
+    error(
+        'Deployment failed. ' +
+        "Application rolled back to ${previousVersion}."
+    )
+}
+
 pipeline {
     agent none
 
@@ -351,46 +384,43 @@ pipeline {
                 failure {
                     script {
                         echo 'Deployment verification failed.'
+                        rollbackDeployment()
+                    }
+                }
+            }
+        }
 
-                        if (!params.ROLLBACK_ON_FAILURE) {
-                            echo 'Rollback is disabled.'
+        stage('e2e Verification') {
+            when {
+                allOf {
+                    branch 'main'
+                    not {
+                        triggeredBy 'TimerTrigger'
+                    }
+                }
+            }
 
-                            error(
-                                'Deployment verification failed and rollback is disabled.'
-                            )
-                        }
+            agent {
+                label 'deployment'
+            }
 
-                        echo 'Starting rollback...'
+            steps {
+                dir('e2e') {
+                    sh 'npm ci'
+                    sh 'npx playwright install --with-deps chromium'
+                    sh 'npx playwright test'
+                }
+            }
 
-                        def previousBuild =
-                            currentBuild.previousSuccessfulBuild
+            post {
+                always {
+                    junit(testResults: 'e2e/test-reports/playwright-results.xml')
+                }
 
-                        if (previousBuild == null) {
-                            error(
-                                'No previous successful deployment exists. ' +
-                                'Rollback cannot be performed.'
-                            )
-                        }
-
-                        def previousVersion =
-                            "1.0.${previousBuild.number}"
-
-                        sh """
-                            export IMAGE_TAG=${previousVersion}
-
-                            echo "Rolling back to version: \\$IMAGE_TAG"
-
-                            docker compose \
-                                -f docker-compose.jenkins.yml \
-                                up -d --no-build
-                        """
-
-                        echo "Rollback to ${previousVersion} completed."
-
-                        error(
-                            'Deployment failed. ' +
-                            "Application rolled back to ${previousVersion}."
-                        )
+                failure {
+                    script {
+                        echo 'E2E tests failed.'
+                        rollbackDeployment()
                     }
                 }
             }

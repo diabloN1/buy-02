@@ -1,7 +1,7 @@
 services:
   frontend:
     build: ./frontend
-    image: mr-jenk/frontend:${IMAGE_TAG}
+    image: buy-02/frontend:${IMAGE_TAG}
 
     ports:
       - "4200:8080"
@@ -15,7 +15,7 @@ services:
       start_period: 20s
 
   eureka:
-    image: mr-jenk/eureka:${IMAGE_TAG}
+    image: buy-02/eureka:${IMAGE_TAG}
     build: ./backend/eureka
 
     healthcheck:
@@ -33,7 +33,7 @@ services:
       retries: 20
 
   user:
-    image: mr-jenk/user-service:${IMAGE_TAG}
+    image: buy-02/user-service:${IMAGE_TAG}
     build: ./backend/user-service
 
     depends_on:
@@ -67,7 +67,7 @@ services:
       retries: 20
 
   product:
-    image: mr-jenk/product-service:${IMAGE_TAG}
+    image: buy-02/product-service:${IMAGE_TAG}
     build: ./backend/product-service
 
     depends_on:
@@ -96,7 +96,7 @@ services:
       retries: 20
 
   media:
-    image: mr-jenk/media-service:${IMAGE_TAG}
+    image: buy-02/media-service:${IMAGE_TAG}
     build: ./backend/media-service
 
     depends_on:
@@ -131,7 +131,7 @@ services:
       retries: 20
 
   audit:
-    image: mr-jenk/audit-service:${IMAGE_TAG}
+    image: buy-02/audit-service:${IMAGE_TAG}
     build: ./backend/audit-service
 
     depends_on:
@@ -161,8 +161,70 @@ services:
       timeout: 3s
       retries: 20
 
+  cart:
+    image: buy-02/cart-service:${IMAGE_TAG}
+    build: ./backend/cart-service
+
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "-",
+          "http://localhost:8085/actuator/health",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  order:
+    image: buy-02/order-service:${IMAGE_TAG}
+    build: ./backend/order-service
+
+    depends_on:
+      eureka:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      MONGODB_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGODB_PASSWORD: ${MONGO_ROOT_PASSWORD}
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "-",
+          "http://localhost:8086/actuator/health",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
   api-gateway:
-    image: mr-jenk/api-gateway:${IMAGE_TAG}
+    image: buy-02/api-gateway:${IMAGE_TAG}
     build: ./backend/api-gateway
 
     depends_on:
@@ -246,15 +308,15 @@ services:
       - mongo-data:/data/db
 
   minio:
-    build: ./deps-setup/minio
-
+    build:
+      context: ./deps-setup/minio
+    image: anlazaar/minio:latest
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-
+    command: server /data --console-address ":9001"
     volumes:
       - minio-data:/data
-
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 5s

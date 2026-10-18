@@ -71,6 +71,12 @@ pipeline {
             defaultValue: true,
             description: 'Send email notifications for build results'
         )
+
+        booleanParam(
+            name: 'DEPLOY',
+            defaultValue: false,
+            description: 'Deploy the application and run E2E verification'
+        )
     }
 
     environment {
@@ -281,7 +287,9 @@ pipeline {
         stage('Deploy') {
             when {
                 allOf {
-                    branch 'main'
+                    expression {
+                        params.DEPLOY
+                    }
 
                     not {
                         triggeredBy 'TimerTrigger'
@@ -336,7 +344,9 @@ pipeline {
         stage('Deployment Verification') {
             when {
                 allOf {
-                    branch 'main'
+                    expression {
+                        params.DEPLOY
+                    }
 
                     not {
                         triggeredBy 'TimerTrigger'
@@ -393,7 +403,10 @@ pipeline {
         stage('e2e Verification') {
             when {
                 allOf {
-                    branch 'main'
+                    expression {
+                        params.DEPLOY
+                    }
+
                     not {
                         triggeredBy 'TimerTrigger'
                     }

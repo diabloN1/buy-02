@@ -420,7 +420,6 @@ pipeline {
             steps {
                 dir('e2e') {
                     sh 'npm ci'
-                    sh 'npx playwright install --with-deps chromium'
                     sh 'npx playwright test'
                 }
             }

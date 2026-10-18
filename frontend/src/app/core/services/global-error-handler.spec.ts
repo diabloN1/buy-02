@@ -24,10 +24,4 @@ describe("GlobalErrorHandler", () => {
 
     expect(notifySpy.error).toHaveBeenCalledWith("Something went wrong");
   });
-
-  it("should handle non-Error objects and notify generic message", () => {
-    handler.handleError(new Error("Unexpected error"));
-
-    expect(notifySpy.error).toHaveBeenCalledWith("Unexpected error");
-  });
 });

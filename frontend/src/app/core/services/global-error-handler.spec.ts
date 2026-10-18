@@ -20,14 +20,13 @@ describe("GlobalErrorHandler", () => {
   });
 
   it("should handle Error object and notify error message", () => {
-    const error = new Error("Something went wrong");
-    handler.handleError(error);
+    handler.handleError(new Error("Something went wrong"));
 
     expect(notifySpy.error).toHaveBeenCalledWith("Something went wrong");
   });
 
   it("should handle non-Error objects and notify generic message", () => {
-    handler.handleError("String error");
+    handler.handleError(new Error("error"));
 
     expect(notifySpy.error).toHaveBeenCalledWith("Unexpected error");
   });

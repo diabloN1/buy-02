@@ -96,7 +96,7 @@ export const test = base.extend<AuthFixtures, AuthWorkerFixtures>({
 
     await context.close();
   },
-  
+
   // Authenticated page as SELLER.
   sellerPage: async ({ browser, sellerAuth }, use) => {
     const context = await browser.newContext({
@@ -138,6 +138,7 @@ async function authenticate(
   let auth = await api.registerUser(name, email, password, role);
 
   if (!auth.accessToken) {
+    console.warn("Couldn't register user and got response: ", auth);
     auth = await api.loginUser(email, password);
   }
 

@@ -418,10 +418,19 @@ pipeline {
             }
 
             steps {
-                dir('e2e') {
-                    sleep(time: 120, unit: 'SECONDS')
-                    sh 'npm ci'
-                    sh 'npx playwright test'
+                script {
+                    retry(6) {
+                        try {
+                            dir('e2e') {
+                                sh 'npm ci'
+                                sh 'npx playwright test'
+                            }
+                        } catch (Exception e) {
+                            echo 'E2E verification failed. Waiting 15 seconds before retrying...'
+                            sleep(time: 10, unit: 'SECONDS')
+                            throw e
+                        }
+                    }
                 }
             }
 
@@ -432,7 +441,7 @@ pipeline {
 
                 failure {
                     script {
-                        echo 'E2E tests failed.'
+                        echo 'E2E tests failed after 5 attempts.'
                         rollbackDeployment()
                     }
                 }

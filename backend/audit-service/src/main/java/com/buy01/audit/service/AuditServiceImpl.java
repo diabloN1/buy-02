@@ -115,7 +115,6 @@ public class AuditServiceImpl {
                         .builder()
                         .buyerId(sale.buyerId())
                         .sellerId(sale.sellerId())
-                        .subOrderId(sale.subOrderId())
                         .productId(sale.productId())
                         .productName(sale.productName())
                         .category(sale.category())

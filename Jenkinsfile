@@ -419,6 +419,7 @@ pipeline {
 
             steps {
                 dir('e2e') {
+                    sleep(time: 120, unit: 'SECONDS')
                     sh 'npm ci'
                     sh 'npx playwright test'
                 }

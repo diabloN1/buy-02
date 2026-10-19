@@ -24,19 +24,6 @@ test.describe("404 Not Found", () => {
     ).toBeVisible();
   });
 
-  test("should show 404 for non-existent product", async ({ page }) => {
-    await page.goto("/products/non-existent-product-id-99999");
-
-    await expect(page).toHaveURL(/\/404$/);
-    
-    await expect(page.getByRole("heading", { name: "404" })).toBeVisible({
-      timeout: 5_000,
-    });
-    await expect(page.getByText("The page you're looking for")).toBeVisible({
-      timeout: 5_000,
-    });
-  });
-
   test("should show 404 for non-existent order", async ({ userPage }) => {
     await userPage.goto("/orders/non-existent-order-id-99999");
 

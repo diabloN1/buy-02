@@ -38,6 +38,7 @@ import { UserAnalytics, SellerAnalytics } from "@core/models/analytics.model";
     AnalyticsDisplayComponent,
     UserAvatarComponent,
     AnalyticsDisplayComponent,
+    UserAvatarComponent,
   ],
   template: `
     <div class="profile-page">

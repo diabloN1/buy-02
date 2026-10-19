@@ -52,7 +52,9 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
           <div class="header-tag">Marketplace</div>
           <h1 class="header-title">
             All Products
-            <span class="count-badge" *ngIf="!loading()">{{ total() }}</span>
+            @if (!loading()) {
+              <span class="count-badge">{{ total() }}</span>
+            }
           </h1>
         </div>
 
@@ -67,6 +69,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
             />
             @if (filterForm.get("keyword")?.value) {
               <button
+                type="button"
                 matSuffix
                 mat-icon-button
                 (click)="filterForm.get('keyword')?.setValue('')"
@@ -194,6 +197,7 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
             [pageSizeOptions]="[12, 24, 48]"
             (page)="onPage($event)"
             aria-label="Select page"
+            class="pro-paginator"
           />
         </div>
       }
@@ -202,17 +206,26 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
   styles: [
     `
       .catalog-section {
-        padding-top: 32px;
+        padding-top: 40px;
         padding-bottom: 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
       }
 
       .catalog-header {
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         justify-content: space-between;
-        margin-bottom: 24px; 
+        margin-bottom: 24px;
         flex-wrap: wrap;
-        gap: 20px;
+        gap: 24px;
+      }
+
+      .header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
       }
 
       .header-actions {
@@ -225,11 +238,11 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
       .search-field {
         width: 340px;
         max-width: 100%;
-        margin-bottom: -1.34375em; 
+        margin-bottom: -1.34375em;
       }
 
       .filter-toggle-btn {
-        height: 56px; 
+        height: 56px;
         border-radius: var(--app-radius-sm);
         position: relative;
       }
@@ -292,17 +305,23 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 24px;
-        margin-bottom: 40px;
+        margin-bottom: 24px;
       }
 
       .paginator-card {
         background: var(--app-surface);
         border: 1px solid var(--app-border);
         border-radius: var(--app-radius);
-        padding: 8px 16px;
+        padding: 4px 16px;
         box-shadow: var(--app-shadow-sm);
         display: flex;
         justify-content: flex-end;
+        overflow: hidden;
+      }
+
+      .pro-paginator {
+        background: transparent !important;
+        color: var(--app-fg) !important;
       }
 
       @keyframes slideDown {
@@ -316,7 +335,6 @@ import { EmptyStateComponent } from "@shared/components/empty-state.component";
         }
       }
 
-      /* Same header typography as before */
       .header-tag {
         font-size: 12px;
         font-weight: 700;
@@ -377,11 +395,10 @@ export class ProductListPage implements OnInit {
   readonly loading = signal(true);
 
   constructor() {
-    // React to any filter changes
     this.filterForm.valueChanges
       .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed())
       .subscribe(() => {
-        this.page.set(1); // Reset to first page on filter change
+        this.page.set(1);
         this.updateActiveFilterCount();
         this.load();
       });
@@ -399,7 +416,6 @@ export class ProductListPage implements OnInit {
   }
 
   clearFilters() {
-    // Reset everything except keyword to default null
     this.filterForm.patchValue({
       minPrice: null,
       maxPrice: null,
@@ -430,15 +446,20 @@ export class ProductListPage implements OnInit {
 
     const formVals = this.filterForm.value;
 
+    const isValidDate = (d: any): d is Date =>
+      d instanceof Date && !isNaN(d.getTime());
+
     const filters: ProductSearchFilter = {
       keyword: formVals.keyword || undefined,
       minPrice: formVals.minPrice ?? undefined,
       maxPrice: formVals.maxPrice ?? undefined,
       categoryId: formVals.categoryId || undefined,
-      startDate: formVals.startDate
+      startDate: isValidDate(formVals.startDate)
         ? formVals.startDate.toISOString()
         : undefined,
-      endDate: formVals.endDate ? formVals.endDate.toISOString() : undefined,
+      endDate: isValidDate(formVals.endDate)
+        ? formVals.endDate.toISOString()
+        : undefined,
     };
 
     this.svc.search(this.page(), this.pageSize(), filters).subscribe({

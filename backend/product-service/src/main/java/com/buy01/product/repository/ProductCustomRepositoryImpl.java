@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -63,7 +64,9 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             criteriaList.add(dateCriteria);
         }
 
-        Query query = new Query().with(pageable);
+        Query query = new Query()
+                .with(pageable)
+                .with(Sort.by(Sort.Direction.DESC, "createdAt"));
 
         if (!criteriaList.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));

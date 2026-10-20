@@ -1,0 +1,26 @@
+{
+  "name": "@marketplace/e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "End-to-end tests for Marketplace using Playwright",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:chromium": "playwright test --project=chromium",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "codegen": "playwright codegen",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.20.5",
+    "playwright": "^1.64.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "crypto": "^1.0.1"
+  }
+}

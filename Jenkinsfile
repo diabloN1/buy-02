@@ -4,8 +4,43 @@ def services = [
     'product-service',
     'api-gateway',
     'eureka',
-    'audit-service'
+    'audit-service',
+    'order-service',
+    'cart-service'
 ]
+
+def rollbackDeployment() {
+    if (!params.ROLLBACK_ON_FAILURE) {
+        echo 'Rollback is disabled.'
+        error(
+            'Deployment verification failed and rollback is disabled.'
+        )
+    }
+
+    def previousBuild = currentBuild.previousSuccessfulBuild
+
+    if (previousBuild == null) {
+        error('No previous successful build exists for rollback.')
+    }
+
+    def previousVersion = "1.0.${previousBuild.number}"
+
+    echo "Rolling back to ${previousVersion}..."
+
+    sh """
+        export IMAGE_TAG=${previousVersion}
+
+        docker compose \
+            -f docker-compose.jenkins.yml \
+            up -d --no-build
+    """
+
+    echo "Rollback to ${previousVersion} completed."
+    error(
+        'Deployment failed. ' +
+        "Application rolled back to ${previousVersion}."
+    )
+}
 
 pipeline {
     agent none
@@ -35,6 +70,12 @@ pipeline {
             name: 'SEND_NOTIFICATIONS',
             defaultValue: true,
             description: 'Send email notifications for build results'
+        )
+
+        booleanParam(
+            name: 'DEPLOY',
+            defaultValue: false,
+            description: 'Deploy the application and run E2E verification'
         )
     }
 
@@ -246,7 +287,9 @@ pipeline {
         stage('Deploy') {
             when {
                 allOf {
-                    branch 'main'
+                    expression {
+                        params.DEPLOY
+                    }
 
                     not {
                         triggeredBy 'TimerTrigger'
@@ -301,7 +344,9 @@ pipeline {
         stage('Deployment Verification') {
             when {
                 allOf {
-                    branch 'main'
+                    expression {
+                        params.DEPLOY
+                    }
 
                     not {
                         triggeredBy 'TimerTrigger'
@@ -349,46 +394,55 @@ pipeline {
                 failure {
                     script {
                         echo 'Deployment verification failed.'
+                        rollbackDeployment()
+                    }
+                }
+            }
+        }
 
-                        if (!params.ROLLBACK_ON_FAILURE) {
-                            echo 'Rollback is disabled.'
+        stage('e2e Verification') {
+            when {
+                allOf {
+                    expression {
+                        params.DEPLOY
+                    }
 
-                            error(
-                                'Deployment verification failed and rollback is disabled.'
-                            )
+                    not {
+                        triggeredBy 'TimerTrigger'
+                    }
+                }
+            }
+
+            agent {
+                label 'deployment'
+            }
+
+            steps {
+                script {
+                    retry(6) {
+                        try {
+                            dir('e2e') {
+                                sh 'npm ci'
+                                sh 'npx playwright test'
+                            }
+                        } catch (Exception e) {
+                            echo 'E2E verification failed. Waiting 15 seconds before retrying...'
+                            sleep(time: 10, unit: 'SECONDS')
+                            throw e
                         }
+                    }
+                }
+            }
 
-                        echo 'Starting rollback...'
+            post {
+                always {
+                    junit(testResults: 'e2e/test-reports/playwright-results.xml')
+                }
 
-                        def previousBuild =
-                            currentBuild.previousSuccessfulBuild
-
-                        if (previousBuild == null) {
-                            error(
-                                'No previous successful deployment exists. ' +
-                                'Rollback cannot be performed.'
-                            )
-                        }
-
-                        def previousVersion =
-                            "1.0.${previousBuild.number}"
-
-                        sh """
-                            export IMAGE_TAG=${previousVersion}
-
-                            echo "Rolling back to version: \\$IMAGE_TAG"
-
-                            docker compose \
-                                -f docker-compose.jenkins.yml \
-                                up -d --no-build
-                        """
-
-                        echo "Rollback to ${previousVersion} completed."
-
-                        error(
-                            'Deployment failed. ' +
-                            "Application rolled back to ${previousVersion}."
-                        )
+                failure {
+                    script {
+                        echo 'E2E tests failed after 5 attempts.'
+                        rollbackDeployment()
                     }
                 }
             }

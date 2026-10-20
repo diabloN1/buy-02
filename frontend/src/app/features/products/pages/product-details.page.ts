@@ -7,11 +7,11 @@ import {
   signal,
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { ActivatedRoute, RouterLink } from "@angular/router";
+import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { shareReplay, switchMap } from "rxjs";
+import { catchError, shareReplay, switchMap, tap, throwError } from "rxjs";
 import { ProductService } from "@core/services/product.service";
 import { Product } from "@core/models/product.model";
 import { LoadingSpinnerComponent } from "@shared/components/loading-spinner.component";
@@ -68,7 +68,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
               }
             </div>
 
-            @if (p.images.length > 1) {
+            @if (p.images && p.images.length > 1) {
               <div class="thumbs">
                 @for (image of p.images; track image.id) {
                   <button
@@ -88,7 +88,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
           <!-- Product Details Column -->
           <div class="info-card app-card stack">
             <div class="header-area">
-              <!-- ADDED: Pill Group for Stock and Category -->
+              <!-- Pill Group for Stock and Category -->
               <div class="pill-group">
                 <span class="stock-pill" [class.out-of-stock]="p.quantity <= 0">
                   <mat-icon>inventory_2</mat-icon>
@@ -126,10 +126,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
             <!-- Seller Information Badge -->
             @if (seller(); as seller) {
               <div class="seller-card">
-                <app-user-avatar
-                  [user]="seller"
-                  [size]="40"
-                />
+                <app-user-avatar [user]="seller" [size]="40" />
 
                 <div class="seller-details">
                   <span class="seller-role">Verified Seller</span>
@@ -160,7 +157,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
                   <label>Quantity:</label>
                   <div class="quantity-stepper">
                     <button
-                      matMiniFab
+                      mat-mini-fab
                       class="minifab"
                       (click)="quantity.set(quantity() - 1)"
                       [disabled]="quantity() <= 1"
@@ -170,7 +167,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
                     </button>
                     <span class="quantity-value">{{ quantity() }}</span>
                     <button
-                      matMiniFab
+                      mat-mini-fab
                       class="minifab"
                       (click)="quantity.set(quantity() + 1)"
                       [disabled]="quantity() >= (p.quantity || 1)"
@@ -303,7 +300,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
       .grid {
         display: grid;
         grid-template-columns: 1.1fr 1fr;
-        gap: 24px; 
+        gap: 24px;
         align-items: start;
       }
       @media (max-width: 860px) {
@@ -316,6 +313,9 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
 
       .gallery {
         padding: 16px;
+      }
+      .info-card {
+        padding: 24px;
       }
       .info-card {
         padding: 24px;
@@ -406,7 +406,6 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
           0 0 0 4px var(--app-primary);
       }
 
-
       .pill-group {
         display: flex;
         gap: 8px;
@@ -414,7 +413,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         flex-wrap: wrap;
       }
 
-
+      /* Typography & Badges */
       .stock-pill {
         display: inline-flex;
         align-items: center;
@@ -439,14 +438,13 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         height: 14px;
       }
 
-
       .category-pill {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         padding: 4px 12px;
         border-radius: var(--app-radius-full);
-        background: var(--app-bg-alt); 
+        background: var(--app-bg-alt);
         border: 1px solid var(--app-border);
         color: var(--app-fg);
         font-size: 12px;
@@ -575,7 +573,6 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         color: var(--app-muted);
       }
 
-
       .divider {
         height: 1px;
         background: var(--app-border);
@@ -629,15 +626,60 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         font-size: 14px;
       }
 
-      .minifab {
-        box-shadow: none;
-        color: var(--app-fg);
-        background-color: transparent;
-      }
-      
       .connect-btn {
         height: 32px !important;
         padding: 0 12px !important;
+      }
+
+      .quantity-selector,
+      .quantity-display {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--app-fg-heading);
+        margin-bottom: 12px;
+      }
+
+      .quantity-stepper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--app-surface);
+        border: 1px solid var(--app-border);
+        padding: 4px;
+        border-radius: var(--app-radius-sm);
+      }
+      .quantity-value {
+        min-width: 24px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .minifab {
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 4px !important;
+        background: transparent !important;
+        color: var(--app-fg) !important;
+        box-shadow: none !important;
+        border: 1px solid transparent !important;
+        transition: background 0.15s ease !important;
+      }
+      .minifab mat-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+        line-height: 16px !important;
+      }
+      .minifab:hover:not(:disabled) {
+        background: var(--app-surface-hover) !important;
+        border-color: var(--app-border) !important;
+      }
+      .minifab:disabled {
+        visibility: hidden;
       }
 
       .quantity-selector,
@@ -703,7 +745,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         border-radius: var(--app-radius-sm);
       }
       .dark-theme .in-cart-card {
-        background: rgba(99, 102, 241, 0.05); 
+        background: rgba(99, 102, 241, 0.05);
       }
 
       .in-cart-message {
@@ -731,6 +773,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
 })
 export class ProductDetailsPage {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly svc = inject(ProductService);
   private readonly userService = inject(UserService);
   private readonly cartService = inject(CartService);
@@ -738,7 +781,17 @@ export class ProductDetailsPage {
   readonly currentUser = inject(CurrentUserService);
 
   private readonly product$ = this.route.paramMap.pipe(
-    switchMap((params) => this.svc.get(params.get("id")!)),
+    switchMap((params) => {
+      return this.svc.get(params.get("id")!).pipe(
+        catchError((err) => {
+          if (err.status === 404) {
+            this.router.navigateByUrl("/not-found");
+          }
+
+          return throwError(() => err.error);
+        }),
+      );
+    }),
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
@@ -778,27 +831,28 @@ export class ProductDetailsPage {
   });
 
   constructor() {
-    effect(() => {
-      const product = this.product();
-      const user = this.currentUser.user();
+    effect(
+      () => {
+        const product = this.product();
+        const user = this.currentUser.user();
 
-      console.log(this.product());
+        if (!product || !user) {
+          this.quantity.set(1);
+          return;
+        }
 
-      if (!product || !user) {
-        this.quantity.set(1);
-        return;
-      }
-
-      this.cartService.getItemQuantity(product.id).subscribe({
-        next: (qty) => {
-          if (qty) {
-            this.quantity.set(qty);
-            this.cartQuantity.set(qty);
-          }
-        },
-        error: () => this.quantity.set(1),
-      });
-    });
+        this.cartService.getItemQuantity(product.id).subscribe({
+          next: (qty) => {
+            if (qty) {
+              this.quantity.set(qty);
+              this.cartQuantity.set(qty);
+            }
+          },
+          error: () => this.quantity.set(1),
+        });
+      },
+      { allowSignalWrites: true },
+    );
   }
 
   addToCart() {

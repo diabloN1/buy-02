@@ -1,6 +1,7 @@
-package com.buy01.product.event;
+package com.buy01.product.event.audit;
 
 import java.time.Instant;
+import lombok.Builder;
 
 public record AuditEvent(
         String entityId,
@@ -8,5 +9,5 @@ public record AuditEvent(
         AuditAction action,
         String executorId,
         boolean isAdmin,
-        Instant timestamp
-) {}
+        Instant timestamp) {
+}

@@ -1,6 +1,5 @@
 package com.buy02.order.config;
 
-import com.buy02.order.event.AuditEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,11 +20,17 @@ public class KafkaConfig {
     private String bootstrapServers;
 
     @Bean
-    ProducerFactory<String, AuditEvent> producerFactory() {
+    ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
-        JacksonJsonSerializer<AuditEvent> serializer = new JacksonJsonSerializer<>();
+        props.put(
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                bootstrapServers
+        );
+
+        JacksonJsonSerializer<Object> serializer =
+                new JacksonJsonSerializer<>();
+
         serializer.setAddTypeInfo(false);
 
         return new DefaultKafkaProducerFactory<>(
@@ -36,7 +41,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    KafkaTemplate<String, AuditEvent> kafkaTemplate() {
+    KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 }

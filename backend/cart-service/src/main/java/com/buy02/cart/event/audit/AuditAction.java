@@ -1,9 +1,8 @@
-package com.buy01.audit.event;
+package com.buy02.cart.event.audit;
 
 public enum AuditAction {
     SELECTED,
     CREATED,
     MODIFIED,
     DELETED,
-    UPLOADED,
 }

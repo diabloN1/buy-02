@@ -37,7 +37,7 @@ spring:
                 - Path=/api/media/**
               filters:
                 - StripPrefix=1
-              
+
             - id: cart-service
               uri: lb://CART-SERVICE
               predicates:

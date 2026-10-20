@@ -287,6 +287,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         padding-bottom: 64px;
       }
 
+  
       .back-btn {
         margin-bottom: 24px;
         font-weight: 500;
@@ -309,12 +310,17 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         }
       }
 
+
       .gallery {
         padding: 16px;
       }
       .info-card {
         padding: 24px;
       }
+      .info-card {
+        padding: 24px;
+      }
+
 
       .main-image-wrap {
         position: relative;
@@ -369,6 +375,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         width: 40px;
         height: 40px;
       }
+
 
       .thumbs {
         display: flex;
@@ -505,6 +512,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         color: var(--app-fg-heading);
       }
 
+
       .seller-card {
         display: flex;
         align-items: center;
@@ -583,6 +591,7 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
         color: var(--app-muted);
         margin: 0;
       }
+
 
       .actions-group {
         display: flex;
@@ -672,6 +681,59 @@ import { UserAvatarComponent } from "@shared/components/user-avatar.component";
       .minifab:disabled {
         visibility: hidden;
       }
+
+      .quantity-selector,
+      .quantity-display {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--app-fg-heading);
+        margin-bottom: 12px;
+      }
+
+      .quantity-stepper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--app-surface);
+        border: 1px solid var(--app-border);
+        padding: 4px;
+        border-radius: var(--app-radius-sm);
+      }
+      .quantity-value {
+        min-width: 24px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .minifab {
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 4px !important;
+        background: transparent !important;
+        color: var(--app-fg) !important;
+        box-shadow: none !important;
+        border: 1px solid transparent !important;
+        transition: background 0.15s ease !important;
+      }
+      .minifab mat-icon {
+        font-size: 16px !important;
+        width: 16px !important;
+        height: 16px !important;
+        line-height: 16px !important;
+      }
+      .minifab:hover:not(:disabled) {
+        background: var(--app-surface-hover) !important;
+        border-color: var(--app-border) !important;
+      }
+      .minifab:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
 
       .in-cart-card {
         display: flex;

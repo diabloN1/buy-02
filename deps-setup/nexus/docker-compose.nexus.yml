@@ -1,0 +1,13 @@
+services:
+  nexus:
+    image: sonatype/nexus3:latest
+    container_name: buy-02-nexus
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+      - "18080:18080"
+    volumes:
+      - nexus-data:/nexus-data
+
+volumes:
+  nexus-data:

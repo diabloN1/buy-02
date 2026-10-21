@@ -580,27 +580,38 @@ export class OrdersPage implements OnInit, OnDestroy {
   loadOrders(): void {
     this.isLoading.set(true);
 
-    const formValues = this.filterForm.value;
+    const isFiltered = this.hasActiveFilters();
+    let request;
 
-    let formattedDate: string | null = null;
-    if (formValues.startDate) {
-      const d = new Date(formValues.startDate);
-      formattedDate = d.toISOString().replace("Z", "");
-    }
-
-    const filter: OrderSearchFilter = {
-      productName: formValues.productName?.trim() || undefined,
-      status: formValues.status || undefined,
-      startDate: formattedDate,
-    };
-
-    const request = this.isSeller
-      ? this.subOrderSvc.searchOrdersBySeller(
+    if (this.isSeller) {
+      if (isFiltered) {
+        const filter = this.buildSearchFilter();
+        request = this.subOrderSvc.searchOrdersBySeller(
           filter,
           this.pageIndex(),
           this.pageSize(),
-        )
-      : this.orderSvc.searchOrders(filter, this.pageIndex(), this.pageSize());
+        );
+      } else {
+        request = this.subOrderSvc.getOrdersBySeller(
+          this.pageIndex(),
+          this.pageSize(),
+        );
+      }
+    } else {
+      if (isFiltered) {
+        const filter = this.buildSearchFilter();
+        request = this.orderSvc.searchOrders(
+          filter,
+          this.pageIndex(),
+          this.pageSize(),
+        );
+      } else {
+        request = this.orderSvc.getUserOrders(
+          this.pageIndex(),
+          this.pageSize(),
+        );
+      }
+    }
 
     request.subscribe({
       next: (response) => {
@@ -616,6 +627,21 @@ export class OrdersPage implements OnInit, OnDestroy {
       },
     });
   }
+
+  private buildSearchFilter(): OrderSearchFilter {
+    const formValues = this.filterForm.value;
+    let formattedDate: string | null = null;
+    if (formValues.startDate) {
+      const d = new Date(formValues.startDate);
+      formattedDate = d.toISOString().replace("Z", "");
+    }
+    return {
+      productName: formValues.productName?.trim() || undefined,
+      status: formValues.status || undefined,
+      startDate: formattedDate,
+    };
+  }
+
   onPageChange(event: PageEvent): void {
     this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
@@ -639,13 +665,26 @@ export class OrdersPage implements OnInit, OnDestroy {
         this.isLoading.set(true);
         this.orderSvc.cancelOrder(orderId).subscribe({
           next: () => {
+            this.updateOrderStatus(orderId, "CANCELLED");
             this.notify.success("Order cancelled");
             this.isLoading.set(false);
-            this.loadOrders();
           },
           error: () => this.isLoading.set(false),
         });
       });
+  }
+
+  private updateOrderStatus(orderId: string, status: OrderStatus): void {
+    this.orders.update((orders) =>
+      orders.map((order) =>
+        order.id === orderId
+          ? {
+              ...order,
+              status,
+            }
+          : order,
+      ),
+    );
   }
 
   redoOrder(orderId: string): void {

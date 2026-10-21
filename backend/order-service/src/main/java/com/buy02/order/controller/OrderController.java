@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.buy02.order.dto.CreateOrderRequest;
 import com.buy02.order.dto.OrderResponse;
+import com.buy02.order.dto.OrderSearchCriteria;
 import com.buy02.order.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -98,5 +99,16 @@ public class OrderController {
 
         orderService.deleteOrder(orderId, userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/search")
+    public Page<OrderResponse> searchOrders(
+            @AuthenticationPrincipal Jwt jwt,
+            OrderSearchCriteria criteria,
+            Pageable pageable) {
+
+        String userId = jwt.getSubject();
+        return orderService.searchOrders(userId, criteria, pageable);
     }
 }

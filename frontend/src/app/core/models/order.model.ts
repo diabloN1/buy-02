@@ -61,3 +61,9 @@ export interface CreateOrderRequest {
 export interface CreateOrderResponse {
   id: string;
 }
+
+export interface OrderSearchFilter {
+  productName?: string;
+  status?: OrderStatus | "";
+  startDate?: string | null;
+}

@@ -16,6 +16,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Document(collection = "orders")
 public class Order {
@@ -34,7 +36,7 @@ public class Order {
     private PaymentMethod paymentMethod = PaymentMethod.PAY_ON_DELIVERY;
 
     @Builder.Default
-    private boolean deleted = false;
+    private Boolean deleted = false;
 
     @CreatedDate
     private LocalDateTime createdAt;

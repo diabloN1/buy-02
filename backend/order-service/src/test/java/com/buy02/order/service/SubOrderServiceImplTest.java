@@ -526,7 +526,7 @@ class SubOrderServiceImplTest {
                                         SELLER_ID);
 
                         // Then
-                        assertThat(subOrder.isDeleted())
+                        assertThat(subOrder.getDeleted())
                                         .isTrue();
 
                         verify(subOrderRepository)
@@ -550,7 +550,7 @@ class SubOrderServiceImplTest {
                                         SELLER_ID);
 
                         // Then
-                        assertThat(subOrder.isDeleted())
+                        assertThat(subOrder.getDeleted())
                                         .isTrue();
 
                         verify(subOrderRepository)

@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.buy02.order.dto.OrderResponse;
+import com.buy02.order.dto.OrderSearchCriteria;
 import com.buy02.order.entity.Order.OrderStatus;
 
 public interface SubOrderService {
@@ -15,4 +16,7 @@ public interface SubOrderService {
     void updateStatus(String subOrderId, String sellerId, OrderStatus status);
 
     void deleteSubOrder(String orderId, String userId);
+
+    Page<OrderResponse> searchOrdersBySeller(String sellerId, OrderSearchCriteria criteria, Pageable pageable);
+
 }

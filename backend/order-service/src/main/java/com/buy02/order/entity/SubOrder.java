@@ -42,7 +42,7 @@ public class SubOrder {
     private List<StatusHistory> statusHistory = new ArrayList<>();
 
     @Builder.Default
-    private boolean deleted = false;
+    private Boolean deleted = false;
 
     @CreatedDate
     private LocalDateTime createdAt;

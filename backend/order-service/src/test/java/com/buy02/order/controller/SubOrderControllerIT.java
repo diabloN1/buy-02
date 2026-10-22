@@ -117,7 +117,7 @@ class SubOrderControllerIT extends BaseIntegrationTest {
 
             var deletedOrder = subOrderRepository.findById(testSubOrder.getId());
             assertThat(deletedOrder).isPresent();
-            assertThat(deletedOrder.get().isDeleted()).isTrue();
+            assertThat(deletedOrder.get().getDeleted()).isTrue();
         }
 
         @Test

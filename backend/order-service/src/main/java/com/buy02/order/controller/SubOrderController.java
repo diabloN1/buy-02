@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import com.buy02.order.dto.OrderResponse;
+import com.buy02.order.dto.OrderSearchCriteria;
 import com.buy02.order.entity.Order.OrderStatus;
 import com.buy02.order.service.SubOrderService;
 
@@ -53,5 +54,15 @@ public class SubOrderController {
 
         subOrderService.deleteSubOrder(orderId, userId);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/search")
+    public Page<OrderResponse> searchOrdersBySeller(
+            @AuthenticationPrincipal Jwt jwt,
+            OrderSearchCriteria criteria,
+            Pageable pageable) {
+
+        String sellerId = jwt.getSubject();
+        return subOrderService.searchOrdersBySeller(sellerId, criteria, pageable);
     }
 }

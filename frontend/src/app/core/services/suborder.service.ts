@@ -4,7 +4,11 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 
 import { API } from "@core/config/api.config";
-import { Order, OrderStatus } from "@core/models/order.model";
+import {
+  Order,
+  OrderStatus,
+  OrderSearchFilter,
+} from "@core/models/order.model";
 import { Paginated } from "@core/models/paginated.model";
 
 const STATUS_FLOW: OrderStatus[] = [
@@ -33,21 +37,31 @@ export class SubOrderService {
 
   getOrdersBySeller(page = 0, size = 10): Observable<Paginated<Order>> {
     const params = new HttpParams().set("page", page).set("size", size);
-
     return this.http
       .get<Paginated<Order>>(API.base + API.subOrders.root, { params })
-      .pipe(
-        map((page) => ({
-          ...page,
-          content: page.content.map((order) => ({
-            ...order,
-            status:
-              STATUS_FLOW.find((status) =>
-                order.subOrders.some((sub) => sub.status === status),
-              ) ?? "PENDING",
-          })),
-        })),
-      );
+      .pipe(map((p) => this.mapSubOrderStatus(p)));
+  }
+
+  searchOrdersBySeller(
+    filter: OrderSearchFilter,
+    page = 0,
+    size = 10,
+  ): Observable<Paginated<Order>> {
+    let params = new HttpParams().set("page", page).set("size", size);
+
+    if (filter.productName?.trim()) {
+      params = params.set("productName", filter.productName.trim());
+    }
+    if (filter.status) {
+      params = params.set("status", filter.status);
+    }
+    if (filter.startDate) {
+      params = params.set("startDate", filter.startDate);
+    }
+
+    return this.http
+      .get<Paginated<Order>>(API.base + API.subOrders.search, { params })
+      .pipe(map((p) => this.mapSubOrderStatus(p)));
   }
 
   updateStatus(subOrderId: string, status: OrderStatus) {
@@ -61,5 +75,18 @@ export class SubOrderService {
 
   deleteSubOrder(subOrderId: string) {
     return this.http.delete(API.base + API.subOrders.delete(subOrderId), {});
+  }
+
+  private mapSubOrderStatus(page: Paginated<Order>): Paginated<Order> {
+    return {
+      ...page,
+      content: page.content.map((order) => ({
+        ...order,
+        status:
+          STATUS_FLOW.find((status) =>
+            order.subOrders?.some((sub) => sub.status === status),
+          ) ?? "PENDING",
+      })),
+    };
   }
 }

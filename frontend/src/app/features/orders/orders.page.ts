@@ -1,30 +1,43 @@
-import { Component, inject, OnInit, signal } from "@angular/core";
+import { Component, inject, OnInit, OnDestroy, signal } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { FormControl, FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterModule } from "@angular/router";
+import { Subject, takeUntil, debounceTime, distinctUntilChanged } from "rxjs";
 
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatCardModule } from "@angular/material/card";
 import { MatTableModule } from "@angular/material/table";
 import { MatPaginatorModule, PageEvent } from "@angular/material/paginator";
-import { MatSortModule, Sort } from "@angular/material/sort";
+import { MatSortModule } from "@angular/material/sort";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatDialog, MatDialogModule } from "@angular/material/dialog";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatInputModule } from "@angular/material/input";
+import { MatSelectModule } from "@angular/material/select";
+import { MatDatepickerModule } from "@angular/material/datepicker";
+import { provideNativeDateAdapter } from "@angular/material/core";
 
 import { OrderService } from "@core/services/order.service";
 import { SubOrderService } from "@core/services/suborder.service";
 import { NotificationService } from "@core/services/notification.service";
 import { ConfirmDialogComponent } from "@shared/components/confirm-dialog.component";
-import { Order, OrderStatus } from "@core/models/order.model";
+import {
+  Order,
+  OrderStatus,
+  OrderSearchFilter,
+} from "@core/models/order.model";
 
 @Component({
   selector: "app-orders",
   standalone: true,
+  providers: [provideNativeDateAdapter()],
   imports: [
     CommonModule,
     RouterModule,
+    ReactiveFormsModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
@@ -35,6 +48,10 @@ import { Order, OrderStatus } from "@core/models/order.model";
     MatProgressSpinnerModule,
     MatChipsModule,
     MatTooltipModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
   ],
   template: `
     <section class="container">
@@ -43,6 +60,72 @@ import { Order, OrderStatus } from "@core/models/order.model";
           {{ isSeller ? "Seller Orders" : "My Orders" }}
         </h1>
       </div>
+
+      <!-- Filters Section -->
+      <mat-card class="filter-card">
+        <form [formGroup]="filterForm" class="filter-form">
+          <!-- Product Name Search -->
+          <mat-form-field appearance="outline" class="filter-field grow">
+            <mat-label>Search by product name</mat-label>
+            <mat-icon matPrefix>search</mat-icon>
+            <input
+              matInput
+              formControlName="productName"
+              placeholder="e.g. Wireless Mouse"
+            />
+            @if (filterForm.get("productName")?.value) {
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="filterForm.get('productName')?.reset()"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </mat-form-field>
+
+          <!-- Status Filter -->
+          <mat-form-field
+            appearance="outline"
+            class="filter-field status-field"
+          >
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="">All Statuses</mat-option>
+              @for (status of statusOptions; track status) {
+                <mat-option [value]="status">{{ status }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Start Date Filter -->
+          <mat-form-field appearance="outline" class="filter-field date-field">
+            <mat-label>From Date</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              formControlName="startDate"
+              placeholder="Choose date"
+            />
+            <mat-datepicker-toggle matIconSuffix [for]="picker" />
+            <mat-datepicker #picker />
+          </mat-form-field>
+
+          <!-- Clear Filters Button -->
+          @if (hasActiveFilters()) {
+            <button
+              mat-button
+              type="button"
+              class="clear-btn"
+              (click)="resetFilters()"
+            >
+              <mat-icon>filter_alt_off</mat-icon>
+              Reset
+            </button>
+          }
+        </form>
+      </mat-card>
 
       @if (isLoading()) {
         <div class="loading-wrap">
@@ -60,13 +143,19 @@ import { Order, OrderStatus } from "@core/models/order.model";
 
             <p class="muted">
               {{
-                isSeller
-                  ? "You will see orders from buyers here."
-                  : "Start shopping to see your orders here."
+                hasActiveFilters()
+                  ? "Try adjusting your search criteria."
+                  : isSeller
+                    ? "You will see orders from buyers here."
+                    : "Start shopping to see your orders here."
               }}
             </p>
 
-            @if (!isSeller) {
+            @if (hasActiveFilters()) {
+              <button mat-stroked-button (click)="resetFilters()">
+                Clear Filters
+              </button>
+            } @else if (!isSeller) {
               <a class="btn btn-primary" routerLink="/products">
                 <mat-icon>shopping_bag</mat-icon>
                 Browse Products
@@ -89,11 +178,8 @@ import { Order, OrderStatus } from "@core/models/order.model";
                   <th mat-header-cell *matHeaderCellDef mat-sort-header>
                     Order #
                   </th>
-
                   <td mat-cell *matCellDef="let order">
-                    <span class="order-number">
-                      {{ order.id }}
-                    </span>
+                    <span class="order-number">{{ order.id }}</span>
                   </td>
                 </ng-container>
 
@@ -102,7 +188,6 @@ import { Order, OrderStatus } from "@core/models/order.model";
                   <th mat-header-cell *matHeaderCellDef mat-sort-header>
                     Date
                   </th>
-
                   <td mat-cell *matCellDef="let order">
                     {{ order.createdAt | date: "MMM d, y, h:mm a" }}
                   </td>
@@ -113,7 +198,6 @@ import { Order, OrderStatus } from "@core/models/order.model";
                   <th mat-header-cell *matHeaderCellDef mat-sort-header>
                     Status
                   </th>
-
                   <td mat-cell *matCellDef="let order">
                     <mat-chip-set>
                       <mat-chip
@@ -131,7 +215,6 @@ import { Order, OrderStatus } from "@core/models/order.model";
                   <th mat-header-cell *matHeaderCellDef mat-sort-header>
                     Total
                   </th>
-
                   <td mat-cell *matCellDef="let order">
                     <span class="amount">
                       {{ order.totalAmount | currency: "USD" }}
@@ -141,10 +224,7 @@ import { Order, OrderStatus } from "@core/models/order.model";
 
                 <!-- Items -->
                 <ng-container matColumnDef="itemsCount">
-                  <th mat-header-cell *matHeaderCellDef>
-                    Items
-                  </th>
-
+                  <th mat-header-cell *matHeaderCellDef>Items</th>
                   <td mat-cell *matCellDef="let order">
                     {{ countTotalItems(order) }}
                   </td>
@@ -152,20 +232,13 @@ import { Order, OrderStatus } from "@core/models/order.model";
 
                 <!-- Actions -->
                 <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef>
-                    Actions
-                  </th>
-
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
                   <td mat-cell *matCellDef="let order">
                     @if (isSeller) {
-                      <!-- Seller actions -->
                       <div class="seller-actions">
                         <button
                           mat-icon-button
-                          [routerLink]="[
-                            '/suborders',
-                            order.subOrders[0].id
-                          ]"
+                          [routerLink]="['/suborders', order.subOrders[0]?.id]"
                           matTooltip="View Details"
                           [disabled]="isLoading()"
                         >
@@ -182,7 +255,7 @@ import { Order, OrderStatus } from "@core/models/order.model";
                             mat-icon-button
                             (click)="
                               updateSubOrderStatus(
-                                order.subOrders[0].id,
+                                order.subOrders[0]?.id,
                                 status
                               )
                             "
@@ -199,9 +272,7 @@ import { Order, OrderStatus } from "@core/models/order.model";
                           <button
                             mat-icon-button
                             color="warn"
-                            (click)="
-                              deleteSubOrder(order.subOrders[0].id)
-                            "
+                            (click)="deleteSubOrder(order.subOrders[0]?.id)"
                             matTooltip="Delete Suborder"
                             [disabled]="isLoading()"
                           >
@@ -210,8 +281,6 @@ import { Order, OrderStatus } from "@core/models/order.model";
                         }
                       </div>
                     } @else {
-                      <!-- Buyer actions -->
-
                       <button
                         mat-icon-button
                         [routerLink]="['/orders', order.id]"
@@ -257,17 +326,10 @@ import { Order, OrderStatus } from "@core/models/order.model";
                   </td>
                 </ng-container>
 
-                <tr
-                  mat-header-row
-                  *matHeaderRowDef="displayedColumns"
-                ></tr>
-
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr
                   mat-row
-                  *matRowDef="
-                    let row;
-                    columns: displayedColumns
-                  "
+                  *matRowDef="let row; columns: displayedColumns"
                 ></tr>
               </table>
             </div>
@@ -287,7 +349,6 @@ import { Order, OrderStatus } from "@core/models/order.model";
       }
     </section>
   `,
-
   styles: [
     `
       .container {
@@ -300,7 +361,7 @@ import { Order, OrderStatus } from "@core/models/order.model";
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
       }
 
       .page-title {
@@ -310,6 +371,49 @@ import { Order, OrderStatus } from "@core/models/order.model";
         margin: 0;
       }
 
+      /* Filter Bar Styling */
+      .filter-card {
+        background: var(--app-surface);
+        border: 1px solid var(--app-border);
+        border-radius: var(--app-radius);
+        box-shadow: var(--app-shadow-sm);
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+
+      .filter-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .filter-field {
+        margin-bottom: -1.25em; /* Compensate for material subscript spacing */
+      }
+
+      .grow {
+        flex: 1 1 240px;
+      }
+
+      .status-field {
+        flex: 0 1 180px;
+      }
+
+      .date-field {
+        flex: 0 1 180px;
+      }
+
+      .clear-btn {
+        height: 48px;
+        color: var(--app-muted);
+        align-self: flex-start;
+      }
+
+      .clear-btn:hover {
+        color: var(--app-danger);
+      }
+
       .seller-actions {
         display: flex;
         gap: 8px;
@@ -317,6 +421,7 @@ import { Order, OrderStatus } from "@core/models/order.model";
 
       .orders-card {
         background: var(--app-surface);
+        border: 1px solid var(--app-border);
         border-radius: var(--app-radius);
         box-shadow: var(--app-shadow);
       }
@@ -380,6 +485,12 @@ import { Order, OrderStatus } from "@core/models/order.model";
           padding: 16px 12px;
         }
 
+        .status-field,
+        .date-field,
+        .grow {
+          flex: 1 1 100%;
+        }
+
         .orders-table {
           min-width: 100%;
         }
@@ -387,12 +498,14 @@ import { Order, OrderStatus } from "@core/models/order.model";
     `,
   ],
 })
-export class OrdersPage implements OnInit {
+export class OrdersPage implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   readonly orderSvc = inject(OrderService);
   private readonly subOrderSvc = inject(SubOrderService);
   private readonly notify = inject(NotificationService);
   private readonly dialog = inject(MatDialog);
+
+  private readonly destroy$ = new Subject<void>();
 
   readonly orders = signal<Order[]>([]);
   readonly isLoading = signal(false);
@@ -400,6 +513,20 @@ export class OrdersPage implements OnInit {
   readonly pageIndex = signal(0);
   readonly pageSize = signal(10);
   readonly totalOrders = signal(0);
+
+  readonly statusOptions: OrderStatus[] = [
+    "PENDING",
+    "CONFIRMED",
+    "SHIPPED",
+    "DELIVERED",
+    "CANCELLED",
+  ];
+
+  readonly filterForm = new FormGroup({
+    productName: new FormControl<string>(""),
+    status: new FormControl<OrderStatus | "">(""),
+    startDate: new FormControl<Date | null>(null),
+  });
 
   readonly displayedColumns = [
     "orderNumber",
@@ -415,21 +542,76 @@ export class OrdersPage implements OnInit {
   }
 
   ngOnInit(): void {
+    this.setupFilterListeners();
     this.loadOrders();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private setupFilterListeners(): void {
+    this.filterForm.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(() => {
+        this.pageIndex.set(0);
+        this.loadOrders();
+      });
+  }
+
+  hasActiveFilters(): boolean {
+    const { productName, status, startDate } = this.filterForm.value;
+    return Boolean(productName?.trim() || status || startDate);
+  }
+
+  resetFilters(): void {
+    this.filterForm.reset({
+      productName: "",
+      status: "",
+      startDate: null,
+    });
   }
 
   loadOrders(): void {
     this.isLoading.set(true);
 
-    const request = this.isSeller
-      ? this.subOrderSvc.getOrdersBySeller(
-          this.pageIndex(),
-          this.pageSize(),
-        )
-      : this.orderSvc.getUserOrders(
+    const isFiltered = this.hasActiveFilters();
+    let request;
+
+    if (this.isSeller) {
+      if (isFiltered) {
+        const filter = this.buildSearchFilter();
+        request = this.subOrderSvc.searchOrdersBySeller(
+          filter,
           this.pageIndex(),
           this.pageSize(),
         );
+      } else {
+        request = this.subOrderSvc.getOrdersBySeller(
+          this.pageIndex(),
+          this.pageSize(),
+        );
+      }
+    } else {
+      if (isFiltered) {
+        const filter = this.buildSearchFilter();
+        request = this.orderSvc.searchOrders(
+          filter,
+          this.pageIndex(),
+          this.pageSize(),
+        );
+      } else {
+        request = this.orderSvc.getUserOrders(
+          this.pageIndex(),
+          this.pageSize(),
+        );
+      }
+    }
 
     request.subscribe({
       next: (response) => {
@@ -439,19 +621,30 @@ export class OrdersPage implements OnInit {
       },
       error: (err) => {
         this.isLoading.set(false);
-
         this.notify.error(
-          err?.error?.message ??
-            "Failed to load orders. Please try again.",
+          err?.error?.message ?? "Failed to load orders. Please try again.",
         );
       },
     });
   }
 
+  private buildSearchFilter(): OrderSearchFilter {
+    const formValues = this.filterForm.value;
+    let formattedDate: string | null = null;
+    if (formValues.startDate) {
+      const d = new Date(formValues.startDate);
+      formattedDate = d.toISOString().replace("Z", "");
+    }
+    return {
+      productName: formValues.productName?.trim() || undefined,
+      status: formValues.status || undefined,
+      startDate: formattedDate,
+    };
+  }
+
   onPageChange(event: PageEvent): void {
     this.pageIndex.set(event.pageIndex);
     this.pageSize.set(event.pageSize);
-
     this.loadOrders();
   }
 
@@ -467,23 +660,31 @@ export class OrdersPage implements OnInit {
       })
       .afterClosed()
       .subscribe((ok) => {
-        if (!ok) {
-          return;
-        }
+        if (!ok) return;
 
         this.isLoading.set(true);
-
         this.orderSvc.cancelOrder(orderId).subscribe({
           next: () => {
             this.updateOrderStatus(orderId, "CANCELLED");
             this.notify.success("Order cancelled");
             this.isLoading.set(false);
           },
-          error: () => {
-            this.isLoading.set(false);
-          },
+          error: () => this.isLoading.set(false),
         });
       });
+  }
+
+  private updateOrderStatus(orderId: string, status: OrderStatus): void {
+    this.orders.update((orders) =>
+      orders.map((order) =>
+        order.id === orderId
+          ? {
+              ...order,
+              status,
+            }
+          : order,
+      ),
+    );
   }
 
   redoOrder(orderId: string): void {
@@ -498,21 +699,16 @@ export class OrdersPage implements OnInit {
       })
       .afterClosed()
       .subscribe((ok) => {
-        if (!ok) {
-          return;
-        }
+        if (!ok) return;
 
         this.isLoading.set(true);
-
         this.orderSvc.redoOrder(orderId).subscribe({
           next: () => {
             this.notify.success("Order Redone");
             this.isLoading.set(false);
             this.loadOrders();
           },
-          error: () => {
-            this.isLoading.set(false);
-          },
+          error: () => this.isLoading.set(false),
         });
       });
   }
@@ -529,46 +725,30 @@ export class OrdersPage implements OnInit {
       })
       .afterClosed()
       .subscribe((ok) => {
-        if (!ok) {
-          return;
-        }
+        if (!ok) return;
 
         this.isLoading.set(true);
-
         this.orderSvc.deleteOrder(orderId).subscribe({
           next: () => {
             this.notify.success("Order deleted");
             this.isLoading.set(false);
             this.loadOrders();
           },
-          error: () => {
-            this.isLoading.set(false);
-          },
+          error: () => this.isLoading.set(false),
         });
       });
   }
 
-  updateSubOrderStatus(
-    subOrderId: string,
-    newStatus: OrderStatus,
-  ): void {
+  updateSubOrderStatus(subOrderId: string, newStatus: OrderStatus): void {
     this.isLoading.set(true);
-
-    this.subOrderSvc
-      .updateStatus(subOrderId, newStatus)
-      .subscribe({
-        next: () => {
-          this.notify.success(
-            `Status updated to ${newStatus}`,
-          );
-
-          this.isLoading.set(false);
-          this.loadOrders();
-        },
-        error: () => {
-          this.isLoading.set(false);
-        },
-      });
+    this.subOrderSvc.updateStatus(subOrderId, newStatus).subscribe({
+      next: () => {
+        this.notify.success(`Status updated to ${newStatus}`);
+        this.isLoading.set(false);
+        this.loadOrders();
+      },
+      error: () => this.isLoading.set(false),
+    });
   }
 
   deleteSubOrder(subOrderId: string): void {
@@ -584,51 +764,24 @@ export class OrdersPage implements OnInit {
       })
       .afterClosed()
       .subscribe((ok) => {
-        if (!ok) {
-          return;
-        }
+        if (!ok) return;
 
         this.isLoading.set(true);
-
-        this.subOrderSvc
-          .deleteSubOrder(subOrderId)
-          .subscribe({
-            next: () => {
-              this.notify.success("Suborder deleted");
-              this.isLoading.set(false);
-              this.loadOrders();
-            },
-            error: () => {
-              this.isLoading.set(false);
-            },
-          });
+        this.subOrderSvc.deleteSubOrder(subOrderId).subscribe({
+          next: () => {
+            this.notify.success("Suborder deleted");
+            this.isLoading.set(false);
+            this.loadOrders();
+          },
+          error: () => this.isLoading.set(false),
+        });
       });
-  }
-
-  private updateOrderStatus(
-    orderId: string,
-    status: OrderStatus,
-  ): void {
-    this.orders.update((orders) =>
-      orders.map((order) =>
-        order.id === orderId
-          ? {
-              ...order,
-              status,
-            }
-          : order,
-      ),
-    );
   }
 
   countTotalItems(order: Order): number {
     return order.subOrders.reduce(
       (total, subOrder) =>
-        total +
-        subOrder.items.reduce(
-          (sum, item) => sum + item.quantity,
-          0,
-        ),
+        total + subOrder.items.reduce((sum, item) => sum + item.quantity, 0),
       0,
     );
   }

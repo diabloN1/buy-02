@@ -8,6 +8,7 @@ import {
   CreateOrderResponse,
   Order,
   OrderStatus,
+  OrderSearchFilter,
 } from "@core/models/order.model";
 import { Paginated } from "@core/models/paginated.model";
 
@@ -38,9 +39,30 @@ export class OrderService {
 
   getUserOrders(page = 0, size = 10): Observable<Paginated<Order>> {
     const params = new HttpParams().set("page", page).set("size", size);
-
     return this.http
       .get<Paginated<Order>>(API.base + API.orders.root, { params })
+      .pipe(map((page) => this.withOverallStatusForPage(page)));
+  }
+
+  searchOrders(
+    filter: OrderSearchFilter,
+    page = 0,
+    size = 10,
+  ): Observable<Paginated<Order>> {
+    let params = new HttpParams().set("page", page).set("size", size);
+
+    if (filter.productName?.trim()) {
+      params = params.set("productName", filter.productName.trim());
+    }
+    if (filter.status) {
+      params = params.set("status", filter.status);
+    }
+    if (filter.startDate) {
+      params = params.set("startDate", filter.startDate);
+    }
+
+    return this.http
+      .get<Paginated<Order>>(API.base + API.orders.search, { params })
       .pipe(map((page) => this.withOverallStatusForPage(page)));
   }
 
@@ -56,9 +78,6 @@ export class OrderService {
     return this.http.delete(API.base + API.orders.delete(orderId), {});
   }
 
-  ///////////////////////
-  // Helpers
-  ///////////////////////
   private withOverallStatus(order: Order): Order {
     return {
       ...order,
@@ -102,11 +121,9 @@ export class OrderService {
     }
 
     const transitions: OrderStatus[] = [];
-
     if (index + 1 < STATUS_FLOW.length) {
       transitions.push(STATUS_FLOW[index + 1]);
     }
-
     if (currentStatus === "PENDING") {
       transitions.push("CANCELLED");
     }
@@ -122,7 +139,6 @@ export class OrderService {
       DELIVERED: "check_box",
       CANCELLED: "cancel",
     };
-
     return icons[status] || "help";
   }
 
@@ -134,7 +150,6 @@ export class OrderService {
       DELIVERED: "primary",
       CANCELLED: "warn",
     };
-
     return colors[status] || "primary";
   }
 }

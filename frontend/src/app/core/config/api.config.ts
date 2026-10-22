@@ -48,6 +48,7 @@ export const API = {
 
   orders: {
     root: "/orders",
+    search: "/orders/search",
     item: (orderId: string) => `/orders/${orderId}`,
     user: "/orders/user",
     cancel: (orderId: string) => `/orders/${orderId}/cancel`,
@@ -56,6 +57,7 @@ export const API = {
   },
   subOrders: {
     root: "/suborders",
+    search: "/suborders/search",
     item: (subOrderId: string) => `/suborders/${subOrderId}`,
     status: (subOrderId: string) => `/suborders/${subOrderId}/status`,
     delete: (subOrderId: string) => `/suborders/${subOrderId}`,

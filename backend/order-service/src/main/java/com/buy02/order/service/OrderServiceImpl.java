@@ -4,12 +4,20 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +30,7 @@ import com.buy02.order.client.ProductClient;
 import com.buy02.order.dto.CartResponse;
 import com.buy02.order.dto.CreateOrderRequest;
 import com.buy02.order.dto.OrderResponse;
+import com.buy02.order.dto.OrderSearchCriteria;
 import com.buy02.order.dto.ProductResponse;
 import com.buy02.order.entity.Order;
 import com.buy02.order.entity.Order.OrderStatus;
@@ -48,6 +57,7 @@ public class OrderServiceImpl implements OrderService {
         private final ProductClient productClient;
         private final OrderMapper orderMapper;
         private final AuditEventProducer eventProducer;
+        private final MongoTemplate mongoTemplate;
 
         private static final List<OrderStatus> STATUS_FLOW = List.of(
                         OrderStatus.PENDING,
@@ -372,4 +382,101 @@ public class OrderServiceImpl implements OrderService {
                 }
                 return OrderStatus.PENDING;
         }
+
+        @Override
+        public Page<OrderResponse> searchOrders(String userId, OrderSearchCriteria criteria, Pageable pageable) {
+                boolean hasProductFilter = criteria.getProductName() != null
+                                && !criteria.getProductName().trim().isEmpty();
+                boolean hasStatusFilter = criteria.getStatus() != null;
+
+                Query orderQuery = new Query();
+                orderQuery.addCriteria(Criteria.where("userId").is(userId));
+                orderQuery.addCriteria(Criteria.where("deleted").is(false));
+
+                if (criteria.getStartDate() != null) {
+                        orderQuery.addCriteria(Criteria.where("createdAt").gte(criteria.getStartDate()));
+                }
+
+                if (hasProductFilter || hasStatusFilter) {
+
+                        Page<Order> userOrders = orderRepository.findByUserIdAndDeletedFalse(userId,
+                                        Pageable.unpaged());
+                        List<String> userOrderIds = userOrders.getContent().stream()
+                                        .map(Order::getId)
+                                        .filter(Objects::nonNull)
+                                        .toList();
+
+                        if (userOrderIds.isEmpty()) {
+                                return Page.empty(pageable);
+                        }
+
+                        List<Object> orderIdLookups = new ArrayList<>();
+                        for (String id : userOrderIds) {
+                                orderIdLookups.add(id);
+                                if (ObjectId.isValid(id)) {
+                                        orderIdLookups.add(new ObjectId(id));
+                                }
+                        }
+
+                        Query subOrderQuery = new Query();
+                        subOrderQuery.addCriteria(Criteria.where("orderId").in(orderIdLookups));
+                        subOrderQuery.addCriteria(Criteria.where("deleted").is(false));
+
+                        if (hasStatusFilter) {
+                                subOrderQuery.addCriteria(Criteria.where("status").is(criteria.getStatus()));
+                        }
+
+                        if (hasProductFilter) {
+                                String sanitized = Pattern.quote(criteria.getProductName().trim());
+                                subOrderQuery.addCriteria(Criteria.where("items.productName").regex(sanitized, "i"));
+                        }
+
+                        List<SubOrder> matchingSubOrders = mongoTemplate.find(subOrderQuery, SubOrder.class);
+
+                        List<String> matchedOrderIds = matchingSubOrders.stream()
+                                        .map(SubOrder::getOrderId)
+                                        .filter(Objects::nonNull)
+                                        .distinct()
+                                        .toList();
+
+                        if (matchedOrderIds.isEmpty()) {
+                                return Page.empty(pageable);
+                        }
+
+                        List<Object> targetIdLookups = new ArrayList<>();
+                        for (String id : matchedOrderIds) {
+                                targetIdLookups.add(id);
+                                if (ObjectId.isValid(id)) {
+                                        targetIdLookups.add(new ObjectId(id));
+                                }
+                        }
+
+                        orderQuery.addCriteria(Criteria.where("_id").in(targetIdLookups));
+                }
+
+                long total = mongoTemplate.count(orderQuery, Order.class);
+                orderQuery.with(pageable);
+                List<Order> orders = mongoTemplate.find(orderQuery, Order.class);
+
+                if (orders.isEmpty()) {
+                        return new PageImpl<>(Collections.emptyList(), pageable, total);
+                }
+
+                List<String> orderIds = orders.stream().map(Order::getId).toList();
+                List<SubOrder> subOrders = subOrderRepository.findByOrderIdIn(orderIds);
+                Map<String, List<SubOrder>> subOrdersByOrder = subOrders.stream()
+                                .filter(sub -> sub.getOrderId() != null)
+                                .collect(Collectors.groupingBy(SubOrder::getOrderId));
+
+                List<OrderResponse> responses = orders.stream().map(order -> {
+                        OrderResponse response = orderMapper.toResponse(order);
+                        List<SubOrder> orderSubs = subOrdersByOrder.getOrDefault(order.getId(),
+                                        Collections.emptyList());
+                        response.setSubOrders(orderMapper.toSubOrderResponses(orderSubs));
+                        return response;
+                }).toList();
+
+                return new PageImpl<>(responses, pageable, total);
+        }
+
 }

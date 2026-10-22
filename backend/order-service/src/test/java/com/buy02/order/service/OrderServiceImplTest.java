@@ -48,664 +48,664 @@ import com.buy02.order.repository.SubOrderRepository;
 @DisplayName("OrderServiceImpl Unit Tests")
 class OrderServiceImplTest {
 
-    @Mock
-    private OrderRepository orderRepository;
+        @Mock
+        private OrderRepository orderRepository;
 
-    @Mock
-    private SubOrderRepository subOrderRepository;
+        @Mock
+        private SubOrderRepository subOrderRepository;
 
-    @Mock
-    private CartClient cartClient;
+        @Mock
+        private CartClient cartClient;
 
-    @Mock
-    private ProductClient productClient;
+        @Mock
+        private ProductClient productClient;
 
-    @Mock
-    private OrderMapper orderMapper;
+        @Mock
+        private OrderMapper orderMapper;
 
-    @Mock
-    private AuditEventProducer eventProducer;
+        @Mock
+        private AuditEventProducer eventProducer;
 
-    @InjectMocks
-    private OrderServiceImpl orderService;
+        @InjectMocks
+        private OrderServiceImpl orderService;
 
-    private static final String ORDER_ID = "order-123";
-    private static final String NEW_ORDER_ID = "order-456";
-    private static final String USER_ID = "user-123";
-    private static final String OTHER_USER_ID = "user-456";
-    private static final String SELLER_ID = "seller-123";
-    private static final String PRODUCT_ID = "product-123";
+        private static final String ORDER_ID = "order-123";
+        private static final String NEW_ORDER_ID = "order-456";
+        private static final String USER_ID = "user-123";
+        private static final String OTHER_USER_ID = "user-456";
+        private static final String SELLER_ID = "seller-123";
+        private static final String PRODUCT_ID = "product-123";
 
-    private static final BigDecimal PRICE = BigDecimal.valueOf(100);
+        private static final BigDecimal PRICE = BigDecimal.valueOf(100);
 
-    private Order order;
-    private SubOrder subOrder;
+        private Order order;
+        private SubOrder subOrder;
 
-    @BeforeEach
-    void setUp() {
-        order = Order.builder()
-                .id(ORDER_ID)
-                .userId(USER_ID)
-                .totalAmount(BigDecimal.valueOf(200))
-                .paymentMethod(Order.PaymentMethod.PAY_ON_DELIVERY)
-                .build();
+        @BeforeEach
+        void setUp() {
+                order = Order.builder()
+                                .id(ORDER_ID)
+                                .userId(USER_ID)
+                                .totalAmount(BigDecimal.valueOf(200))
+                                .paymentMethod(Order.PaymentMethod.PAY_ON_DELIVERY)
+                                .build();
 
-        subOrder = SubOrder.builder()
-                .id("sub-123")
-                .orderId(ORDER_ID)
-                .sellerId(SELLER_ID)
-                .items(new ArrayList<>())
-                .totalAmount(BigDecimal.valueOf(200))
-                .status(OrderStatus.PENDING)
-                .statusHistory(new ArrayList<>())
-                .build();
-    }
-
-    @Nested
-    @DisplayName("CreateOrder")
-    class CreateOrder {
-
-        @Test
-        @DisplayName("should create order successfully")
-        void success() {
-            // Given
-            CreateOrderRequest request = mock(CreateOrderRequest.class);
-
-            when(request.totalAmount())
-                    .thenReturn(BigDecimal.valueOf(200));
-
-            CartResponse.CartItemResponse item = mockCartItem(PRICE, 2);
-
-            CartResponse cart = mockCart(List.of(item));
-
-            Order.ShippingAddress shippingAddress = mock(
-                    Order.ShippingAddress.class);
-
-            when(cartClient.getCart())
-                    .thenReturn(cart);
-
-            when(orderMapper.toShippingAddress(any()))
-                    .thenReturn(shippingAddress);
-
-            when(orderRepository.save(any()))
-                    .thenReturn(order);
-
-            when(orderMapper.toOrderItems(anyList()))
-                    .thenReturn(new ArrayList<>());
-
-            when(subOrderRepository.saveAll(anyList()))
-                    .thenReturn(List.of(subOrder));
-
-            when(orderMapper.toResponse(order))
-                    .thenReturn(new OrderResponse());
-
-            when(orderMapper.toSubOrderResponses(anyList()))
-                    .thenReturn(new ArrayList<>());
-
-            // When
-            OrderResponse result = orderService.createOrder(USER_ID, request);
-
-            // Then
-            assertThat(result).isNotNull();
-
-            verify(cartClient).getCart();
-            verify(orderRepository).save(any());
-            verify(subOrderRepository).saveAll(anyList());
+                subOrder = SubOrder.builder()
+                                .id("sub-123")
+                                .orderId(ORDER_ID)
+                                .sellerId(SELLER_ID)
+                                .items(new ArrayList<>())
+                                .totalAmount(BigDecimal.valueOf(200))
+                                .status(OrderStatus.PENDING)
+                                .statusHistory(new ArrayList<>())
+                                .build();
         }
 
-        @Test
-        @DisplayName("should reject empty cart")
-        void emptyCart() {
-            // Given
-            CreateOrderRequest request = mock(CreateOrderRequest.class);
+        @Nested
+        @DisplayName("CreateOrder")
+        class CreateOrder {
 
-            CartResponse cart = mockCart(List.of());
+                @Test
+                @DisplayName("should create order successfully")
+                void success() {
+                        // Given
+                        CreateOrderRequest request = mock(CreateOrderRequest.class);
 
-            when(cartClient.getCart())
-                    .thenReturn(cart);
+                        when(request.totalAmount())
+                                        .thenReturn(BigDecimal.valueOf(200));
 
-            // When / Then
-            assertThatThrownBy(
-                    () -> orderService.createOrder(USER_ID, request))
-                    .isInstanceOf(BadRequestException.class)
-                    .hasMessageContaining("Cart is empty");
+                        CartResponse.CartItemResponse item = mockCartItem(PRICE, 2);
 
-            verify(orderRepository, never()).save(any());
-            verify(subOrderRepository, never()).saveAll(anyList());
+                        CartResponse cart = mockCart(List.of(item));
+
+                        Order.ShippingAddress shippingAddress = mock(
+                                        Order.ShippingAddress.class);
+
+                        when(cartClient.getCart())
+                                        .thenReturn(cart);
+
+                        when(orderMapper.toShippingAddress(any()))
+                                        .thenReturn(shippingAddress);
+
+                        when(orderRepository.save(any()))
+                                        .thenReturn(order);
+
+                        when(orderMapper.toOrderItems(anyList()))
+                                        .thenReturn(new ArrayList<>());
+
+                        when(subOrderRepository.saveAll(anyList()))
+                                        .thenReturn(List.of(subOrder));
+
+                        when(orderMapper.toResponse(order))
+                                        .thenReturn(new OrderResponse());
+
+                        when(orderMapper.toSubOrderResponses(anyList()))
+                                        .thenReturn(new ArrayList<>());
+
+                        // When
+                        OrderResponse result = orderService.createOrder(USER_ID, request);
+
+                        // Then
+                        assertThat(result).isNotNull();
+
+                        verify(cartClient).getCart();
+                        verify(orderRepository).save(any());
+                        verify(subOrderRepository).saveAll(anyList());
+                }
+
+                @Test
+                @DisplayName("should reject empty cart")
+                void emptyCart() {
+                        // Given
+                        CreateOrderRequest request = mock(CreateOrderRequest.class);
+
+                        CartResponse cart = mockCart(List.of());
+
+                        when(cartClient.getCart())
+                                        .thenReturn(cart);
+
+                        // When / Then
+                        assertThatThrownBy(
+                                        () -> orderService.createOrder(USER_ID, request))
+                                        .isInstanceOf(BadRequestException.class)
+                                        .hasMessageContaining("Cart is empty");
+
+                        verify(orderRepository, never()).save(any());
+                        verify(subOrderRepository, never()).saveAll(anyList());
+                }
+
+                @Test
+                @DisplayName("should reject total mismatch")
+                void totalMismatch() {
+                        // Given
+                        CreateOrderRequest request = mock(CreateOrderRequest.class);
+
+                        when(request.totalAmount())
+                                        .thenReturn(BigDecimal.valueOf(999));
+
+                        CartResponse.CartItemResponse item = mockCartItem(PRICE, 2);
+
+                        CartResponse cart = mockCart(List.of(item));
+
+                        when(cartClient.getCart())
+                                        .thenReturn(cart);
+
+                        // When / Then
+                        assertThatThrownBy(
+                                        () -> orderService.createOrder(USER_ID, request))
+                                        .isInstanceOf(BadRequestException.class)
+                                        .hasMessageContaining("Order total mismatch");
+
+                        verify(orderRepository, never()).save(any());
+                        verify(subOrderRepository, never()).saveAll(anyList());
+                }
         }
 
-        @Test
-        @DisplayName("should reject total mismatch")
-        void totalMismatch() {
-            // Given
-            CreateOrderRequest request = mock(CreateOrderRequest.class);
+        @Nested
+        @DisplayName("GetOrder")
+        class GetOrder {
 
-            when(request.totalAmount())
-                    .thenReturn(BigDecimal.valueOf(999));
+                @Test
+                @DisplayName("should return order")
+                void success() {
+                        // Given
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
 
-            CartResponse.CartItemResponse item = mockCartItem(PRICE, 2);
+                        when(subOrderRepository.findByOrderId(ORDER_ID))
+                                        .thenReturn(List.of(subOrder));
 
-            CartResponse cart = mockCart(List.of(item));
+                        OrderResponse response = new OrderResponse();
 
-            when(cartClient.getCart())
-                    .thenReturn(cart);
+                        when(orderMapper.toResponse(order))
+                                        .thenReturn(response);
 
-            // When / Then
-            assertThatThrownBy(
-                    () -> orderService.createOrder(USER_ID, request))
-                    .isInstanceOf(BadRequestException.class)
-                    .hasMessageContaining("Order total mismatch");
+                        when(orderMapper.toSubOrderResponses(anyList()))
+                                        .thenReturn(new ArrayList<>());
 
-            verify(orderRepository, never()).save(any());
-            verify(subOrderRepository, never()).saveAll(anyList());
-        }
-    }
+                        // When
+                        OrderResponse result = orderService.getOrder(ORDER_ID, USER_ID);
 
-    @Nested
-    @DisplayName("GetOrder")
-    class GetOrder {
+                        // Then
+                        assertThat(result).isNotNull();
 
-        @Test
-        @DisplayName("should return order")
-        void success() {
-            // Given
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
+                        verify(orderRepository)
+                                        .findByIdAndDeletedFalse(ORDER_ID);
 
-            when(subOrderRepository.findByOrderId(ORDER_ID))
-                    .thenReturn(List.of(subOrder));
+                        verify(subOrderRepository)
+                                        .findByOrderId(ORDER_ID);
 
-            OrderResponse response = new OrderResponse();
+                        verify(orderMapper)
+                                        .toResponse(order);
+                }
 
-            when(orderMapper.toResponse(order))
-                    .thenReturn(response);
+                @Test
+                @DisplayName("should throw when order does not exist")
+                void notFound() {
+                        // Given
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.empty());
 
-            when(orderMapper.toSubOrderResponses(anyList()))
-                    .thenReturn(new ArrayList<>());
+                        // When / Then
+                        assertThatThrownBy(
+                                        () -> orderService.getOrder(
+                                                        ORDER_ID,
+                                                        USER_ID))
+                                        .isInstanceOf(NotFoundException.class);
 
-            // When
-            OrderResponse result = orderService.getOrder(ORDER_ID, USER_ID);
+                        verify(subOrderRepository, never())
+                                        .findByOrderId(any());
+                }
 
-            // Then
-            assertThat(result).isNotNull();
+                @Test
+                @DisplayName("should reject another user")
+                void forbidden() {
+                        // Given
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
 
-            verify(orderRepository)
-                    .findByIdAndDeletedFalse(ORDER_ID);
+                        // When / Then
+                        assertThatThrownBy(
+                                        () -> orderService.getOrder(
+                                                        ORDER_ID,
+                                                        OTHER_USER_ID))
+                                        .isInstanceOf(ForbiddenException.class);
 
-            verify(subOrderRepository)
-                    .findByOrderId(ORDER_ID);
-
-            verify(orderMapper)
-                    .toResponse(order);
-        }
-
-        @Test
-        @DisplayName("should throw when order does not exist")
-        void notFound() {
-            // Given
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.empty());
-
-            // When / Then
-            assertThatThrownBy(
-                    () -> orderService.getOrder(
-                            ORDER_ID,
-                            USER_ID))
-                    .isInstanceOf(NotFoundException.class);
-
-            verify(subOrderRepository, never())
-                    .findByOrderId(any());
+                        verify(subOrderRepository, never())
+                                        .findByOrderId(any());
+                }
         }
 
-        @Test
-        @DisplayName("should reject another user")
-        void forbidden() {
-            // Given
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
+        @Nested
+        @DisplayName("GetOrdersByUser")
+        class GetOrdersByUser {
 
-            // When / Then
-            assertThatThrownBy(
-                    () -> orderService.getOrder(
-                            ORDER_ID,
-                            OTHER_USER_ID))
-                    .isInstanceOf(ForbiddenException.class);
+                @Test
+                @DisplayName("should return paginated orders")
+                void success() {
+                        // Given
+                        Pageable pageable = PageRequest.of(0, 10);
 
-            verify(subOrderRepository, never())
-                    .findByOrderId(any());
-        }
-    }
+                        Page<Order> page = new PageImpl<>(List.of(order));
 
-    @Nested
-    @DisplayName("GetOrdersByUser")
-    class GetOrdersByUser {
+                        when(orderRepository.findByUserIdAndDeletedFalse(
+                                        USER_ID,
+                                        pageable))
+                                        .thenReturn(page);
 
-        @Test
-        @DisplayName("should return paginated orders")
-        void success() {
-            // Given
-            Pageable pageable = PageRequest.of(0, 10);
+                        when(subOrderRepository.findByOrderIdIn(
+                                        List.of(ORDER_ID)))
+                                        .thenReturn(List.of(subOrder));
 
-            Page<Order> page = new PageImpl<>(List.of(order));
+                        when(orderMapper.toResponse(order))
+                                        .thenReturn(new OrderResponse());
 
-            when(orderRepository.findByUserIdAndDeletedFalse(
-                    USER_ID,
-                    pageable))
-                    .thenReturn(page);
+                        when(orderMapper.toSubOrderResponses(anyList()))
+                                        .thenReturn(new ArrayList<>());
 
-            when(subOrderRepository.findByOrderIdIn(
-                    List.of(ORDER_ID)))
-                    .thenReturn(List.of(subOrder));
+                        // When
+                        Page<OrderResponse> result = orderService.getOrdersByUser(
+                                        USER_ID,
+                                        pageable);
 
-            when(orderMapper.toResponse(order))
-                    .thenReturn(new OrderResponse());
+                        // Then
+                        assertThat(result.getContent())
+                                        .hasSize(1);
 
-            when(orderMapper.toSubOrderResponses(anyList()))
-                    .thenReturn(new ArrayList<>());
+                        verify(orderRepository)
+                                        .findByUserIdAndDeletedFalse(
+                                                        USER_ID,
+                                                        pageable);
 
-            // When
-            Page<OrderResponse> result = orderService.getOrdersByUser(
-                    USER_ID,
-                    pageable);
+                        verify(subOrderRepository)
+                                        .findByOrderIdIn(
+                                                        List.of(ORDER_ID));
+                }
 
-            // Then
-            assertThat(result.getContent())
-                    .hasSize(1);
+                @Test
+                @DisplayName("should return empty page")
+                void empty() {
+                        // Given
+                        Pageable pageable = PageRequest.of(0, 10);
 
-            verify(orderRepository)
-                    .findByUserIdAndDeletedFalse(
-                            USER_ID,
-                            pageable);
+                        when(orderRepository.findByUserIdAndDeletedFalse(
+                                        USER_ID,
+                                        pageable))
+                                        .thenReturn(Page.empty(pageable));
 
-            verify(subOrderRepository)
-                    .findByOrderIdIn(
-                            List.of(ORDER_ID));
-        }
+                        // When
+                        Page<OrderResponse> result = orderService.getOrdersByUser(
+                                        USER_ID,
+                                        pageable);
 
-        @Test
-        @DisplayName("should return empty page")
-        void empty() {
-            // Given
-            Pageable pageable = PageRequest.of(0, 10);
+                        // Then
+                        assertThat(result.getContent())
+                                        .isEmpty();
 
-            when(orderRepository.findByUserIdAndDeletedFalse(
-                    USER_ID,
-                    pageable))
-                    .thenReturn(Page.empty(pageable));
-
-            // When
-            Page<OrderResponse> result = orderService.getOrdersByUser(
-                    USER_ID,
-                    pageable);
-
-            // Then
-            assertThat(result.getContent())
-                    .isEmpty();
-
-            verify(subOrderRepository, never())
-                    .findByOrderIdIn(anyList());
-        }
-    }
-
-    @Nested
-    @DisplayName("CancelOrder")
-    class CancelOrder {
-
-        @Test
-        @DisplayName("should cancel pending order")
-        void success() {
-            // Given
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
-
-            when(subOrderRepository.findByOrderId(ORDER_ID))
-                    .thenReturn(List.of(subOrder));
-
-            when(subOrderRepository.saveAll(anyList()))
-                    .thenReturn(List.of(subOrder));
-
-            // When
-            orderService.cancelOrder(
-                    ORDER_ID,
-                    USER_ID);
-
-            // Then
-            assertThat(subOrder.getStatus())
-                    .isEqualTo(OrderStatus.CANCELLED);
-
-            assertThat(subOrder.getStatusHistory())
-                    .hasSize(1);
-
-            verify(subOrderRepository)
-                    .saveAll(anyList());
+                        verify(subOrderRepository, never())
+                                        .findByOrderIdIn(anyList());
+                }
         }
 
-        @Test
-        @DisplayName("should reject non-pending order")
-        void notPending() {
-            // Given
-            subOrder.setStatus(
-                    OrderStatus.CONFIRMED);
+        @Nested
+        @DisplayName("CancelOrder")
+        class CancelOrder {
 
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
+                @Test
+                @DisplayName("should cancel pending order")
+                void success() {
+                        // Given
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
 
-            when(subOrderRepository.findByOrderId(ORDER_ID))
-                    .thenReturn(List.of(subOrder));
+                        when(subOrderRepository.findByOrderId(ORDER_ID))
+                                        .thenReturn(List.of(subOrder));
 
-            // When / Then
-            assertThatThrownBy(
-                    () -> orderService.cancelOrder(
-                            ORDER_ID,
-                            USER_ID))
-                    .isInstanceOf(BadRequestException.class);
+                        when(subOrderRepository.saveAll(anyList()))
+                                        .thenReturn(List.of(subOrder));
 
-            verify(subOrderRepository, never())
-                    .saveAll(anyList());
+                        // When
+                        orderService.cancelOrder(
+                                        ORDER_ID,
+                                        USER_ID);
+
+                        // Then
+                        assertThat(subOrder.getStatus())
+                                        .isEqualTo(OrderStatus.CANCELLED);
+
+                        assertThat(subOrder.getStatusHistory())
+                                        .hasSize(1);
+
+                        verify(subOrderRepository)
+                                        .saveAll(anyList());
+                }
+
+                @Test
+                @DisplayName("should reject non-pending order")
+                void notPending() {
+                        // Given
+                        subOrder.setStatus(
+                                        OrderStatus.CONFIRMED);
+
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
+
+                        when(subOrderRepository.findByOrderId(ORDER_ID))
+                                        .thenReturn(List.of(subOrder));
+
+                        // When / Then
+                        assertThatThrownBy(
+                                        () -> orderService.cancelOrder(
+                                                        ORDER_ID,
+                                                        USER_ID))
+                                        .isInstanceOf(BadRequestException.class);
+
+                        verify(subOrderRepository, never())
+                                        .saveAll(anyList());
+                }
+
+                @Test
+                @DisplayName("should reject another user")
+                void forbidden() {
+                        // Given
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
+
+                        // When / Then
+                        assertThatThrownBy(
+                                        () -> orderService.cancelOrder(
+                                                        ORDER_ID,
+                                                        OTHER_USER_ID))
+                                        .isInstanceOf(ForbiddenException.class);
+
+                        verify(subOrderRepository, never())
+                                        .findByOrderId(any());
+                }
         }
 
-        @Test
-        @DisplayName("should reject another user")
-        void forbidden() {
-            // Given
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
+        @Nested
+        @DisplayName("RedoOrder")
+        class RedoOrder {
 
-            // When / Then
-            assertThatThrownBy(
-                    () -> orderService.cancelOrder(
-                            ORDER_ID,
-                            OTHER_USER_ID))
-                    .isInstanceOf(ForbiddenException.class);
+                @Test
+                @DisplayName("should redo order when stock is available")
+                void success() {
+                        // Given
+                        SubOrder.Item item = SubOrder.Item.builder()
+                                        .productId(PRODUCT_ID)
+                                        .productName("Product")
+                                        .price(PRICE)
+                                        .quantity(2)
+                                        .build();
 
-            verify(subOrderRepository, never())
-                    .findByOrderId(any());
-        }
-    }
+                        subOrder.setItems(List.of(item));
 
-    @Nested
-    @DisplayName("RedoOrder")
-    class RedoOrder {
+                        ProductResponse product = mock(
+                                        ProductResponse.class);
 
-        @Test
-        @DisplayName("should redo order when stock is available")
-        void success() {
-            // Given
-            SubOrder.Item item = SubOrder.Item.builder()
-                    .productId(PRODUCT_ID)
-                    .productName("Product")
-                    .price(PRICE)
-                    .quantity(2)
-                    .build();
+                        when(product.getId())
+                                        .thenReturn(PRODUCT_ID);
 
-            subOrder.setItems(List.of(item));
+                        when(product.getQuantity())
+                                        .thenReturn(10);
 
-            ProductResponse product = mock(
-                    ProductResponse.class);
+                        Order newOrder = Order.builder()
+                                        .id(NEW_ORDER_ID)
+                                        .userId(USER_ID)
+                                        .build();
 
-            when(product.getId())
-                    .thenReturn(PRODUCT_ID);
+                        SubOrder newSubOrder = SubOrder.builder()
+                                        .id("new-sub")
+                                        .items(new ArrayList<>(subOrder.getItems()))
+                                        .statusHistory(new ArrayList<>())
+                                        .build();
 
-            when(product.getQuantity())
-                    .thenReturn(10);
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
 
-            Order newOrder = Order.builder()
-                    .id(NEW_ORDER_ID)
-                    .userId(USER_ID)
-                    .build();
+                        when(subOrderRepository.findByOrderId(ORDER_ID))
+                                        .thenReturn(List.of(subOrder));
 
-            SubOrder newSubOrder = SubOrder.builder()
-                .id("new-sub")
-                .items(new ArrayList<>(subOrder.getItems()))
-                .statusHistory(new ArrayList<>())
-                .build();
+                        when(productClient.getProductsByIds(
+                                        List.of(PRODUCT_ID)))
+                                        .thenReturn(List.of(product));
 
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
+                        when(orderMapper.copyOrder(order))
+                                        .thenReturn(newOrder);
 
-            when(subOrderRepository.findByOrderId(ORDER_ID))
-                    .thenReturn(List.of(subOrder));
+                        when(orderRepository.save(newOrder))
+                                        .thenReturn(newOrder);
 
-            when(productClient.getProductsByIds(
-                    List.of(PRODUCT_ID)))
-                    .thenReturn(List.of(product));
+                        when(orderMapper.copySubOrder(subOrder))
+                                        .thenReturn(newSubOrder);
 
-            when(orderMapper.copyOrder(order))
-                    .thenReturn(newOrder);
+                        // When
+                        orderService.redoOrder(
+                                        ORDER_ID,
+                                        USER_ID);
 
-            when(orderRepository.save(newOrder))
-                    .thenReturn(newOrder);
+                        // Then
+                        assertThat(newSubOrder.getOrderId())
+                                        .isEqualTo(NEW_ORDER_ID);
 
-            when(orderMapper.copySubOrder(subOrder))
-                    .thenReturn(newSubOrder);
+                        verify(orderRepository)
+                                        .save(newOrder);
 
-            // When
-            orderService.redoOrder(
-                    ORDER_ID,
-                    USER_ID);
+                        verify(subOrderRepository)
+                                        .saveAll(anyList());
+                }
 
-            // Then
-            assertThat(newSubOrder.getOrderId())
-                    .isEqualTo(NEW_ORDER_ID);
+                @Test
+                @DisplayName("should reject unavailable product")
+                void productUnavailable() {
+                        // Given
+                        SubOrder.Item item = SubOrder.Item.builder()
+                                        .productId(PRODUCT_ID)
+                                        .productName("Product")
+                                        .price(PRICE)
+                                        .quantity(2)
+                                        .build();
 
-            verify(orderRepository)
-                    .save(newOrder);
+                        subOrder.setItems(List.of(item));
 
-            verify(subOrderRepository)
-                    .saveAll(anyList());
-        }
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
 
-        @Test
-        @DisplayName("should reject unavailable product")
-        void productUnavailable() {
-            // Given
-            SubOrder.Item item = SubOrder.Item.builder()
-                    .productId(PRODUCT_ID)
-                    .productName("Product")
-                    .price(PRICE)
-                    .quantity(2)
-                    .build();
+                        when(subOrderRepository.findByOrderId(ORDER_ID))
+                                        .thenReturn(List.of(subOrder));
 
-            subOrder.setItems(List.of(item));
+                        when(productClient.getProductsByIds(
+                                        List.of(PRODUCT_ID)))
+                                        .thenReturn(List.of());
 
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
+                        // When / Then
+                        assertThatThrownBy(
+                                        () -> orderService.redoOrder(
+                                                        ORDER_ID,
+                                                        USER_ID))
+                                        .isInstanceOf(BadRequestException.class)
+                                        .hasMessageContaining(
+                                                        "Product no longer available");
 
-            when(subOrderRepository.findByOrderId(ORDER_ID))
-                    .thenReturn(List.of(subOrder));
+                        verify(orderRepository, never())
+                                        .save(any());
 
-            when(productClient.getProductsByIds(
-                    List.of(PRODUCT_ID)))
-                    .thenReturn(List.of());
+                        verify(subOrderRepository, never())
+                                        .saveAll(anyList());
+                }
 
-            // When / Then
-            assertThatThrownBy(
-                    () -> orderService.redoOrder(
-                            ORDER_ID,
-                            USER_ID))
-                    .isInstanceOf(BadRequestException.class)
-                    .hasMessageContaining(
-                            "Product no longer available");
+                @Test
+                @DisplayName("should reject insufficient stock")
+                void insufficientStock() {
+                        // Given
+                        SubOrder.Item item = SubOrder.Item.builder()
+                                        .productId(PRODUCT_ID)
+                                        .productName("Product")
+                                        .price(PRICE)
+                                        .quantity(10)
+                                        .build();
 
-            verify(orderRepository, never())
-                    .save(any());
+                        subOrder.setItems(List.of(item));
 
-            verify(subOrderRepository, never())
-                    .saveAll(anyList());
-        }
+                        ProductResponse product = mock(
+                                        ProductResponse.class);
 
-        @Test
-        @DisplayName("should reject insufficient stock")
-        void insufficientStock() {
-            // Given
-            SubOrder.Item item = SubOrder.Item.builder()
-                    .productId(PRODUCT_ID)
-                    .productName("Product")
-                    .price(PRICE)
-                    .quantity(10)
-                    .build();
+                        when(product.getId())
+                                        .thenReturn(PRODUCT_ID);
 
-            subOrder.setItems(List.of(item));
+                        when(product.getQuantity())
+                                        .thenReturn(5);
 
-            ProductResponse product = mock(
-                    ProductResponse.class);
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
 
-            when(product.getId())
-                    .thenReturn(PRODUCT_ID);
+                        when(subOrderRepository.findByOrderId(ORDER_ID))
+                                        .thenReturn(List.of(subOrder));
 
-            when(product.getQuantity())
-                    .thenReturn(5);
+                        when(productClient.getProductsByIds(
+                                        List.of(PRODUCT_ID)))
+                                        .thenReturn(List.of(product));
 
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
+                        // When / Then
+                        assertThatThrownBy(
+                                        () -> orderService.redoOrder(
+                                                        ORDER_ID,
+                                                        USER_ID))
+                                        .isInstanceOf(BadRequestException.class)
+                                        .hasMessageContaining(
+                                                        "Insufficient stock");
 
-            when(subOrderRepository.findByOrderId(ORDER_ID))
-                    .thenReturn(List.of(subOrder));
+                        verify(orderRepository, never())
+                                        .save(any());
 
-            when(productClient.getProductsByIds(
-                    List.of(PRODUCT_ID)))
-                    .thenReturn(List.of(product));
-
-            // When / Then
-            assertThatThrownBy(
-                    () -> orderService.redoOrder(
-                            ORDER_ID,
-                            USER_ID))
-                    .isInstanceOf(BadRequestException.class)
-                    .hasMessageContaining(
-                            "Insufficient stock");
-
-            verify(orderRepository, never())
-                    .save(any());
-
-            verify(subOrderRepository, never())
-                    .saveAll(anyList());
-        }
-    }
-
-    @Nested
-    @DisplayName("DeleteOrder")
-    class DeleteOrder {
-
-        @Test
-        @DisplayName("should delete delivered order")
-        void delivered() {
-            // Given
-            subOrder.setStatus(
-                    OrderStatus.DELIVERED);
-
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
-
-            when(subOrderRepository.findByOrderId(ORDER_ID))
-                    .thenReturn(List.of(subOrder));
-
-            // When
-            orderService.deleteOrder(
-                    ORDER_ID,
-                    USER_ID);
-
-            // Then
-            assertThat(order.isDeleted())
-                    .isTrue();
-
-            verify(orderRepository)
-                    .save(order);
+                        verify(subOrderRepository, never())
+                                        .saveAll(anyList());
+                }
         }
 
-        @Test
-        @DisplayName("should delete cancelled order")
-        void cancelled() {
-            // Given
-            subOrder.setStatus(
-                    OrderStatus.CANCELLED);
+        @Nested
+        @DisplayName("DeleteOrder")
+        class DeleteOrder {
 
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
+                @Test
+                @DisplayName("should delete delivered order")
+                void delivered() {
+                        // Given
+                        subOrder.setStatus(
+                                        OrderStatus.DELIVERED);
 
-            when(subOrderRepository.findByOrderId(ORDER_ID))
-                    .thenReturn(List.of(subOrder));
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
 
-            // When
-            orderService.deleteOrder(
-                    ORDER_ID,
-                    USER_ID);
+                        when(subOrderRepository.findByOrderId(ORDER_ID))
+                                        .thenReturn(List.of(subOrder));
 
-            // Then
-            assertThat(order.isDeleted())
-                    .isTrue();
+                        // When
+                        orderService.deleteOrder(
+                                        ORDER_ID,
+                                        USER_ID);
 
-            verify(orderRepository)
-                    .save(order);
+                        // Then
+                        assertThat(order.getDeleted())
+                                        .isTrue();
+
+                        verify(orderRepository)
+                                        .save(order);
+                }
+
+                @Test
+                @DisplayName("should delete cancelled order")
+                void cancelled() {
+                        // Given
+                        subOrder.setStatus(
+                                        OrderStatus.CANCELLED);
+
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
+
+                        when(subOrderRepository.findByOrderId(ORDER_ID))
+                                        .thenReturn(List.of(subOrder));
+
+                        // When
+                        orderService.deleteOrder(
+                                        ORDER_ID,
+                                        USER_ID);
+
+                        // Then
+                        assertThat(order.getDeleted())
+                                        .isTrue();
+
+                        verify(orderRepository)
+                                        .save(order);
+                }
+
+                @Test
+                @DisplayName("should reject order still in progress")
+                void inProgress() {
+                        // Given
+                        subOrder.setStatus(
+                                        OrderStatus.CONFIRMED);
+
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
+
+                        when(subOrderRepository.findByOrderId(ORDER_ID))
+                                        .thenReturn(List.of(subOrder));
+
+                        // When / Then
+                        assertThatThrownBy(
+                                        () -> orderService.deleteOrder(
+                                                        ORDER_ID,
+                                                        USER_ID))
+                                        .isInstanceOf(BadRequestException.class);
+
+                        verify(orderRepository, never())
+                                        .save(any());
+                }
+
+                @Test
+                @DisplayName("should reject another user")
+                void forbidden() {
+                        // Given
+                        when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
+                                        .thenReturn(Optional.of(order));
+
+                        // When / Then
+                        assertThatThrownBy(
+                                        () -> orderService.deleteOrder(
+                                                        ORDER_ID,
+                                                        OTHER_USER_ID))
+                                        .isInstanceOf(ForbiddenException.class);
+
+                        verify(subOrderRepository, never())
+                                        .findByOrderId(any());
+                }
         }
 
-        @Test
-        @DisplayName("should reject order still in progress")
-        void inProgress() {
-            // Given
-            subOrder.setStatus(
-                    OrderStatus.CONFIRMED);
+        private CartResponse mockCart(
+                        List<CartResponse.CartItemResponse> items) {
 
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
+                CartResponse cart = mock(
+                                CartResponse.class);
 
-            when(subOrderRepository.findByOrderId(ORDER_ID))
-                    .thenReturn(List.of(subOrder));
+                when(cart.getItems())
+                                .thenReturn(items);
 
-            // When / Then
-            assertThatThrownBy(
-                    () -> orderService.deleteOrder(
-                            ORDER_ID,
-                            USER_ID))
-                    .isInstanceOf(BadRequestException.class);
-
-            verify(orderRepository, never())
-                    .save(any());
+                return cart;
         }
 
-        @Test
-        @DisplayName("should reject another user")
-        void forbidden() {
-            // Given
-            when(orderRepository.findByIdAndDeletedFalse(ORDER_ID))
-                    .thenReturn(Optional.of(order));
+        private CartResponse.CartItemResponse mockCartItem(
+                        BigDecimal price,
+                        int quantity) {
 
-            // When / Then
-            assertThatThrownBy(
-                    () -> orderService.deleteOrder(
-                            ORDER_ID,
-                            OTHER_USER_ID))
-                    .isInstanceOf(ForbiddenException.class);
-
-            verify(subOrderRepository, never())
-                    .findByOrderId(any());
+                return CartResponse.CartItemResponse.builder()
+                                .productId(PRODUCT_ID)
+                                .ownerId(SELLER_ID)
+                                .productName("Product")
+                                .price(price)
+                                .quantity(quantity)
+                                .imageUrl(null)
+                                .availableStock(10)
+                                .build();
         }
-    }
-
-    private CartResponse mockCart(
-            List<CartResponse.CartItemResponse> items) {
-
-        CartResponse cart = mock(
-                CartResponse.class);
-
-        when(cart.getItems())
-                .thenReturn(items);
-
-        return cart;
-    }
-
-    private CartResponse.CartItemResponse mockCartItem(
-            BigDecimal price,
-            int quantity) {
-
-        return CartResponse.CartItemResponse.builder()
-                .productId(PRODUCT_ID)
-                .ownerId(SELLER_ID)
-                .productName("Product")
-                .price(price)
-                .quantity(quantity)
-                .imageUrl(null)
-                .availableStock(10)
-                .build();
-    }
 }

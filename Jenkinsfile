@@ -141,7 +141,7 @@ pipeline {
         <mirror>
             <id>nexus-maven</id>
             <mirrorOf>*</mirrorOf>
-            <url>http://nexus:8081/repository/maven-public/</url>
+            <url>http://localhost:8081/repository/maven-public/</url>
         </mirror>
     </mirrors>
 </settings>

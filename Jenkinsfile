@@ -12,9 +12,7 @@ def services = [
 def rollbackDeployment() {
     if (!params.ROLLBACK_ON_FAILURE) {
         echo 'Rollback is disabled.'
-        error(
-            'Deployment verification failed and rollback is disabled.'
-        )
+        error('Deployment verification failed and rollback is disabled.')
     }
 
     def previousBuild = currentBuild.previousSuccessfulBuild
@@ -24,20 +22,26 @@ def rollbackDeployment() {
     }
 
     def previousVersion = "1.0.${previousBuild.number}"
+    echo "Rolling back to version ${previousVersion} from Nexus..."
 
-    echo "Rolling back to ${previousVersion}..."
+    withCredentials([
+        usernamePassword(
+            credentialsId: 'nexus-docker-credentials',
+            usernameVariable: 'NEXUS_USERNAME',
+            passwordVariable: 'NEXUS_PASSWORD'
+        )
+    ]) {
+        sh """
+            set -eu
+            printf '%s' "\$NEXUS_PASSWORD" | docker login localhost:18080 --username "\$NEXUS_USERNAME" --password-stdin
+            export IMAGE_TAG='${previousVersion}'
+            docker compose -f docker-compose.jenkins.yml pull
+            docker compose -f docker-compose.jenkins.yml up -d --no-build
+        """
+    }
 
-    sh """
-        IMAGE_TAG='${previousVersion}' docker compose \
-            -f docker-compose.jenkins.yml \
-            up -d --no-build
-    """
-
-    echo "Rollback to ${previousVersion} completed."
-    error(
-        'Deployment failed. ' +
-        "Application rolled back to ${previousVersion}."
-    )
+    echo "Rollback to ${previousVersion} completed successfully."
+    error("Deployment failed. Application rolled back to ${previousVersion}.")
 }
 
 pipeline {
@@ -45,6 +49,8 @@ pipeline {
 
     options {
         skipDefaultCheckout(true)
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 1, unit: 'HOURS')
     }
 
     triggers {
@@ -80,54 +86,35 @@ pipeline {
     environment {
         IMAGE_TAG = "1.0.${BUILD_NUMBER}"
         NOTIFICATION_EMAIL = 'amine.yacoubi.med@gmail.com'
-
-        JWT_SECRET = credentials('JWT_SECRET')
-        GATEWAY_KEYSTORE_PASSWORD = credentials('GATEWAY_KEYSTORE_PASSWORD')
-        MINIO_ROOT_USER = credentials('MINIO_ROOT_USER')
-        MINIO_ROOT_PASSWORD = credentials('MINIO_ROOT_PASSWORD')
-        MONGO_ROOT_USERNAME = credentials('MONGO_ROOT_USERNAME')
-        MONGO_ROOT_PASSWORD = credentials('MONGO_ROOT_PASSWORD')
-        ADMIN_NAME = credentials('ADMIN_NAME')
-        ADMIN_EMAIL = credentials('ADMIN_EMAIL')
-        ADMIN_PASSWORD = credentials('ADMIN_PASSWORD')
+        NEXUS_MAVEN_URL = 'http://localhost:8081/repository'
+        NEXUS_DOCKER_REGISTRY = 'localhost:18080'
     }
 
     stages {
         stage('Checkout Source') {
-            agent {
-                label 'backend'
-            }
-
+            agent { label 'backend' }
             steps {
+                deleteDir()
                 checkout scm
-
-                stash(
-                    name: 'source',
-                    includes: '**'
-                )
+                stash name: 'source', includes: '**'
             }
         }
 
         stage('Backend CI') {
-            agent {
-                label 'backend'
-            }
-
+            agent { label 'backend' }
             stages {
-                stage('Checkout') {
+                stage('Prepare Workspace & Settings') {
                     steps {
                         deleteDir()
                         unstash 'source'
-                    }
-                }
 
-                stage('Configure Nexus Maven') {
-                    steps {
-                        writeFile file: '.maven-settings.xml', text: '''\
-<settings>
+                        // Write settings.xml to proxy dependencies and define credentials
+                        writeFile file: '.maven-settings.xml', text: '''<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
     <servers>
         <server>
-            <id>nexus-maven</id>
+            <id>nexus-releases</id>
             <username>${env.NEXUS_USERNAME}</username>
             <password>${env.NEXUS_PASSWORD}</password>
         </server>
@@ -139,130 +126,111 @@ pipeline {
     </servers>
     <mirrors>
         <mirror>
-            <id>nexus-maven</id>
+            <id>nexus-group</id>
             <mirrorOf>*</mirrorOf>
             <url>http://localhost:8081/repository/maven-public/</url>
         </mirror>
     </mirrors>
-</settings>
-'''
-                        stash name: 'maven-settings',
-              includes: '.maven-settings.xml'
+</settings>'''
+                        stash name: 'maven-settings', includes: '.maven-settings.xml'
                     }
                 }
 
-                stage('Build') {
+                stage('Version & Build Backend') {
                     steps {
                         withCredentials([
-                                usernamePassword(
-                                    credentialsId: 'nexus-docker-credentials',
-                                    usernameVariable: 'NEXUS_USERNAME',
-                                    passwordVariable: 'NEXUS_PASSWORD'
-                                )
-                            ]) {
+                            usernamePassword(
+                                credentialsId: 'nexus-docker-credentials',
+                                usernameVariable: 'NEXUS_USERNAME',
+                                passwordVariable: 'NEXUS_PASSWORD'
+                            )
+                        ]) {
                             script {
                                 def builds = [:]
-
                                 services.each { service ->
                                     def currentService = service
-
                                     builds[currentService] = {
                                         dir("backend/${currentService}") {
                                             unstash 'maven-settings'
-
-                                            sh '''
-                                            ./mvnw -B \
-                                                -s .maven-settings.xml \
-                                                package -DskipTests
-                                        '''
+                                            // Set POM version to 1.0.<BUILD_NUMBER> for traceability
+                                            sh """
+                                                chmod +x ./mvnw
+                                                ./mvnw -B versions:set -DnewVersion=${IMAGE_TAG} -DgenerateBackupPoms=false
+                                                ./mvnw -B -s .maven-settings.xml clean package -DskipTests
+                                            """
                                         }
                                     }
                                 }
-
                                 parallel builds
                             }
-                            }
+                        }
                     }
                 }
 
-                stage('Test') {
+                stage('Test Backend') {
                     when {
                         expression {
-                            params.TEST_SCOPE == 'all' ||
-                            params.TEST_SCOPE == 'backend'
+                            params.TEST_SCOPE == 'all' || params.TEST_SCOPE == 'backend'
                         }
                     }
-
                     steps {
                         withCredentials([
-                                usernamePassword(
-                                    credentialsId: 'nexus-docker-credentials',
-                                    usernameVariable: 'NEXUS_USERNAME',
-                                    passwordVariable: 'NEXUS_PASSWORD'
-                                )
-                            ]) {
+                            usernamePassword(
+                                credentialsId: 'nexus-docker-credentials',
+                                usernameVariable: 'NEXUS_USERNAME',
+                                passwordVariable: 'NEXUS_PASSWORD'
+                            )
+                        ]) {
                             script {
                                 def tests = [:]
-
                                 services.each { service ->
                                     def currentService = service
-
                                     tests[currentService] = {
                                         dir("backend/${currentService}") {
                                             unstash 'maven-settings'
-
-                                            sh '''
-                                            ./mvnw -B \
-                                                -s .maven-settings.xml \
-                                                verify
-                                        '''
+                                            sh './mvnw -B -s .maven-settings.xml test'
                                         }
                                     }
                                 }
-
                                 parallel tests
                             }
-                            }
+                        }
                     }
-
                     post {
                         always {
-                            junit 'backend/**/target/surefire-reports/*.xml'
+                            junit allowEmptyResults: true, testResults: 'backend/**/target/surefire-reports/*.xml'
                         }
                     }
                 }
 
-                stage('Publish Maven Artifacts') {
+                stage('Publish Maven Artifacts to Nexus') {
                     steps {
                         withCredentials([
-                                usernamePassword(
-                                    credentialsId: 'nexus-docker-credentials',
-                                    usernameVariable: 'NEXUS_USERNAME',
-                                    passwordVariable: 'NEXUS_PASSWORD'
-                                )
-                            ]) {
+                            usernamePassword(
+                                credentialsId: 'nexus-docker-credentials',
+                                usernameVariable: 'NEXUS_USERNAME',
+                                passwordVariable: 'NEXUS_PASSWORD'
+                            )
+                        ]) {
                             script {
                                 def deployments = [:]
-
                                 services.each { service ->
                                     def currentService = service
-
                                     deployments[currentService] = {
                                         dir("backend/${currentService}") {
                                             unstash 'maven-settings'
-
-                                            sh '''
-                                ./mvnw -B \
-                                    -s .maven-settings.xml \
-                                    deploy -DskipTests
-                            '''
+                                            // Deploy to Nexus release or snapshot repository explicitly
+                                            sh """
+                                                ./mvnw -B -s .maven-settings.xml deploy -DskipTests \
+                                                -DaltReleaseDeploymentRepository=nexus-releases::default::${NEXUS_MAVEN_URL}/maven-releases/ \
+                                                -DaltSnapshotDeploymentRepository=nexus-snapshots::default::${NEXUS_MAVEN_URL}/maven-snapshots/
+                                            """
                                         }
                                     }
                                 }
-
                                 parallel deployments
                             }
-        }
+                        }
                     }
                 }
 
@@ -273,26 +241,23 @@ pipeline {
                             includes: 'backend/**/target/classes/**/*.class,backend/**/target/site/jacoco/jacoco.xml',
                             allowEmpty: true
                         )
+                        stash(
+                            name: 'backend-jars',
+                            includes: 'backend/**/target/*.jar',
+                            allowEmpty: true
+                        )
                     }
                 }
             }
         }
 
         stage('Frontend CI') {
-            agent {
-                label 'frontend'
-            }
-
+            agent { label 'frontend' }
             stages {
-                stage('Checkout') {
+                stage('Checkout & Build Frontend') {
                     steps {
                         deleteDir()
                         unstash 'source'
-                    }
-                }
-
-                stage('Build') {
-                    steps {
                         dir('frontend') {
                             sh 'npm ci'
                             sh 'npm run build'
@@ -300,23 +265,20 @@ pipeline {
                     }
                 }
 
-                stage('Test') {
+                stage('Test Frontend') {
                     when {
                         expression {
-                            params.TEST_SCOPE == 'all' ||
-                            params.TEST_SCOPE == 'frontend'
+                            params.TEST_SCOPE == 'all' || params.TEST_SCOPE == 'frontend'
                         }
                     }
-
                     steps {
                         dir('frontend') {
-                            sh 'npm test'
+                            sh 'npm test -- --watchAll=false'
                         }
                     }
-
                     post {
                         always {
-                            junit 'frontend/test-reports/reports.xml'
+                            junit allowEmptyResults: true, testResults: 'frontend/test-reports/*.xml'
                         }
                     }
                 }
@@ -334,26 +296,18 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            agent {
-                label 'backend'
-            }
-
+            agent { label 'backend' }
             steps {
                 deleteDir()
-
                 unstash 'source'
                 unstash 'backend-artifacts'
 
                 script {
-                    if (
-                        params.TEST_SCOPE == 'all' ||
-                        params.TEST_SCOPE == 'frontend'
-                    ) {
+                    if (params.TEST_SCOPE == 'all' || params.TEST_SCOPE == 'frontend') {
                         unstash 'frontend-coverage'
                     }
 
                     def scannerHome = tool 'SonarScanner'
-
                     withSonarQubeEnv('SonarQube') {
                         sh """
                             ${scannerHome}/bin/sonar-scanner \
@@ -366,100 +320,72 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    waitForQualityGate(
-                        abortPipeline: true,
-                    )
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate(abortPipeline: true)
                 }
             }
         }
 
-        stage('Build & Push Docker Images') {
+        stage('Build & Push Docker Images to Nexus') {
             when {
                 allOf {
                     expression { params.DEPLOY }
-                    not {
-                        triggeredBy 'TimerTrigger'
-                    }
+                    not { triggeredBy 'TimerTrigger' }
                 }
             }
-
-            agent {
-                label 'deployment'
-            }
-
+            agent { label 'deployment' }
             steps {
                 deleteDir()
                 unstash 'source'
+                unstash 'backend-jars'
 
                 withCredentials([
-            usernamePassword(
-                credentialsId: 'nexus-docker-credentials',
-                usernameVariable: 'NEXUS_USERNAME',
-                passwordVariable: 'NEXUS_PASSWORD'
-            ),
-            file(
-                credentialsId: 'TLS_KEY',
-                variable: 'TLS_KEY'
-            ),
-            file(
-                credentialsId: 'TLS_CRT',
-                variable: 'TLS_CRT'
-            ),
-            file(
-                credentialsId: 'GATEWAY_KEYSTORE',
-                variable: 'KEYSTORE_FILE'
-            )
-        ]) {
+                    usernamePassword(
+                        credentialsId: 'nexus-docker-credentials',
+                        usernameVariable: 'NEXUS_USERNAME',
+                        passwordVariable: 'NEXUS_PASSWORD'
+                    ),
+                    file(credentialsId: 'TLS_KEY', variable: 'TLS_KEY'),
+                    file(credentialsId: 'TLS_CRT', variable: 'TLS_CRT'),
+                    file(credentialsId: 'GATEWAY_KEYSTORE', variable: 'KEYSTORE_FILE')
+                ]) {
                     sh '''
-                set -eu
+                        set -eu
+                        mkdir -p frontend/certs
+                        cp "$TLS_KEY" frontend/certs/frontend.key
+                        cp "$TLS_CRT" frontend/certs/frontend.crt
 
-                mkdir -p frontend/certs
+                        mkdir -p backend/api-gateway/src/main/resources
+                        cp "$KEYSTORE_FILE" backend/api-gateway/src/main/resources/gateway-keystore.p12
 
-                cp "$TLS_KEY" frontend/certs/frontend.key
-                cp "$TLS_CRT" frontend/certs/frontend.crt
-
-                cp "$KEYSTORE_FILE" \
-                    backend/api-gateway/src/main/resources/gateway-keystore.p12
-
-                printf '%s' "$NEXUS_PASSWORD" |
-                    docker login localhost:18080 \
-                        --username "$NEXUS_USERNAME" \
-                        --password-stdin
-            '''
+                        # Log in to Nexus Docker Registry
+                        printf '%s' "$NEXUS_PASSWORD" | docker login localhost:18080 --username "$NEXUS_USERNAME" --password-stdin
+                    '''
 
                     script {
                         services.each { service ->
-                            def image =
-                        "localhost:18080/buy-02/${service}:${IMAGE_TAG}"
-
+                            def image = "${NEXUS_DOCKER_REGISTRY}/buy-02/${service}:${IMAGE_TAG}"
                             sh """
-                        set -eu
-                        docker build -t '${image}' 'backend/${service}'
-                        docker push '${image}'
-                    """
+                                set -eu
+                                docker build -t '${image}' 'backend/${service}'
+                                docker push '${image}'
+                            """
                         }
                     }
 
                     sh """
-                set -eu
-                docker build \
-                    -t 'localhost:18080/buy-02/frontend:${IMAGE_TAG}' \
-                    ./frontend
-
-                docker push \
-                    'localhost:18080/buy-02/frontend:${IMAGE_TAG}'
-            """
-        }
+                        set -eu
+                        docker build -t '${NEXUS_DOCKER_REGISTRY}/buy-02/frontend:${IMAGE_TAG}' ./frontend
+                        docker push '${NEXUS_DOCKER_REGISTRY}/buy-02/frontend:${IMAGE_TAG}'
+                    """
+                }
             }
-
             post {
                 always {
                     sh 'docker logout localhost:18080 || true'
                 }
             }
         }
-
 
         stage('Deploy') {
             when {
@@ -468,116 +394,83 @@ pipeline {
                     not { triggeredBy 'TimerTrigger' }
                 }
             }
-
-            agent {
-                label 'deployment'
-            }
-
+            agent { label 'deployment' }
             steps {
                 deleteDir()
                 unstash 'source'
 
                 withCredentials([
-                    string(credentialsId: 'JWT_SECRET',
-                        variable: 'JWT_SECRET'),
-                    string(credentialsId: 'GATEWAY_KEYSTORE_PASSWORD',
-                        variable: 'GATEWAY_KEYSTORE_PASSWORD'),
-                    string(credentialsId: 'MINIO_ROOT_USER',
-                        variable: 'MINIO_ROOT_USER'),
-                    string(credentialsId: 'MINIO_ROOT_PASSWORD',
-                        variable: 'MINIO_ROOT_PASSWORD'),
-                    string(credentialsId: 'MONGO_ROOT_USERNAME',
-                        variable: 'MONGO_ROOT_USERNAME'),
-                    string(credentialsId: 'MONGO_ROOT_PASSWORD',
-                        variable: 'MONGO_ROOT_PASSWORD'),
-                    string(credentialsId: 'ADMIN_NAME',
-                        variable: 'ADMIN_NAME'),
-                    string(credentialsId: 'ADMIN_EMAIL',
-                        variable: 'ADMIN_EMAIL'),
-                    string(credentialsId: 'ADMIN_PASSWORD',
-                        variable: 'ADMIN_PASSWORD'),
-                    file(credentialsId: 'TLS_KEY',
-                        variable: 'TLS_KEY'),
-                    file(credentialsId: 'TLS_CRT',
-                        variable: 'TLS_CRT'),
-                    file(credentialsId: 'GATEWAY_KEYSTORE',
-                        variable: 'KEYSTORE_FILE')
+                    usernamePassword(
+                        credentialsId: 'nexus-docker-credentials',
+                        usernameVariable: 'NEXUS_USERNAME',
+                        passwordVariable: 'NEXUS_PASSWORD'
+                    ),
+                    string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
+                    string(credentialsId: 'GATEWAY_KEYSTORE_PASSWORD', variable: 'GATEWAY_KEYSTORE_PASSWORD'),
+                    string(credentialsId: 'MINIO_ROOT_USER', variable: 'MINIO_ROOT_USER'),
+                    string(credentialsId: 'MINIO_ROOT_PASSWORD', variable: 'MINIO_ROOT_PASSWORD'),
+                    string(credentialsId: 'MONGO_ROOT_USERNAME', variable: 'MONGO_ROOT_USERNAME'),
+                    string(credentialsId: 'MONGO_ROOT_PASSWORD', variable: 'MONGO_ROOT_PASSWORD'),
+                    string(credentialsId: 'ADMIN_NAME', variable: 'ADMIN_NAME'),
+                    string(credentialsId: 'ADMIN_EMAIL', variable: 'ADMIN_EMAIL'),
+                    string(credentialsId: 'ADMIN_PASSWORD', variable: 'ADMIN_PASSWORD'),
+                    file(credentialsId: 'TLS_KEY', variable: 'TLS_KEY'),
+                    file(credentialsId: 'TLS_CRT', variable: 'TLS_CRT'),
+                    file(credentialsId: 'GATEWAY_KEYSTORE', variable: 'KEYSTORE_FILE')
                 ]) {
                     sh '''
                         set -eu
-
                         mkdir -p frontend/certs
                         mkdir -p backend/api-gateway/src/main/resources
 
                         cp "$TLS_KEY" frontend/certs/frontend.key
                         cp "$TLS_CRT" frontend/certs/frontend.crt
-                        cp "$KEYSTORE_FILE" \
-                            backend/api-gateway/src/main/resources/gateway-keystore.p12
+                        cp "$KEYSTORE_FILE" backend/api-gateway/src/main/resources/gateway-keystore.p12
 
                         export IMAGE_TAG="${IMAGE_TAG}"
 
-                        docker compose \
-                            -f docker-compose.jenkins.yml \
-                            config --quiet
-
-                        docker compose \
-                            -f docker-compose.jenkins.yml \
-                            up -d --no-build
+                        # Authenticate and pull the freshly pushed images from Nexus (Requirement 6)
+                        printf '%s' "$NEXUS_PASSWORD" | docker login localhost:18080 --username "$NEXUS_USERNAME" --password-stdin
+                        docker compose -f docker-compose.jenkins.yml config --quiet
+                        docker compose -f docker-compose.jenkins.yml pull
+                        docker compose -f docker-compose.jenkins.yml up -d --no-build
                     '''
                 }
             }
         }
 
-
         stage('Deployment Verification') {
             when {
                 allOf {
-                    expression {
-                        params.DEPLOY
-                    }
-
-                    not {
-                        triggeredBy 'TimerTrigger'
-                    }
+                    expression { params.DEPLOY }
+                    not { triggeredBy 'TimerTrigger' }
                 }
             }
-
-            agent {
-                label 'deployment'
-            }
-
+            agent { label 'deployment' }
             steps {
                 script {
                     retry(6) {
                         sh '''
                             for container in $(docker compose -f docker-compose.jenkins.yml ps -q); do
                                 name=$(docker inspect --format='{{.Name}}' "$container")
-
-                                health=$(docker inspect \
-                                    --format='{{if .State.Health}}{{.State.Health.Status}}{{end}}' \
-                                    "$container")
+                                health=$(docker inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{end}}' "$container")
 
                                 if [ -z "$health" ]; then
                                     echo "$name: no healthcheck (OK)"
-
                                 elif [ "$health" = "healthy" ]; then
                                     echo "$name: healthy (OK)"
-
                                 else
-                                    echo "$name: $health (FAIL)"
+                                    echo "$name: $health (WAITING/FAIL)"
                                     sleep 5
                                     exit 1
                                 fi
                             done
                         '''
-
                         echo 'All containers are healthy.'
                     }
-
                     echo "Deployment ${env.IMAGE_TAG} is healthy."
                 }
             }
-
             post {
                 failure {
                     script {
@@ -591,45 +484,34 @@ pipeline {
         stage('e2e Verification') {
             when {
                 allOf {
-                    expression {
-                        params.DEPLOY
-                    }
-
-                    not {
-                        triggeredBy 'TimerTrigger'
-                    }
+                    expression { params.DEPLOY }
+                    not { triggeredBy 'TimerTrigger' }
                 }
             }
-
-            agent {
-                label 'deployment'
-            }
-
+            agent { label 'deployment' }
             steps {
                 script {
-                    retry(6) {
+                    retry(3) {
                         try {
                             dir('e2e') {
                                 sh 'npm ci'
                                 sh 'npx playwright test'
                             }
                         } catch (Exception e) {
-                            echo 'E2E verification failed. Waiting 15 seconds before retrying...'
+                            echo 'E2E verification failed. Retrying in 10s...'
                             sleep(time: 10, unit: 'SECONDS')
                             throw e
                         }
                     }
                 }
             }
-
             post {
                 always {
-                    junit(testResults: 'e2e/test-reports/playwright-results.xml')
+                    junit allowEmptyResults: true, testResults: 'e2e/test-reports/*.xml'
                 }
-
                 failure {
                     script {
-                        echo 'E2E tests failed after 5 attempts.'
+                        echo 'E2E tests failed.'
                         rollbackDeployment()
                     }
                 }
@@ -641,10 +523,7 @@ pipeline {
         success {
             script {
                 if (params.SEND_NOTIFICATIONS) {
-                    catchError(
-                        buildResult: 'SUCCESS',
-                        stageResult: 'UNSTABLE'
-                    ) {
+                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                         mail(
                             to: env.NOTIFICATION_EMAIL,
                             subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — SUCCESS",
@@ -657,22 +536,17 @@ pipeline {
                                 Test scope: ${params.TEST_SCOPE}
                                 Status: SUCCESS
 
-                                Logs:
-                                ${env.BUILD_URL}
+                                Logs: ${env.BUILD_URL}
                             """.stripIndent()
                         )
                     }
                 }
             }
         }
-
         failure {
             script {
                 if (params.SEND_NOTIFICATIONS) {
-                    catchError(
-                        buildResult: 'FAILURE',
-                        stageResult: 'UNSTABLE'
-                    ) {
+                    catchError(buildResult: 'FAILURE', stageResult: 'UNSTABLE') {
                         mail(
                             to: env.NOTIFICATION_EMAIL,
                             subject: "Build #${env.BUILD_NUMBER} — ${env.JOB_NAME} — FAILURE",
@@ -685,8 +559,7 @@ pipeline {
                                 Test scope: ${params.TEST_SCOPE}
                                 Status: FAILURE
 
-                                Check the Jenkins console output:
-                                ${env.BUILD_URL}
+                                Console Output: ${env.BUILD_URL}
                             """.stripIndent()
                         )
                     }

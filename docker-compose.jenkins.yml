@@ -1,7 +1,6 @@
 services:
   frontend:
-    build: ./frontend
-    image: buy-02/frontend:${IMAGE_TAG}
+    image: localhost:18080/buy-02/frontend:${IMAGE_TAG}
 
     ports:
       - "4200:8080"
@@ -15,8 +14,7 @@ services:
       start_period: 20s
 
   eureka:
-    image: buy-02/eureka:${IMAGE_TAG}
-    build: ./backend/eureka
+    image: localhost:18080/buy-02/eureka:${IMAGE_TAG}
 
     healthcheck:
       test:
@@ -33,8 +31,7 @@ services:
       retries: 20
 
   user:
-    image: buy-02/user-service:${IMAGE_TAG}
-    build: ./backend/user-service
+    image: localhost:18080/buy-02/user-service:${IMAGE_TAG}
 
     depends_on:
       eureka:
@@ -67,8 +64,7 @@ services:
       retries: 20
 
   product:
-    image: buy-02/product-service:${IMAGE_TAG}
-    build: ./backend/product-service
+    image: localhost:18080/buy-02/product-service:${IMAGE_TAG}
 
     depends_on:
       eureka:
@@ -96,8 +92,7 @@ services:
       retries: 20
 
   media:
-    image: buy-02/media-service:${IMAGE_TAG}
-    build: ./backend/media-service
+    image: localhost:18080/buy-02/media-service:${IMAGE_TAG}
 
     depends_on:
       eureka:
@@ -131,8 +126,7 @@ services:
       retries: 20
 
   audit:
-    image: buy-02/audit-service:${IMAGE_TAG}
-    build: ./backend/audit-service
+    image: localhost:18080/buy-02/audit-service:${IMAGE_TAG}
 
     depends_on:
       eureka:
@@ -162,8 +156,7 @@ services:
       retries: 20
 
   cart:
-    image: buy-02/cart-service:${IMAGE_TAG}
-    build: ./backend/cart-service
+    image: localhost:18080/buy-02/cart-service:${IMAGE_TAG}
 
     depends_on:
       eureka:
@@ -193,8 +186,7 @@ services:
       retries: 20
 
   order:
-    image: buy-02/order-service:${IMAGE_TAG}
-    build: ./backend/order-service
+    image: localhost:18080/buy-02/order-service:${IMAGE_TAG}
 
     depends_on:
       eureka:
@@ -224,8 +216,7 @@ services:
       retries: 20
 
   api-gateway:
-    image: buy-02/api-gateway:${IMAGE_TAG}
-    build: ./backend/api-gateway
+    image: localhost:18080/buy-02/api-gateway:${IMAGE_TAG}
 
     depends_on:
       product:

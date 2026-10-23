@@ -1,13 +1,19 @@
 services:
   nexus:
     image: sonatype/nexus3:latest
-    container_name: buy-02-nexus
+    container_name: nexus
     restart: unless-stopped
     ports:
       - "8081:8081"
       - "18080:18080"
     volumes:
       - nexus-data:/nexus-data
+    networks:
+      - ci-network
 
 volumes:
   nexus-data:
+
+networks:
+  ci-network:
+    external: true

@@ -28,9 +28,7 @@ def rollbackDeployment() {
     echo "Rolling back to ${previousVersion}..."
 
     sh """
-        export IMAGE_TAG=${previousVersion}
-
-        docker compose \
+        IMAGE_TAG='${previousVersion}' docker compose \
             -f docker-compose.jenkins.yml \
             up -d --no-build
     """
@@ -123,23 +121,67 @@ pipeline {
                     }
                 }
 
+                stage('Configure Nexus Maven') {
+                    steps {
+                        writeFile file: '.maven-settings.xml', text: '''\
+<settings>
+    <servers>
+        <server>
+            <id>nexus-maven</id>
+            <username>${env.NEXUS_USERNAME}</username>
+            <password>${env.NEXUS_PASSWORD}</password>
+        </server>
+        <server>
+            <id>nexus-snapshots</id>
+            <username>${env.NEXUS_USERNAME}</username>
+            <password>${env.NEXUS_PASSWORD}</password>
+        </server>
+    </servers>
+    <mirrors>
+        <mirror>
+            <id>nexus-maven</id>
+            <mirrorOf>*</mirrorOf>
+            <url>http://nexus:8081/repository/maven-public/</url>
+        </mirror>
+    </mirrors>
+</settings>
+'''
+                        stash name: 'maven-settings',
+              includes: '.maven-settings.xml'
+                    }
+                }
+
                 stage('Build') {
                     steps {
-                        script {
-                            def builds = [:]
+                        withCredentials([
+                                usernamePassword(
+                                    credentialsId: 'nexus-docker-credentials',
+                                    usernameVariable: 'NEXUS_USERNAME',
+                                    passwordVariable: 'NEXUS_PASSWORD'
+                                )
+                            ]) {
+                            script {
+                                def builds = [:]
 
-                            services.each { service ->
-                                def currentService = service
+                                services.each { service ->
+                                    def currentService = service
 
-                                builds[currentService] = {
-                                    dir("backend/${currentService}") {
-                                        sh './mvnw package -DskipTests'
+                                    builds[currentService] = {
+                                        dir("backend/${currentService}") {
+                                            unstash 'maven-settings'
+
+                                            sh '''
+                                            ./mvnw -B \
+                                                -s .maven-settings.xml \
+                                                package -DskipTests
+                                        '''
+                                        }
                                     }
                                 }
-                            }
 
-                            parallel builds
-                        }
+                                parallel builds
+                            }
+                            }
                     }
                 }
 
@@ -152,27 +194,75 @@ pipeline {
                     }
 
                     steps {
-                        script {
-                            def tests = [:]
+                        withCredentials([
+                                usernamePassword(
+                                    credentialsId: 'nexus-docker-credentials',
+                                    usernameVariable: 'NEXUS_USERNAME',
+                                    passwordVariable: 'NEXUS_PASSWORD'
+                                )
+                            ]) {
+                            script {
+                                def tests = [:]
 
-                            services.each { service ->
-                                def currentService = service
+                                services.each { service ->
+                                    def currentService = service
 
-                                tests[currentService] = {
-                                    dir("backend/${currentService}") {
-                                        sh './mvnw verify'
+                                    tests[currentService] = {
+                                        dir("backend/${currentService}") {
+                                            unstash 'maven-settings'
+
+                                            sh '''
+                                            ./mvnw -B \
+                                                -s .maven-settings.xml \
+                                                verify
+                                        '''
+                                        }
                                     }
                                 }
-                            }
 
-                            parallel tests
-                        }
+                                parallel tests
+                            }
+                            }
                     }
 
                     post {
                         always {
                             junit 'backend/**/target/surefire-reports/*.xml'
                         }
+                    }
+                }
+
+                stage('Publish Maven Artifacts') {
+                    steps {
+                        withCredentials([
+                                usernamePassword(
+                                    credentialsId: 'nexus-docker-credentials',
+                                    usernameVariable: 'NEXUS_USERNAME',
+                                    passwordVariable: 'NEXUS_PASSWORD'
+                                )
+                            ]) {
+                            script {
+                                def deployments = [:]
+
+                                services.each { service ->
+                                    def currentService = service
+
+                                    deployments[currentService] = {
+                                        dir("backend/${currentService}") {
+                                            unstash 'maven-settings'
+
+                                            sh '''
+                                ./mvnw -B \
+                                    -s .maven-settings.xml \
+                                    deploy -DskipTests
+                            '''
+                                        }
+                                    }
+                                }
+
+                                parallel deployments
+                            }
+        }
                     }
                 }
 
@@ -284,6 +374,92 @@ pipeline {
             }
         }
 
+        stage('Build & Push Docker Images') {
+            when {
+                allOf {
+                    expression { params.DEPLOY }
+                    not {
+                        triggeredBy 'TimerTrigger'
+                    }
+                }
+            }
+
+            agent {
+                label 'deployment'
+            }
+
+            steps {
+                deleteDir()
+                unstash 'source'
+
+                withCredentials([
+            usernamePassword(
+                credentialsId: 'nexus-docker-credentials',
+                usernameVariable: 'NEXUS_USERNAME',
+                passwordVariable: 'NEXUS_PASSWORD'
+            ),
+            file(
+                credentialsId: 'TLS_KEY',
+                variable: 'TLS_KEY'
+            ),
+            file(
+                credentialsId: 'TLS_CRT',
+                variable: 'TLS_CRT'
+            ),
+            file(
+                credentialsId: 'GATEWAY_KEYSTORE',
+                variable: 'KEYSTORE_FILE'
+            )
+        ]) {
+                    sh '''
+                set -eu
+
+                mkdir -p frontend/certs
+
+                cp "$TLS_KEY" frontend/certs/frontend.key
+                cp "$TLS_CRT" frontend/certs/frontend.crt
+
+                cp "$KEYSTORE_FILE" \
+                    backend/api-gateway/src/main/resources/gateway-keystore.p12
+
+                printf '%s' "$NEXUS_PASSWORD" |
+                    docker login localhost:18080 \
+                        --username "$NEXUS_USERNAME" \
+                        --password-stdin
+            '''
+
+                    script {
+                        services.each { service ->
+                            def image =
+                        "localhost:18080/buy-02/${service}:${IMAGE_TAG}"
+
+                            sh """
+                        set -eu
+                        docker build -t '${image}' 'backend/${service}'
+                        docker push '${image}'
+                    """
+                        }
+                    }
+
+                    sh """
+                set -eu
+                docker build \
+                    -t 'localhost:18080/buy-02/frontend:${IMAGE_TAG}' \
+                    ./frontend
+
+                docker push \
+                    'localhost:18080/buy-02/frontend:${IMAGE_TAG}'
+            """
+        }
+            }
+
+            post {
+                always {
+                    sh 'docker logout localhost:18080 || true'
+                }
+            }
+        }
+
         stage('Deploy') {
             when {
                 allOf {
@@ -333,9 +509,9 @@ pipeline {
                         cp "$KEYSTORE_FILE" \
                             backend/api-gateway/src/main/resources/gateway-keystore.p12
 
-                        docker compose \
-                            -f docker-compose.jenkins.yml \
-                            up -d --build
+                    docker compose \
+                        -f docker-compose.jenkins.yml \
+                        up -d --no-build
                     '''
                 }
             }
@@ -362,7 +538,7 @@ pipeline {
                 script {
                     retry(6) {
                         sh '''
-                            for container in $(docker compose ps -q); do
+                            for container in $(docker compose -f docker-compose.jenkins.yml ps -q); do
                                 name=$(docker inspect --format='{{.Name}}' "$container")
 
                                 health=$(docker inspect \

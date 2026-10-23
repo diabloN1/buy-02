@@ -460,16 +460,12 @@ pipeline {
             }
         }
 
+
         stage('Deploy') {
             when {
                 allOf {
-                    expression {
-                        params.DEPLOY
-                    }
-
-                    not {
-                        triggeredBy 'TimerTrigger'
-                    }
+                    expression { params.DEPLOY }
+                    not { triggeredBy 'TimerTrigger' }
                 }
             }
 
@@ -482,40 +478,56 @@ pipeline {
                 unstash 'source'
 
                 withCredentials([
-                    file(
-                        credentialsId: 'TLS_KEY',
-                        variable: 'TLS_KEY'
-                    ),
-                    file(
-                        credentialsId: 'TLS_CRT',
-                        variable: 'TLS_CRT'
-                    ),
-                    file(
-                        credentialsId: 'GATEWAY_KEYSTORE',
-                        variable: 'KEYSTORE_FILE'
-                    )
+                    string(credentialsId: 'JWT_SECRET',
+                        variable: 'JWT_SECRET'),
+                    string(credentialsId: 'GATEWAY_KEYSTORE_PASSWORD',
+                        variable: 'GATEWAY_KEYSTORE_PASSWORD'),
+                    string(credentialsId: 'MINIO_ROOT_USER',
+                        variable: 'MINIO_ROOT_USER'),
+                    string(credentialsId: 'MINIO_ROOT_PASSWORD',
+                        variable: 'MINIO_ROOT_PASSWORD'),
+                    string(credentialsId: 'MONGO_ROOT_USERNAME',
+                        variable: 'MONGO_ROOT_USERNAME'),
+                    string(credentialsId: 'MONGO_ROOT_PASSWORD',
+                        variable: 'MONGO_ROOT_PASSWORD'),
+                    string(credentialsId: 'ADMIN_NAME',
+                        variable: 'ADMIN_NAME'),
+                    string(credentialsId: 'ADMIN_EMAIL',
+                        variable: 'ADMIN_EMAIL'),
+                    string(credentialsId: 'ADMIN_PASSWORD',
+                        variable: 'ADMIN_PASSWORD'),
+                    file(credentialsId: 'TLS_KEY',
+                        variable: 'TLS_KEY'),
+                    file(credentialsId: 'TLS_CRT',
+                        variable: 'TLS_CRT'),
+                    file(credentialsId: 'GATEWAY_KEYSTORE',
+                        variable: 'KEYSTORE_FILE')
                 ]) {
                     sh '''
-                        rm -f \
-                            frontend/certs/frontend.key \
-                            frontend/certs/frontend.crt \
-                            backend/api-gateway/src/main/resources/gateway-keystore.p12
+                        set -eu
 
                         mkdir -p frontend/certs
+                        mkdir -p backend/api-gateway/src/main/resources
 
                         cp "$TLS_KEY" frontend/certs/frontend.key
                         cp "$TLS_CRT" frontend/certs/frontend.crt
-
                         cp "$KEYSTORE_FILE" \
                             backend/api-gateway/src/main/resources/gateway-keystore.p12
 
-                    docker compose \
-                        -f docker-compose.jenkins.yml \
-                        up -d --no-build
+                        export IMAGE_TAG="${IMAGE_TAG}"
+
+                        docker compose \
+                            -f docker-compose.jenkins.yml \
+                            config --quiet
+
+                        docker compose \
+                            -f docker-compose.jenkins.yml \
+                            up -d --no-build
                     '''
                 }
             }
         }
+
 
         stage('Deployment Verification') {
             when {

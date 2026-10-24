@@ -477,6 +477,36 @@ pipeline {
                 unstash 'source'
 
                 withCredentials([
+            usernamePassword(
+                credentialsId: 'nexus-docker-credentials',
+                usernameVariable: 'NEXUS_USERNAME',
+                passwordVariable: 'NEXUS_PASSWORD'
+            )
+        ]) {
+                    sh '''
+                set -eu
+
+                export IMAGE_TAG="${IMAGE_TAG}"
+
+                trap 'docker logout localhost:18080 >/dev/null 2>&1 || true' EXIT
+
+                printf '%s' "$NEXUS_PASSWORD" |
+                    docker login localhost:18080 \
+                        --username "$NEXUS_USERNAME" \
+                        --password-stdin
+
+                docker compose \
+                    -f docker-compose.jenkins.yml \
+                    config --quiet
+
+                docker compose \
+                    -f docker-compose.jenkins.yml \
+                    pull \
+                    frontend eureka user product media audit cart order api-gateway
+            '''
+        }
+
+                withCredentials([
                     string(credentialsId: 'JWT_SECRET',
                         variable: 'JWT_SECRET'),
                     string(credentialsId: 'GATEWAY_KEYSTORE_PASSWORD',
@@ -501,29 +531,32 @@ pipeline {
                         variable: 'TLS_CRT'),
                     file(credentialsId: 'GATEWAY_KEYSTORE',
                         variable: 'KEYSTORE_FILE')
-                ]) {
+        ]) {
                     sh '''
-                        set -eu
+                set -eu
 
-                        mkdir -p frontend/certs
-                        mkdir -p backend/api-gateway/src/main/resources
+                export IMAGE_TAG="${IMAGE_TAG}"
 
-                        cp "$TLS_KEY" frontend/certs/frontend.key
-                        cp "$TLS_CRT" frontend/certs/frontend.crt
-                        cp "$KEYSTORE_FILE" \
-                            backend/api-gateway/src/main/resources/gateway-keystore.p12
+                install -d -m 700 frontend/certs
+                install -d -m 700 \
+                    backend/api-gateway/src/main/resources
 
-                        export IMAGE_TAG="${IMAGE_TAG}"
+                install -m 600 "$TLS_KEY" \
+                    frontend/certs/frontend.key
+                install -m 644 "$TLS_CRT" \
+                    frontend/certs/frontend.crt
+                install -m 600 "$KEYSTORE_FILE" \
+                    backend/api-gateway/src/main/resources/gateway-keystore.p12
 
-                        docker compose \
-                            -f docker-compose.jenkins.yml \
-                            config --quiet
+                docker compose \
+                    -f docker-compose.jenkins.yml \
+                    config --quiet
 
-                        docker compose \
-                            -f docker-compose.jenkins.yml \
-                            up -d --no-build
-                    '''
-                }
+                docker compose \
+                    -f docker-compose.jenkins.yml \
+                    up -d --no-build
+            '''
+        }
             }
         }
 

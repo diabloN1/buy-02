@@ -122,7 +122,6 @@ pipeline {
                 }
 
                 stage('Diagnose Nexus Connectivity') {
-                    agent { label 'backend' }
                     steps {
                         sh '''
                             echo "=== Agent identity ==="

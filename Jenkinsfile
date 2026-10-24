@@ -680,17 +680,9 @@ pipeline {
 
             steps {
                 script {
-                    retry(6) {
-                        try {
-                            dir('e2e') {
-                                sh 'npm ci'
-                                sh 'npx playwright test'
-                            }
-                        } catch (Exception e) {
-                            echo 'E2E verification failed. Waiting 15 seconds before retrying...'
-                            sleep(time: 10, unit: 'SECONDS')
-                            throw e
-                        }
+                    dir('e2e') {
+                        sh 'npm ci'
+                        sh 'npx playwright test'
                     }
                 }
             }

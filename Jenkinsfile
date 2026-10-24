@@ -145,31 +145,49 @@ pipeline {
 
                 stage('Configure Nexus Maven') {
                     steps {
-                        writeFile file: '.maven-settings.xml', text: '''\
-<settings>
-    <servers>
-        <server>
-            <id>nexus-maven</id>
-            <username>${env.NEXUS_USERNAME}</username>
-            <password>${env.NEXUS_PASSWORD}</password>
-        </server>
-        <server>
-            <id>nexus-snapshots</id>
-            <username>${env.NEXUS_USERNAME}</username>
-            <password>${env.NEXUS_PASSWORD}</password>
-        </server>
-    </servers>
-    <mirrors>
-        <mirror>
-            <id>nexus-maven</id>
-            <mirrorOf>*</mirrorOf>
-            <url>http://localhost:8081/repository/maven-public/</url>
-        </mirror>
-    </mirrors>
-</settings>
-'''
-                        stash name: 'maven-settings',
-              includes: '.maven-settings.xml'
+                        withCredentials([
+                           usernamePassword(
+                                credentialsId: 'nexus-docker-credentials',
+                                usernameVariable: 'NEXUS_USERNAME',
+                                passwordVariable: 'NEXUS_PASSWORD'
+                            )
+                        ]) {
+                            sh '''
+                                set +x
+                                cat > .maven-settings.xml <<EOF
+                <settings>
+                    <servers>
+                        <server>
+                            <id>nexus-maven</id>
+                            <username>${NEXUS_USERNAME}</username>
+                            <password>${NEXUS_PASSWORD}</password>
+                        </server>
+                        <server>
+                            <id>nexus-snapshots</id>
+                            <username>${NEXUS_USERNAME}</username>
+                            <password>${NEXUS_PASSWORD}</password>
+                        </server>
+                        <server>
+                            <id>nexus-releases</id>
+                            <username>${NEXUS_USERNAME}</username>
+                            <password>${NEXUS_PASSWORD}</password>
+                        </server>
+                    </servers>
+                    <mirrors>
+                        <mirror>
+                            <id>nexus-maven</id>
+                            <mirrorOf>*</mirrorOf>
+                            <url>http://localhost:8081/repository/maven-public/</url>
+                        </mirror>
+                    </mirrors>
+                </settings>
+                EOF
+            '''
+                            stash(
+                name: 'maven-settings',
+                includes: '.maven-settings.xml'
+            )
+        }
                     }
                 }
 

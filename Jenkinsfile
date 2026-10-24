@@ -121,6 +121,29 @@ pipeline {
                     }
                 }
 
+                stage('Diagnose Nexus Connectivity') {
+                    agent { label 'backend' }
+                    steps {
+                        sh '''
+                            echo "=== Agent identity ==="
+                            hostname
+                            id
+
+                            echo "=== Nexus DNS ==="
+                            getent hosts nexus || true
+
+                            echo "=== Nexus endpoints ==="
+                            curl -sS -o /dev/null -w "nexus:8081 -> HTTP %{http_code}\\n" \
+                                --connect-timeout 5 \
+                                http://nexus:8081/service/rest/v1/status || true
+
+                            curl -sS -o /dev/null -w "localhost:8081 -> HTTP %{http_code}\\n" \
+                                --connect-timeout 5 \
+                                http://localhost:8081/service/rest/v1/status || true
+                        '''
+                    }
+                }
+
                 stage('Configure Nexus Maven') {
                     steps {
                         writeFile file: '.maven-settings.xml', text: '''\

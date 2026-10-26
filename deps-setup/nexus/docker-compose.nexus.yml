@@ -1,0 +1,32 @@
+services:
+  nexus:
+    image: sonatype/nexus3:latest
+    container_name: nexus
+    restart: unless-stopped
+
+    # Limit total container memory
+    mem_limit: 2500m
+
+    # Limit Java memory usage
+    environment:
+      INSTALL4J_ADD_VM_PARAMS: >-
+        -Xms512m
+        -Xmx1g
+        -XX:MaxDirectMemorySize=512m
+
+    ports:
+      - "8081:8081"
+      - "18080:18080"
+
+    volumes:
+      - nexus-data:/nexus-data
+
+    networks:
+      - ci-network
+
+volumes:
+  nexus-data:
+
+networks:
+  ci-network:
+    external: true

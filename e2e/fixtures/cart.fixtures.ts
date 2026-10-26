@@ -6,7 +6,6 @@ type CartFixtures = {
 };
 
 export const test = base.extend<CartFixtures>({
-
   productPage: async ({ userPage, seededProducts }, use) => {
     await userPage.goto("/products");
 
@@ -21,10 +20,9 @@ export const test = base.extend<CartFixtures>({
     await use(userPage);
   },
 
-
   cartWithItem: async ({ productPage }, use) => {
-    const addToCartBtn = productPage.getByText("add_shopping_cart Add to cart");
-    const inCartIndicator = productPage.getByText("already in cart");
+    const addToCartBtn = productPage.getByText("Add to cart");
+    const inCartIndicator = productPage.getByText("View Cart");
 
     let inCart = false;
     const deadline = Date.now() + 10_000;
@@ -45,7 +43,7 @@ export const test = base.extend<CartFixtures>({
     if (!inCart) {
       await addToCartBtn.click();
       await expect(
-        productPage.getByText("Product added! go to cart for"),
+        productPage.getByText("Product added! go to cart for checkout"),
       ).toBeVisible({ timeout: 10_000 });
     }
 

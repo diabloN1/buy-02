@@ -1,118 +1,116 @@
-<testsuites id="" name="" tests="49" failures="0" skipped="0" errors="0" time="51.987901">
-<testsuite name="404.spec.ts" timestamp="2026-10-18T23:48:16.577Z" hostname="chromium" tests="4" failures="0" skipped="0" time="3.394" errors="0">
-<testcase name="404 Not Found › should show 404 page for unknown route" classname="404.spec.ts" time="0.914">
+<testsuites id="" name="" tests="48" failures="0" skipped="0" errors="0" time="61.715631">
+<testsuite name="404.spec.ts" timestamp="2026-10-26T14:08:29.112Z" hostname="chromium" tests="3" failures="0" skipped="0" time="3.092" errors="0">
+<testcase name="404 Not Found › should show 404 page for unknown route" classname="404.spec.ts" time="1.08">
 </testcase>
-<testcase name="404 Not Found › should have link back to home/products from 404" classname="404.spec.ts" time="0.818">
+<testcase name="404 Not Found › should have link back to home/products from 404" classname="404.spec.ts" time="1.033">
 </testcase>
-<testcase name="404 Not Found › should show 404 for non-existent product" classname="404.spec.ts" time="0.816">
-</testcase>
-<testcase name="404 Not Found › should show 404 for non-existent order" classname="404.spec.ts" time="0.846">
+<testcase name="404 Not Found › should show 404 for non-existent order" classname="404.spec.ts" time="0.979">
 </testcase>
 </testsuite>
-<testsuite name="auth.spec.ts" timestamp="2026-10-18T23:48:16.577Z" hostname="chromium" tests="3" failures="0" skipped="0" time="3.291" errors="0">
-<testcase name="Authentication › should allow user registration" classname="auth.spec.ts" time="1.349">
+<testsuite name="auth.spec.ts" timestamp="2026-10-26T14:08:29.112Z" hostname="chromium" tests="3" failures="0" skipped="0" time="4.072" errors="0">
+<testcase name="Authentication › should allow user registration" classname="auth.spec.ts" time="1.742">
 </testcase>
-<testcase name="Authentication › should allow login with valid credentials" classname="auth.spec.ts" time="0.975">
+<testcase name="Authentication › should allow login with valid credentials" classname="auth.spec.ts" time="1.273">
 </testcase>
-<testcase name="Authentication › should show error for invalid login" classname="auth.spec.ts" time="0.967">
-</testcase>
-</testsuite>
-<testsuite name="cart.spec.ts" timestamp="2026-10-18T23:48:16.577Z" hostname="chromium" tests="6" failures="0" skipped="0" time="5.337" errors="0">
-<testcase name="Shopping Cart › should add product to cart from product page" classname="cart.spec.ts" time="1.043">
-</testcase>
-<testcase name="Shopping Cart › should show cart page with items" classname="cart.spec.ts" time="0.765">
-</testcase>
-<testcase name="Shopping Cart › should update item quantity in cart" classname="cart.spec.ts" time="1.043">
-</testcase>
-<testcase name="Shopping Cart › should remove item from cart" classname="cart.spec.ts" time="0.912">
-</testcase>
-<testcase name="Shopping Cart › should clear entire cart" classname="cart.spec.ts" time="0.756">
-</testcase>
-<testcase name="Shopping Cart › should show empty cart state when no items" classname="cart.spec.ts" time="0.818">
+<testcase name="Authentication › should show error for invalid login" classname="auth.spec.ts" time="1.057">
 </testcase>
 </testsuite>
-<testsuite name="checkout.spec.ts" timestamp="2026-10-18T23:48:16.577Z" hostname="chromium" tests="4" failures="0" skipped="0" time="6.46" errors="0">
-<testcase name="Checkout - Pay on Delivery › should complete checkout with pay on delivery" classname="checkout.spec.ts" time="2.423">
+<testsuite name="cart.spec.ts" timestamp="2026-10-26T14:08:29.112Z" hostname="chromium" tests="6" failures="0" skipped="0" time="6.936" errors="0">
+<testcase name="Shopping Cart › should add product to cart from product page" classname="cart.spec.ts" time="1.215">
 </testcase>
-<testcase name="Checkout - Pay on Delivery › should navigate back between steps" classname="checkout.spec.ts" time="1.595">
+<testcase name="Shopping Cart › should show cart page with items" classname="cart.spec.ts" time="1.03">
 </testcase>
-<testcase name="Checkout - Pay on Delivery › should show back to cart from checkout" classname="checkout.spec.ts" time="1.399">
+<testcase name="Shopping Cart › should update item quantity in cart" classname="cart.spec.ts" time="1.591">
 </testcase>
-<testcase name="Checkout - Pay on Delivery › should show empty cart state at checkout" classname="checkout.spec.ts" time="1.043">
+<testcase name="Shopping Cart › should remove item from cart" classname="cart.spec.ts" time="1.016">
 </testcase>
-</testsuite>
-<testsuite name="orders-seller.spec.ts" timestamp="2026-10-18T23:48:16.577Z" hostname="chromium" tests="7" failures="0" skipped="0" time="5.531" errors="0">
-<testcase name="Orders (Seller) › should show seller orders page" classname="orders-seller.spec.ts" time="0.815">
+<testcase name="Shopping Cart › should clear entire cart" classname="cart.spec.ts" time="0.99">
 </testcase>
-<testcase name="Orders (Seller) › should list seller orders with actions" classname="orders-seller.spec.ts" time="0.759">
-</testcase>
-<testcase name="Orders (Seller) › should update suborder status" classname="orders-seller.spec.ts" time="0.756">
-</testcase>
-<testcase name="Orders (Seller) › should view order details from seller perspective" classname="orders-seller.spec.ts" time="0.811">
-</testcase>
-<testcase name="Orders (Seller) › should show seller order status timeline" classname="orders-seller.spec.ts" time="0.813">
-</testcase>
-<testcase name="Orders (Seller) › should allow delete suborder when enabled" classname="orders-seller.spec.ts" time="0.757">
-</testcase>
-<testcase name="Orders (Seller) › should show order status timeline with available transitions" classname="orders-seller.spec.ts" time="0.82">
+<testcase name="Shopping Cart › should show empty cart state when no items" classname="cart.spec.ts" time="1.094">
 </testcase>
 </testsuite>
-<testsuite name="orders.spec.ts" timestamp="2026-10-18T23:48:16.577Z" hostname="chromium" tests="8" failures="0" skipped="0" time="6.28" errors="0">
-<testcase name="Orders (Buyer) › should show orders page" classname="orders.spec.ts" time="0.798">
+<testsuite name="checkout.spec.ts" timestamp="2026-10-26T14:08:29.112Z" hostname="chromium" tests="4" failures="0" skipped="0" time="7.37" errors="0">
+<testcase name="Checkout - Pay on Delivery › should complete checkout with pay on delivery" classname="checkout.spec.ts" time="2.669">
 </testcase>
-<testcase name="Orders (Buyer) › should show empty state when no orders" classname="orders.spec.ts" time="0.762">
+<testcase name="Checkout - Pay on Delivery › should navigate back between steps" classname="checkout.spec.ts" time="1.77">
 </testcase>
-<testcase name="Orders (Buyer) › should navigate to order details from order list" classname="orders.spec.ts" time="0.788">
+<testcase name="Checkout - Pay on Delivery › should show back to cart from checkout" classname="checkout.spec.ts" time="1.709">
 </testcase>
-<testcase name="Orders (Buyer) › should show order details page" classname="orders.spec.ts" time="0.733">
-</testcase>
-<testcase name="Orders (Buyer) › should allow redo order (buyer)" classname="orders.spec.ts" time="0.777">
-</testcase>
-<testcase name="Orders (Buyer) › should allow cancel order when pending" classname="orders.spec.ts" time="0.78">
-</testcase>
-<testcase name="Orders (Buyer) › should show order status chips with correct colors" classname="orders.spec.ts" time="0.772">
-</testcase>
-<testcase name="Orders (Buyer) › should paginate orders list" classname="orders.spec.ts" time="0.87">
+<testcase name="Checkout - Pay on Delivery › should show empty cart state at checkout" classname="checkout.spec.ts" time="1.222">
 </testcase>
 </testsuite>
-<testsuite name="product-details.spec.ts" timestamp="2026-10-18T23:48:16.577Z" hostname="chromium" tests="4" failures="0" skipped="0" time="4.038" errors="0">
-<testcase name="Product Details › should display product details correctly" classname="product-details.spec.ts" time="1.012">
+<testsuite name="orders-seller.spec.ts" timestamp="2026-10-26T14:08:29.112Z" hostname="chromium" tests="7" failures="0" skipped="0" time="6.992" errors="0">
+<testcase name="Orders (Seller) › should show seller orders page" classname="orders-seller.spec.ts" time="1.015">
 </testcase>
-<testcase name="Product Details › should have back to products link" classname="product-details.spec.ts" time="1.055">
+<testcase name="Orders (Seller) › should list seller orders with actions" classname="orders-seller.spec.ts" time="0.971">
 </testcase>
-<testcase name="Product Details › show 404 for non-existent product" classname="product-details.spec.ts" time="0.961">
+<testcase name="Orders (Seller) › should update suborder status" classname="orders-seller.spec.ts" time="1.022">
 </testcase>
-<testcase name="Product Details › should display inventory status correctly" classname="product-details.spec.ts" time="1.01">
+<testcase name="Orders (Seller) › should view order details from seller perspective" classname="orders-seller.spec.ts" time="0.977">
 </testcase>
-</testsuite>
-<testsuite name="products.spec.ts" timestamp="2026-10-18T23:48:16.577Z" hostname="chromium" tests="7" failures="0" skipped="0" time="7.522" errors="0">
-<testcase name="Products › home page loads with featured products" classname="products.spec.ts" time="0.791">
+<testcase name="Orders (Seller) › should show seller order status timeline" classname="orders-seller.spec.ts" time="1.005">
 </testcase>
-<testcase name="Products › should navigate to products page and show catalog" classname="products.spec.ts" time="0.779">
+<testcase name="Orders (Seller) › should allow delete suborder when enabled" classname="orders-seller.spec.ts" time="0.973">
 </testcase>
-<testcase name="Products › should search products by keyword" classname="products.spec.ts" time="1.377">
-</testcase>
-<testcase name="Products › should clear search when clicking close button" classname="products.spec.ts" time="1.408">
-</testcase>
-<testcase name="Products › should navigate to product details on card click" classname="products.spec.ts" time="0.985">
-</testcase>
-<testcase name="Products › should paginate product list" classname="products.spec.ts" time="0.809">
-</testcase>
-<testcase name="Products › should show empty state when no results" classname="products.spec.ts" time="1.373">
+<testcase name="Orders (Seller) › should show order status timeline with available transitions" classname="orders-seller.spec.ts" time="1.029">
 </testcase>
 </testsuite>
-<testsuite name="profile.spec.ts" timestamp="2026-10-18T23:48:16.577Z" hostname="chromium" tests="6" failures="0" skipped="0" time="8.2" errors="0">
-<testcase name="Profile &amp; Analytics › should show user profile page" classname="profile.spec.ts" time="0.891">
+<testsuite name="orders.spec.ts" timestamp="2026-10-26T14:08:29.112Z" hostname="chromium" tests="8" failures="0" skipped="0" time="8.033" errors="0">
+<testcase name="Orders (Buyer) › should show orders page" classname="orders.spec.ts" time="0.969">
 </testcase>
-<testcase name="Profile &amp; Analytics › should allow updating profile name and email" classname="profile.spec.ts" time="0.954">
+<testcase name="Orders (Buyer) › should show empty state when no orders" classname="orders.spec.ts" time="1.011">
 </testcase>
-<testcase name="Profile &amp; Analytics › should show analytics toggle button" classname="profile.spec.ts" time="0.776">
+<testcase name="Orders (Buyer) › should navigate to order details from order list" classname="orders.spec.ts" time="0.995">
 </testcase>
-<testcase name="Profile &amp; Analytics › should load and display analytics" classname="profile.spec.ts" time="1.839">
+<testcase name="Orders (Buyer) › should show order details page" classname="orders.spec.ts" time="1.029">
 </testcase>
-<testcase name="Profile &amp; Analytics › should display show analytics button" classname="profile.spec.ts" time="1.867">
+<testcase name="Orders (Buyer) › should allow redo order (buyer)" classname="orders.spec.ts" time="1.049">
 </testcase>
-<testcase name="Profile &amp; Analytics › should show seller analytics for seller role" classname="profile.spec.ts" time="1.873">
+<testcase name="Orders (Buyer) › should allow cancel order when pending" classname="orders.spec.ts" time="1.021">
+</testcase>
+<testcase name="Orders (Buyer) › should show order status chips with correct colors" classname="orders.spec.ts" time="0.992">
+</testcase>
+<testcase name="Orders (Buyer) › should paginate orders list" classname="orders.spec.ts" time="0.967">
+</testcase>
+</testsuite>
+<testsuite name="product-details.spec.ts" timestamp="2026-10-26T14:08:29.112Z" hostname="chromium" tests="4" failures="0" skipped="0" time="5.121" errors="0">
+<testcase name="Product Details › should display product details correctly" classname="product-details.spec.ts" time="1.325">
+</testcase>
+<testcase name="Product Details › should have back to products link" classname="product-details.spec.ts" time="1.312">
+</testcase>
+<testcase name="Product Details › show 404 for non-existent product" classname="product-details.spec.ts" time="1.207">
+</testcase>
+<testcase name="Product Details › should display inventory status correctly" classname="product-details.spec.ts" time="1.277">
+</testcase>
+</testsuite>
+<testsuite name="products.spec.ts" timestamp="2026-10-26T14:08:29.112Z" hostname="chromium" tests="7" failures="0" skipped="0" time="8.778" errors="0">
+<testcase name="Products › home page loads with featured products" classname="products.spec.ts" time="0.987">
+</testcase>
+<testcase name="Products › should navigate to products page and show catalog" classname="products.spec.ts" time="1.071">
+</testcase>
+<testcase name="Products › should search products by keyword" classname="products.spec.ts" time="1.566">
+</testcase>
+<testcase name="Products › should clear search when clicking close button" classname="products.spec.ts" time="1.53">
+</testcase>
+<testcase name="Products › should navigate to product details on card click" classname="products.spec.ts" time="1.09">
+</testcase>
+<testcase name="Products › should paginate product list" classname="products.spec.ts" time="1.026">
+</testcase>
+<testcase name="Products › should show empty state when no results" classname="products.spec.ts" time="1.508">
+</testcase>
+</testsuite>
+<testsuite name="profile.spec.ts" timestamp="2026-10-26T14:08:29.112Z" hostname="chromium" tests="6" failures="0" skipped="0" time="9.172" errors="0">
+<testcase name="Profile &amp; Analytics › should show user profile page" classname="profile.spec.ts" time="1.001">
+</testcase>
+<testcase name="Profile &amp; Analytics › should allow updating profile name and email" classname="profile.spec.ts" time="1.114">
+</testcase>
+<testcase name="Profile &amp; Analytics › should View Insights toggle button" classname="profile.spec.ts" time="0.992">
+</testcase>
+<testcase name="Profile &amp; Analytics › should load and display analytics" classname="profile.spec.ts" time="2.027">
+</testcase>
+<testcase name="Profile &amp; Analytics › should display View Insights button" classname="profile.spec.ts" time="2.011">
+</testcase>
+<testcase name="Profile &amp; Analytics › should show seller analytics for seller role" classname="profile.spec.ts" time="2.027">
 </testcase>
 </testsuite>
 </testsuites>

@@ -2,12 +2,13 @@ import { test, expect } from "../fixtures/cart.fixtures";
 
 test.describe("Shopping Cart", () => {
   test("should add product to cart from product page", async ({
-    productPage
+    productPage,
   }) => {
+    productPage.getByText("Add to Cart").click();
 
-    productPage.getByText("add_shopping_cart Add to cart").click();
-
-    await expect(productPage.getByText("Product added! go to cart for")).toBeVisible({ timeout: 5_000 });
+    await expect(
+      productPage.getByText("Product added! go to cart for checkout"),
+    ).toBeVisible({ timeout: 5_000 });
   });
 
   test("should show cart page with items", async ({ userPage }) => {
@@ -25,7 +26,6 @@ test.describe("Shopping Cart", () => {
   });
 
   test("should update item quantity in cart", async ({ cartWithItem }) => {
-
     const firstItem = cartWithItem.locator("app-cart-item").first();
 
     const initialQuantity = await firstItem

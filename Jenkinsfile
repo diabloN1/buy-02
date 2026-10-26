@@ -664,38 +664,41 @@ pipeline {
         stage('e2e Verification') {
             when {
                 allOf {
-                    expression {
-                        params.DEPLOY
-                    }
-
-                    not {
-                        triggeredBy 'TimerTrigger'
-                    }
+                    expression { params.DEPLOY }
+                    not { triggeredBy 'TimerTrigger' }
                 }
             }
-
             agent {
                 label 'deployment'
             }
-
             steps {
                 script {
-                    sh 'timeout 60 bash -c "until curl -k -s https://localhost:8080/api/categories > /dev/null; do sleep 2; done"'
+                    echo 'Waiting for Auth API to become fully ready...'
+                    sh '''
+                # Loop until the auth endpoint responds with a 400 or 200 (not 401/403/502/down)
+                # Sending an empty POST to login returns 400 Bad Request when the security filter is ready
+                timeout 60 bash -c '
+                    until [ "$(curl -k -s -o /dev/null -w "%{http_code}" -X POST https://localhost:8080/api/users/auth/login -H "Content-Type: application/json" -d "{}")" = "400" ]; do
+                        echo "Auth service not ready yet (security context loading), waiting 3s..."
+                        sleep 3
+                    done
+                '
+                echo "Auth service is ready!"
+            '''
+
                     dir('e2e') {
                         sh 'npm ci'
                         sh 'npx playwright test'
                     }
                 }
             }
-
             post {
                 always {
                     junit(testResults: 'e2e/test-reports/playwright-results.xml')
                 }
-
                 failure {
                     script {
-                        echo 'E2E tests failed after 5 attempts.'
+                        echo 'E2E tests failed.'
                         rollbackDeployment()
                     }
                 }

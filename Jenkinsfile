@@ -680,6 +680,7 @@ pipeline {
 
             steps {
                 script {
+                    sh 'timeout 60 bash -c "until curl -k -s https://localhost:8080/api/categories > /dev/null; do sleep 2; done"'
                     dir('e2e') {
                         sh 'npm ci'
                         sh 'npx playwright test'

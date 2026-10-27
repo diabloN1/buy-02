@@ -2,6 +2,8 @@
 **/docker.log
 **/.env
 **/*.p12
+**/*.crt
+**/*.key
 docs/
 generateCerts.sh
 frontend/coverage

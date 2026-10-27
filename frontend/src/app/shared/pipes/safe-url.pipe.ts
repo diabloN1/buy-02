@@ -6,6 +6,11 @@ export class SafeUrlPipe implements PipeTransform {
   private readonly sanitizer = inject(DomSanitizer);
   transform(url: string | null | undefined): SafeUrl | string {
     if (!url) return '';
-    return this.sanitizer.bypassSecurityTrustUrl(url);
+
+    // Used when communicating to none certified backend
+    // if (url.startsWith('http://')) return this.sanitizer.bypassSecurityTrustUrl(url); 
+    
+    return url;
+    
   }
 }

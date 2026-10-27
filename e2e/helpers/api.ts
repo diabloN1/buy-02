@@ -44,16 +44,18 @@ class ApiHelper {
 
     const body = await response.json();
 
+    expect(
+      response.ok(),
+      `Registration failed (${response.status()}): ${body.message || response.statusText()}`,
+    ).toBe(true);
+
     return body;
   }
 
   async loginUser(email: string, password: string) {
-    const response = await this.context.post(
-      `${API_BASE}/users/auth/login`,
-      {
-        data: { email, password },
-      },
-    );
+    const response = await this.context.post(`${API_BASE}/users/auth/login`, {
+      data: { email, password },
+    });
 
     const body = await response.json();
 

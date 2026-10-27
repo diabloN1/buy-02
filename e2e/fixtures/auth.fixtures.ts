@@ -138,7 +138,12 @@ async function authenticate(
   let auth = await api.registerUser(name, email, password, role);
 
   if (!auth.accessToken) {
-    console.warn("Couldn't register user and got response: ", auth);
+    console.error("Registration returned no access token:", {
+      role,
+      email,
+      response: auth,
+    });
+
     auth = await api.loginUser(email, password);
   }
 

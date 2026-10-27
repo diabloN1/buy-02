@@ -335,11 +335,7 @@ pipeline {
 
                         docker compose \
                         -f docker-compose.jenkins.yml \
-                        up -d --build
-
-                        docker compose \
-                        -f docker-compose.jenkins.yml \
-                        logs -f > jenkins.log 2>&1 &
+                        up --build
                     '''
                 }
             }

@@ -334,8 +334,12 @@ pipeline {
                             backend/api-gateway/src/main/resources/gateway-keystore.p12
 
                         podman compose \
-                            -f docker-compose.jenkins.yml \
-                            up -d --build
+                        -f docker-compose.jenkins.yml \
+                        up -d --build
+
+                        podman compose \
+                        -f docker-compose.jenkins.yml \
+                        logs -f > jenkins.log 2>&1 &
                     '''
                 }
             }

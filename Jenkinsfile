@@ -30,7 +30,7 @@ def rollbackDeployment() {
     sh """
         export IMAGE_TAG=${previousVersion}
 
-        podman compose \
+        docker compose \
             -f docker-compose.jenkins.yml \
             up -d --no-build
     """
@@ -333,11 +333,11 @@ pipeline {
                         cp "$KEYSTORE_FILE" \
                             backend/api-gateway/src/main/resources/gateway-keystore.p12
 
-                        podman compose \
+                        docker compose \
                         -f docker-compose.jenkins.yml \
                         up -d --build
 
-                        podman compose \
+                        docker compose \
                         -f docker-compose.jenkins.yml \
                         logs -f > jenkins.log 2>&1 &
                     '''
@@ -366,10 +366,10 @@ pipeline {
                 script {
                     retry(6) {
                         sh '''
-                            for container in $(podman compose ps -q); do
-                                name=$(podman inspect --format='{{.Name}}' "$container")
+                            for container in $(docker compose ps -q); do
+                                name=$(docker inspect --format='{{.Name}}' "$container")
 
-                                health=$(podman inspect \
+                                health=$(docker inspect \
                                     --format='{{if .State.Health}}{{.State.Health.Status}}{{end}}' \
                                     "$container")
 

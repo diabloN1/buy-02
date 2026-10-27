@@ -423,6 +423,7 @@ pipeline {
                         try {
                             dir('e2e') {
                                 sh 'npm ci'
+                                sh 'npx playwright install'
                                 sh 'npx playwright test'
                             }
                         } catch (Exception e) {

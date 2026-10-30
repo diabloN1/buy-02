@@ -319,24 +319,25 @@ pipeline {
                         variable: 'KEYSTORE_FILE'
                     )
                 ]) {
-                    sh '''
-                        rm -f \
-                            frontend/certs/frontend.key \
-                            frontend/certs/frontend.crt \
-                            backend/api-gateway/src/main/resources/gateway-keystore.p12
+                    withEnv(['JENKINS_NODE_COOKIE=dontKillMe']) {
+                        sh '''
+                            rm -f \
+                                frontend/certs/frontend.key \
+                                frontend/certs/frontend.crt \
+                                backend/api-gateway/src/main/resources/gateway-keystore.p12
 
-                        mkdir -p frontend/certs
+                            mkdir -p frontend/certs
 
-                        cp "$TLS_KEY" frontend/certs/frontend.key
-                        cp "$TLS_CRT" frontend/certs/frontend.crt
+                            cp "$TLS_KEY" frontend/certs/frontend.key
+                            cp "$TLS_CRT" frontend/certs/frontend.crt
 
-                        cp "$KEYSTORE_FILE" \
-                            backend/api-gateway/src/main/resources/gateway-keystore.p12
+                            cp "$KEYSTORE_FILE" \
+                                backend/api-gateway/src/main/resources/gateway-keystore.p12
 
-                            nohup docker compose -f docker-compose.jenkins.yml up --build \
-                                > compose.log 2>&1 < /dev/null &
+                            docker compose -f docker-compose.jenkins.yml up --build -d
 
-                    '''
+                        '''
+                    }
                 }
 
                 script {

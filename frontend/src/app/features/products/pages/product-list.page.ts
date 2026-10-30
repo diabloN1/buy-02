@@ -447,7 +447,7 @@ export class ProductListPage implements OnInit {
     const formVals = this.filterForm.value;
 
     const isValidDate = (d: any): d is Date =>
-      d instanceof Date && !isNaN(d.getTime());
+      d instanceof Date && !Number.isNaN(d.getTime());
 
     const filters: ProductSearchFilter = {
       keyword: formVals.keyword || undefined,

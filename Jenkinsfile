@@ -335,11 +335,30 @@ pipeline {
                                 backend/api-gateway/src/main/resources/gateway-keystore.p12
 
                             docker compose -f docker-compose.jenkins.yml up --build -d
-
                         '''
                     }
                 }
+            }
+        }
 
+        stage('Deployment Verification') {
+            when {
+                allOf {
+                    expression {
+                        params.DEPLOY
+                    }
+
+                    not {
+                        triggeredBy 'TimerTrigger'
+                    }
+                }
+            }
+
+            agent {
+                label 'deployment'
+            }
+
+            steps {
                 script {
                     retry(6) {
                         sh '''
@@ -369,7 +388,36 @@ pipeline {
 
                     echo "Deployment ${env.IMAGE_TAG} is healthy."
                 }
+            }
 
+            post {
+                failure {
+                    script {
+                        echo 'Deployment verification failed.'
+                        rollbackDeployment()
+                    }
+                }
+            }
+        }
+
+        stage('e2e Verification') {
+            when {
+                allOf {
+                    expression {
+                        params.DEPLOY
+                    }
+
+                    not {
+                        triggeredBy 'TimerTrigger'
+                    }
+                }
+            }
+
+            agent {
+                label 'deployment'
+            }
+
+            steps {
                 script {
                     retry(6) {
                         try {
@@ -394,7 +442,7 @@ pipeline {
 
                 failure {
                     script {
-                        echo 'Deployment verification or E2E tests failed after 5 attempts.'
+                        echo 'E2E tests failed after 5 attempts.'
                         rollbackDeployment()
                     }
                 }

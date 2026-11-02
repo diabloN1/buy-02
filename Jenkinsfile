@@ -582,6 +582,7 @@ pipeline {
                     file(credentialsId: 'GATEWAY_KEYSTORE',
                         variable: 'KEYSTORE_FILE')
         ]) {
+            withEnv(['JENKINS_NODE_COOKIE=dontKillMe']) {
                     sh '''
                 set -eu
 
@@ -606,6 +607,7 @@ pipeline {
                     -f docker-compose.jenkins.yml \
                     up -d --no-build
             '''
+            }
         }
             }
         }

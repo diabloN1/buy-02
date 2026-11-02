@@ -683,7 +683,19 @@ pipeline {
             }
             steps {
                 script {
-                    dir('e2e') {
+                        dir('e2e') {
+                            echo 'Waiting for Auth API to become fully ready...'
+                        sh '''
+                            # Loop until the auth endpoint responds with a 400 or 200 (not 401/403/502/down)
+                            # Sending an empty POST to login returns 400 Bad Request when the security filter is ready
+                            timeout 60 bash -c '
+                                until [ "$(curl -k -s -o /dev/null -w "%{http_code}" -X POST https://localhost:8080/api/users/auth/login -H "Content-Type: application/json" -d "{}")" = "400" ]; do
+                                    echo "Auth service not ready yet (security context loading), waiting 3s..."
+                                    sleep 3
+                                done
+                            '
+                            echo "Auth service is ready!"
+                        '''
                         sh 'npm ci'
                         sh 'npx playwright install'
                         sh 'npx playwright test'

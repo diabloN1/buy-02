@@ -584,29 +584,29 @@ pipeline {
         ]) {
             withEnv(['JENKINS_NODE_COOKIE=dontKillMe']) {
                     sh '''
-                set -eu
+                        set -eu
 
-                export IMAGE_TAG="${IMAGE_TAG}"
+                        export IMAGE_TAG="${IMAGE_TAG}"
 
-                install -d -m 700 frontend/certs
-                install -d -m 700 \
-                    backend/api-gateway/src/main/resources
+                        install -d -m 700 frontend/certs
+                        install -d -m 700 \
+                            backend/api-gateway/src/main/resources
 
-                install -m 600 "$TLS_KEY" \
-                    frontend/certs/frontend.key
-                install -m 644 "$TLS_CRT" \
-                    frontend/certs/frontend.crt
-                install -m 600 "$KEYSTORE_FILE" \
-                    backend/api-gateway/src/main/resources/gateway-keystore.p12
+                        install -m 600 "$TLS_KEY" \
+                            frontend/certs/frontend.key
+                        install -m 644 "$TLS_CRT" \
+                            frontend/certs/frontend.crt
+                        install -m 600 "$KEYSTORE_FILE" \
+                            backend/api-gateway/src/main/resources/gateway-keystore.p12
 
-                docker compose \
-                    -f docker-compose.jenkins.yml \
-                    config --quiet
+                        docker compose \
+                            -f docker-compose.jenkins.yml \
+                            config --quiet
 
-                docker compose \
-                    -f docker-compose.jenkins.yml \
-                    up -d --no-build
-            '''
+                        docker compose \
+                            -f docker-compose.jenkins.yml \
+                            up -d --no-build
+                    '''
             }
         }
             }
@@ -683,19 +683,6 @@ pipeline {
             }
             steps {
                 script {
-                    echo 'Waiting for Auth API to become fully ready...'
-                    sh '''
-                # Loop until the auth endpoint responds with a 400 or 200 (not 401/403/502/down)
-                # Sending an empty POST to login returns 400 Bad Request when the security filter is ready
-                timeout 60 bash -c '
-                    until [ "$(curl -k -s -o /dev/null -w "%{http_code}" -X POST https://localhost:8080/api/users/auth/login -H "Content-Type: application/json" -d "{}")" = "400" ]; do
-                        echo "Auth service not ready yet (security context loading), waiting 3s..."
-                        sleep 3
-                    done
-                '
-                echo "Auth service is ready!"
-            '''
-
                     dir('e2e') {
                         sh 'npm ci'
                         sh 'npx playwright test'

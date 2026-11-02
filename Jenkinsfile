@@ -685,6 +685,7 @@ pipeline {
                 script {
                     dir('e2e') {
                         sh 'npm ci'
+                        sh 'npx playwright install'
                         sh 'npx playwright test'
                     }
                 }

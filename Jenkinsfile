@@ -483,6 +483,14 @@ pipeline {
                         }
                     }
 
+                    sh '''
+                        docker build \
+                            -t localhost:18080/buy-02/minio:latest \
+                            ./deps-setup/minio
+
+                        docker push localhost:18080/buy-02/minio:latest
+                    '''
+
                     sh """
                 set -eu
                 docker build \
@@ -544,7 +552,7 @@ pipeline {
                 docker compose \
                     -f docker-compose.jenkins.yml \
                     pull \
-                    frontend eureka user product media audit cart order api-gateway
+                    frontend eureka user product media audit cart order api-gateway minio
             '''
         }
 

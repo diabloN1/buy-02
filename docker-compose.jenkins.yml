@@ -301,7 +301,7 @@ services:
   minio:
     build:
       context: ./deps-setup/minio
-    image: anlazaar/minio:latest
+    image: localhost:18080/buy-02/minio:latest
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
